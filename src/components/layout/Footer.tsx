@@ -6,7 +6,7 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <h2 className="text-2xl font-bold text-white">
-            Pahadi Pathways
+            The Himalayan Compass
           </h2>
 
           <p className="mt-4 leading-7">
@@ -52,7 +52,7 @@ export default function Footer() {
 
           <div className="mt-4 space-y-3">
             <p>📍 Himachal Pradesh, India</p>
-            <p>📧 info@pahadipathways.com</p>
+            <p>📧 info@thehimalayancompass.com</p>
             <p>📞 +91 XXXXX XXXXX</p>
           </div>
         </div>
@@ -61,9 +61,9 @@ export default function Footer() {
 
       <div className="border-t border-gray-700">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 text-sm text-gray-400 md:flex-row">
-          <p>© 2026 Pahadi Pathways. All rights reserved.</p>
+          <p>© 2026 The Himalayan Compass. All rights reserved.</p>
 
-          <p>Crafted with ❤️ for travelers who love Himachal.</p>
+          <p>Crafted with ❤️ for mountain travelers.</p>
         </div>
       </div>
     </footer>

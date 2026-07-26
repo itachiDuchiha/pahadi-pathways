@@ -1,31 +1,36 @@
-export default function Navbar() {
+import Logo from "./Logo";
+import NavLinks from "./NavLinks";
+
+type NavbarProps = {
+  onPlanTrip: () => void;
+};
+
+export default function Navbar({ onPlanTrip }: NavbarProps) {
   return (
-    <nav className="absolute top-0 left-0 w-full z-50">
-      <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/95 backdrop-blur-md">
+      <div className="mx-auto flex h-24 max-w-7xl items-center justify-between px-8">
 
-        <h1 className="text-2xl font-bold tracking-wide text-white">
-          Pahadi Pathways
-        </h1>
-
-        <div className="hidden md:flex gap-8 text-white font-medium">
-
-          <a href="#">Home</a>
-
-          <a href="#">Destinations</a>
-
-          <a href="#">Packages</a>
-
-          <a href="#">Gallery</a>
-
-          <a href="#">Contact</a>
-
+        {/* Logo */}
+        <div className="flex flex-shrink-0 items-center">
+          <Logo />
         </div>
 
-        <button className="bg-green-700 hover:bg-green-800 transition px-5 py-2 rounded-full text-white">
-          Plan My Trip
-        </button>
+        {/* Navigation */}
+        <nav className="hidden flex-1 justify-center lg:flex">
+          <NavLinks />
+        </nav>
+
+        {/* CTA Button */}
+        <div className="flex flex-shrink-0 items-center">
+          <button
+            onClick={onPlanTrip}
+            className="rounded-full bg-[#C89A3D] px-8 py-3.5 font-semibold text-[#10264A] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#D7AE57] hover:shadow-xl active:scale-95"
+          >
+            Plan My Journey
+          </button>
+        </div>
 
       </div>
-    </nav>
+    </header>
   );
 }
