@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Hero from "@/components/home/Hero";
+import HeroPlanner from "@/components/home/HeroPlanner";
 import FeaturedDestinations from "@/components/home/FeaturedDestinations";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import PopularPackages from "@/components/home/PopularPackages";
@@ -21,6 +22,8 @@ export default function Home() {
     <>
       <main>
         <Hero onPlanTrip={() => setIsModalOpen(true)} />
+
+        <HeroPlanner />
 
         <FeaturedDestinations />
 
