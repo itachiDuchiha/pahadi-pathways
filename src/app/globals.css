@@ -30,3 +30,33 @@ body {
   --brand-gold-light: #D7AE57;
   --brand-gold-dark: #B5852F;
 }
+/* ===== Testimonials Auto Scroll ===== */
+
+@keyframes testimonialScroll {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-testimonial-scroll {
+  animation: testimonialScroll 42s linear infinite;
+  will-change: transform;
+}
+
+.animate-testimonial-scroll:hover {
+  animation-play-state: paused;
+}
+/* Hide Scrollbar */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

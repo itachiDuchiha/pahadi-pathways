@@ -7,7 +7,7 @@ import {
 
 export default function HeroPlanner() {
   return (
-    <section className="relative z-30 -mt-12 mb-2 hidden md:block">
+    <section className="relative z-30 mb-2 hidden md:block">
       <div className="mx-auto flex max-w-6xl items-center rounded-2xl bg-white px-3 py-2 shadow-[0_30px_70px_rgba(0,0,0,0.18)]">
 
         {/* Destination */}
