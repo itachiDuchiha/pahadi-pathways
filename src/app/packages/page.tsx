@@ -1,41 +1,18 @@
 import Image from "next/image";
-import Link from "next/link";
 
-const packages = [
-  {
-    name: "Shimla Escape",
-    location: "Shimla",
-    duration: "3 Days / 2 Nights",
-    description:
-      "A relaxing Himalayan getaway through Shimla's scenic views, colonial charm and peaceful mountain surroundings.",
-    image: "/images/packages/shimla.jpg",
-  },
-  {
-    name: "Manali Adventure",
-    location: "Manali",
-    duration: "5 Days / 4 Nights",
-    description:
-      "Experience the beauty of Manali with mountain landscapes, rivers, forests and unforgettable local experiences.",
-    image: "/images/packages/manali.jpg",
-  },
-  {
-    name: "Spiti Expedition",
-    location: "Spiti Valley",
-    duration: "7 Days / 6 Nights",
-    description:
-      "Journey deep into the remote Himalayas through ancient monasteries, dramatic valleys and breathtaking landscapes.",
-    image: "/images/packages/spiti.jpg",
-  },
-];
+import SiteLayout from "@/components/layout/SiteLayout";
+import PackageCard from "@/components/packages/PackageCard";
+
+import { packages } from "@/data/packages";
 
 export default function PackagesPage() {
   return (
-    <main className="min-h-screen bg-[#F7F3E9]">
+    <SiteLayout>
+      {/* =========================================================
+          HERO
+      ========================================================= */}
 
-      {/* ================= HERO ================= */}
-
-      <section className="relative flex min-h-[55vh] items-center justify-center overflow-hidden">
-
+      <section className="relative flex min-h-[520px] items-center justify-center overflow-hidden md:min-h-[560px]">
         <Image
           src="/images/hero/hero.jpg"
           alt="Himalayan mountain journey"
@@ -44,188 +21,118 @@ export default function PackagesPage() {
           className="object-cover"
         />
 
-        {/* Overlay */}
+        {/* Dark cinematic overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#081526]/80 via-[#081526]/55 to-[#081526]/85" />
 
-        <div className="absolute inset-0 bg-[#081526]/70" />
+        {/* Soft center glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_60%)]" />
 
-        {/* Hero Content */}
+        {/* Hero content */}
+        <div className="relative z-10 mx-auto w-full max-w-4xl px-6 pb-4 pt-24 text-center text-white sm:px-8">
+          {/* Eyebrow */}
+          <div className="flex items-center justify-center gap-3">
+            <span className="h-px w-8 bg-[#C89A3D]/80 sm:w-14" />
 
-        <div className="relative z-10 px-6 pt-24 text-center text-white">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37] sm:text-xs">
+              Handpicked Himalayan Escapes
+            </p>
 
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#D4AF37] md:text-sm">
-            CURATED HIMALAYAN JOURNEYS
-          </p>
+            <span className="h-px w-8 bg-[#C89A3D]/80 sm:w-14" />
+          </div>
 
-          <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl">
+          {/* Heading */}
+          <h1 className="mx-auto mt-6 max-w-3xl font-serif text-[2.75rem] font-medium leading-[1.05] tracking-[-0.02em] sm:text-5xl md:text-6xl">
             Journeys Made
             <br />
-            For You
+            <span className="italic text-[#D4AF37]">For You</span>
           </h1>
 
-          <div className="mx-auto mt-6 h-1 w-24 rounded-full bg-[#C89A3D]" />
+          {/* Divider */}
+          <div className="mx-auto mt-5 flex items-center justify-center gap-3">
+            <span className="h-px w-10 bg-[#C89A3D]/80 sm:w-16" />
 
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-gray-200 md:text-xl">
-            Thoughtfully planned journeys through the mountains,
-            designed around comfort, discovery and authentic experiences.
+            <span className="h-1.5 w-1.5 rounded-full bg-[#D4AF37]" />
+
+            <span className="h-px w-10 bg-[#C89A3D]/80 sm:w-16" />
+          </div>
+
+          {/* Description */}
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-gray-200 sm:text-base sm:leading-7">
+            Thoughtfully planned journeys through the mountains, designed
+            around comfort, discovery and authentic Himalayan experiences.
           </p>
-
         </div>
 
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#081526]/35 to-transparent" />
       </section>
 
+      {/* =========================================================
+          INTRO
+      ========================================================= */}
 
-      {/* ================= INTRO ================= */}
-
-      <section className="mx-auto max-w-5xl px-6 py-20 text-center">
-
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+      <section className="mx-auto max-w-5xl px-6 pb-10 pt-12 text-center md:pb-12 md:pt-14">
+        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
           Our Journeys
         </p>
 
-        <h2 className="mt-4 text-3xl font-bold text-[#10264A] md:text-4xl">
+        <h2 className="mt-3 font-serif text-3xl font-medium text-[#10264A] md:text-4xl">
           Choose Your Himalayan Experience
         </h2>
 
-        <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-gray-600">
-          From short mountain escapes to deeper Himalayan adventures,
-          choose a journey that matches the way you want to travel.
+        <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-gray-600 sm:text-base">
+          From short mountain escapes to deeper Himalayan adventures, choose a
+          journey that matches the way you want to travel.
         </p>
-
       </section>
 
+      {/* =========================================================
+          PACKAGE GRID
+      ========================================================= */}
 
-      {/* ================= PACKAGE CARDS ================= */}
-
-      <section className="mx-auto max-w-7xl px-6 pb-24">
-
-        <div className="grid gap-8 md:grid-cols-3">
-
+      <section className="mx-auto max-w-6xl px-6 pb-16 md:pb-20">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {packages.map((pkg) => (
-            <article
-              key={pkg.name}
-              className="
-                group
-                overflow-hidden
-                rounded-3xl
-                bg-white
-                shadow-lg
-                transition-all
-                duration-500
-                hover:-translate-y-2
-                hover:shadow-2xl
-              "
-            >
-
-              {/* Image */}
-
-              <div className="relative h-[340px] overflow-hidden">
-
-                <Image
-                  src={pkg.image}
-                  alt={pkg.name}
-                  fill
-                  className="
-                    object-cover
-                    transition-transform
-                    duration-700
-                    group-hover:scale-105
-                  "
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/85 via-transparent to-transparent" />
-
-                {/* Image Information */}
-
-                <div className="absolute bottom-6 left-6 text-white">
-
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#D4AF37]">
-                    {pkg.location}
-                  </p>
-
-                  <h3 className="mt-2 text-3xl font-bold">
-                    {pkg.name}
-                  </h3>
-
-                </div>
-
-              </div>
-
-
-              {/* Card Content */}
-
-              <div className="p-7">
-
-                {/* Duration */}
-
-                <div className="mb-5 inline-flex rounded-full bg-[#F7F3E9] px-4 py-2 text-sm font-semibold text-[#10264A]">
-                  {pkg.duration}
-                </div>
-
-                <p className="leading-7 text-gray-600">
-                  {pkg.description}
-                </p>
-
-                <Link
-                  href="#"
-                  className="
-                    mt-6
-                    inline-flex
-                    items-center
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    duration-300
-                    hover:text-[#C89A3D]
-                  "
-                >
-                  View Journey
-                  <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-
-              </div>
-
-            </article>
+            <PackageCard key={pkg.slug} pkg={pkg} />
           ))}
-
         </div>
-
       </section>
 
+      {/* =========================================================
+          CUSTOM JOURNEY
+      ========================================================= */}
 
-      {/* ================= CUSTOM JOURNEY ================= */}
+      <section className="mx-auto max-w-6xl px-6 pb-16 md:pb-20">
+        <div className="relative overflow-hidden rounded-3xl bg-[#10264A] px-7 py-12 text-center text-white sm:px-10 md:px-16 md:py-14">
+          {/* Decorative glow */}
+          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#C89A3D]/10 blur-3xl" />
 
-      <section className="mx-auto max-w-6xl px-6 pb-24">
-
-        <div className="relative overflow-hidden rounded-3xl bg-[#10264A] px-8 py-16 text-center text-white md:px-16">
-
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#C89A3D]/10 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
 
           <div className="relative">
-
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
               Travel Your Way
             </p>
 
-            <h2 className="mt-4 text-3xl font-bold md:text-4xl">
+            <h2 className="mx-auto mt-3 max-w-2xl font-serif text-3xl font-medium md:text-4xl">
               Want Something More Personal?
             </h2>
 
-            <p className="mx-auto mt-5 max-w-2xl leading-8 text-gray-300">
-              Every traveler is different. Tell us what you're looking for
-              and we'll help create a Himalayan journey around you.
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-gray-300 sm:text-base">
+              Every traveler is different. Tell us what you're looking for and
+              we'll help create a Himalayan journey around you.
             </p>
 
             <button
               type="button"
               className="
-                mt-8
+                mt-7
                 rounded-full
                 bg-[#C89A3D]
-                px-8
-                py-4
-                font-semibold
+                px-7
+                py-3.5
+                text-sm
+                font-bold
                 text-[#10264A]
                 shadow-lg
                 transition-all
@@ -233,17 +140,14 @@ export default function PackagesPage() {
                 hover:-translate-y-1
                 hover:bg-[#D7AE57]
                 hover:shadow-xl
+                active:scale-95
               "
             >
               Plan My Journey
             </button>
-
           </div>
-
         </div>
-
       </section>
-
-    </main>
+    </SiteLayout>
   );
 }

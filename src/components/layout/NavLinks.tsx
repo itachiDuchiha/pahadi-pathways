@@ -11,8 +11,8 @@ const links = [
   { name: "Home", href: "/" },
   { name: "Destinations", href: "/destinations" },
   { name: "Packages", href: "/packages" },
-  { name: "Experiences", href: "#" },
-  { name: "Gallery", href: "#" },
+  { name: "Experiences", href: "/experiences" },
+  { name: "Gallery", href: "/gallery" },
 ];
 
 export default function NavLinks({ scrolled }: NavLinksProps) {

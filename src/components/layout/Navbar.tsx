@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Menu, Phone, X } from "lucide-react";
+import { Menu, Phone, User, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
@@ -11,13 +12,25 @@ type NavbarProps = {
 };
 
 export default function Navbar({ onPlanTrip }: NavbarProps) {
+  const pathname = usePathname();
+
   const [scrolled, setScrolled] = useState(false);
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* ================= SCROLL DETECTION ================= */
+  /*
+   * Package detail pages use a light navbar from the start
+   * because their Hero begins with a light cream background.
+   *
+   * /packages itself is NOT included here, so its existing
+   * transparent-over-hero behavior remains unchanged.
+   */
+  const isPackageDetailPage =
+    pathname.startsWith("/packages/") && pathname !== "/packages";
+
+  const lightNavbar = scrolled || isPackageDetailPage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,8 +45,6 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  /* ================= PHONE POPUP ================= */
 
   const openPhonePopup = () => {
     if (closeTimer.current) {
@@ -54,8 +65,6 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
     }, 250);
   };
 
-  /* ================= MOBILE MENU ================= */
-
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((previous) => !previous);
     setIsPhoneOpen(false);
@@ -65,59 +74,71 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
     setIsMobileMenuOpen(false);
   };
 
-  const handleMobilePlanTrip = () => {
-    setIsMobileMenuOpen(false);
-    onPlanTrip();
-  };
-
   return (
-    <header
-      className={`
-        fixed
-        left-0
-        right-0
-        top-0
-        z-50
-        w-full
-        transition-all
-        duration-300
-        ${
-          scrolled
-            ? "border-b border-gray-200 bg-white/95 shadow-md backdrop-blur-md"
-            : "border-b border-white/10 bg-transparent"
-        }
-      `}
-    >
-      {/* ================= NAVBAR ================= */}
+    <header className="fixed left-0 right-0 top-0 z-50 w-full">
+      {/* =========================================================
+          NAVBAR BACKGROUND
+      ========================================================= */}
 
       <div
-        className="
-          mx-auto
-          flex
-          h-[96px]
-          max-w-7xl
-          items-center
-          justify-between
-          px-5
-          sm:px-6
-          lg:px-8
-        "
-      >
-        {/* LOGO */}
+        className={`
+          absolute
+          inset-0
+          -z-10
+          border-b
+          transition-all
+          duration-500
+          ease-in-out
+          ${
+            lightNavbar
+              ? "border-gray-200 bg-white/95 shadow-md backdrop-blur-md"
+              : "border-white/10 bg-transparent"
+          }
+        `}
+      />
+
+      <div className="mx-auto flex h-[96px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
+        {/* =========================================================
+            LOGO
+        ========================================================= */}
 
         <div className="flex shrink-0 items-center">
           <Logo />
         </div>
 
-        {/* ================= DESKTOP NAVIGATION ================= */}
+        {/* =========================================================
+            DESKTOP NAVIGATION
+        ========================================================= */}
 
         <nav className="hidden flex-1 justify-center lg:flex">
-          <NavLinks scrolled={scrolled} />
+          <NavLinks scrolled={lightNavbar} />
         </nav>
 
-        {/* ================= DESKTOP RIGHT SIDE ================= */}
+        {/* =========================================================
+            DESKTOP RIGHT SIDE
+        ========================================================= */}
 
-        <div className="hidden shrink-0 items-center gap-4 lg:flex">
+        <div className="hidden shrink-0 items-center gap-5 lg:flex">
+          {/* LOGIN */}
+
+          <a
+            href="/login"
+            className={`group/login relative flex items-center gap-2 py-2 font-semibold transition-colors duration-300 ${
+              lightNavbar
+                ? "text-[#10264A] hover:text-[#C89A3D]"
+                : "text-white hover:text-[#C89A3D]"
+            }`}
+          >
+            <User
+              size={18}
+              strokeWidth={2}
+              className="transition-colors duration-300 group-hover/login:text-[#C89A3D]"
+            />
+
+            <span>Login</span>
+
+            <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-[#C89A3D] transition-all duration-300 group-hover/login:w-full" />
+          </a>
 
           {/* PHONE */}
 
@@ -132,23 +153,11 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
               onClick={openPhonePopup}
               onFocus={openPhonePopup}
               onBlur={closePhonePopup}
-              className={`
-                flex
-                h-12
-                w-12
-                items-center
-                justify-center
-                rounded-full
-                shadow-lg
-                backdrop-blur-md
-                transition-all
-                duration-300
-                ${
-                  scrolled
-                    ? "bg-[#10264A]/5 text-[#10264A] hover:bg-[#10264A]/10"
-                    : "bg-white/15 text-white hover:bg-white/25"
-                }
-              `}
+              className={`flex h-12 w-12 items-center justify-center rounded-full shadow-lg backdrop-blur-md transition-all duration-300 ${
+                lightNavbar
+                  ? "bg-[#10264A]/5 text-[#10264A] hover:bg-[#C89A3D]/15 hover:text-[#C89A3D]"
+                  : "bg-white/15 text-white hover:bg-[#C89A3D]/20 hover:text-[#C89A3D]"
+              }`}
             >
               <Phone size={21} strokeWidth={2} />
             </button>
@@ -158,38 +167,13 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
             <div
               onMouseEnter={openPhonePopup}
               onMouseLeave={closePhonePopup}
-              className={`
-                absolute
-                right-0
-                top-[62px]
-                w-[240px]
-                rounded-2xl
-                bg-white
-                p-4
-                text-left
-                shadow-[0_15px_40px_rgba(0,0,0,0.18)]
-                transition-all
-                duration-200
-                ${
-                  isPhoneOpen
-                    ? "visible translate-y-0 opacity-100"
-                    : "invisible translate-y-2 opacity-0"
-                }
-              `}
+              className={`absolute right-0 top-[62px] w-[240px] rounded-2xl bg-white p-4 text-left shadow-[0_15px_40px_rgba(0,0,0,0.18)] transition-all duration-200 ${
+                isPhoneOpen
+                  ? "visible translate-y-0 opacity-100"
+                  : "invisible translate-y-2 opacity-0"
+              }`}
             >
-              {/* Arrow */}
-
-              <div
-                className="
-                  absolute
-                  -top-2
-                  right-5
-                  h-4
-                  w-4
-                  rotate-45
-                  bg-white
-                "
-              />
+              <div className="absolute -top-2 right-5 h-4 w-4 rotate-45 bg-white" />
 
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#C89A3D]">
                 Call Us
@@ -197,33 +181,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
 
               <a
                 href="tel:+919876543210"
-                className="
-                  mt-3
-                  flex
-                  items-center
-                  gap-3
-                  rounded-xl
-                  bg-[#F7F3E9]
-                  px-3
-                  py-3
-                  text-[#10264A]
-                  transition-all
-                  duration-300
-                  hover:bg-[#C89A3D]/20
-                "
+                className="mt-3 flex items-center gap-3 rounded-xl bg-[#F7F3E9] px-3 py-3 text-[#10264A] transition-all duration-300 hover:bg-[#C89A3D]/20"
               >
-                <div
-                  className="
-                    flex
-                    h-9
-                    w-9
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#C89A3D]
-                  "
-                >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C89A3D]">
                   <Phone
                     size={17}
                     className="text-[#10264A]"
@@ -242,60 +202,28 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
               </a>
             </div>
           </div>
-
-          {/* PLAN MY JOURNEY */}
-
-          <button
-            onClick={onPlanTrip}
-            className="
-              rounded-full
-              bg-[#C89A3D]
-              px-8
-              py-3.5
-              font-semibold
-              text-[#10264A]
-              shadow-lg
-              transition-all
-              duration-300
-              hover:-translate-y-1
-              hover:bg-[#D7AE57]
-              hover:shadow-xl
-              active:scale-95
-            "
-          >
-            Plan My Journey
-          </button>
         </div>
 
-        {/* ================= MOBILE RIGHT SIDE ================= */}
+        {/* =========================================================
+            MOBILE RIGHT SIDE
+        ========================================================= */}
 
         <div className="flex items-center gap-2 lg:hidden">
-
-          {/* PHONE */}
+          {/* MOBILE PHONE */}
 
           <a
             href="tel:+919876543210"
             aria-label="Call The Himalayan Compass"
-            className={`
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-              rounded-full
-              transition-all
-              duration-300
-              ${
-                scrolled
-                  ? "bg-[#10264A]/5 text-[#10264A]"
-                  : "bg-white/15 text-white backdrop-blur-md"
-              }
-            `}
+            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all duration-300 ${
+              lightNavbar
+                ? "bg-[#10264A]/5 text-[#10264A] hover:bg-[#C89A3D]/15 hover:text-[#C89A3D]"
+                : "bg-white/15 text-white backdrop-blur-md hover:bg-[#C89A3D]/20 hover:text-[#C89A3D]"
+            }`}
           >
             <Phone size={20} strokeWidth={2} />
           </a>
 
-          {/* MENU BUTTON */}
+          {/* MOBILE MENU BUTTON */}
 
           <button
             type="button"
@@ -306,21 +234,11 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
             }
             aria-expanded={isMobileMenuOpen}
             onClick={toggleMobileMenu}
-            className={`
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-              rounded-full
-              transition-all
-              duration-300
-              ${
-                scrolled
-                  ? "bg-[#10264A]/5 text-[#10264A]"
-                  : "bg-white/15 text-white backdrop-blur-md"
-              }
-            `}
+            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all duration-300 ${
+              lightNavbar
+                ? "bg-[#10264A]/5 text-[#10264A]"
+                : "bg-white/15 text-white backdrop-blur-md"
+            }`}
           >
             {isMobileMenuOpen ? (
               <X size={23} />
@@ -331,48 +249,27 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
         </div>
       </div>
 
-      {/* ================= MOBILE MENU ================= */}
+      {/* =========================================================
+          MOBILE MENU
+      ========================================================= */}
 
       <div
-        className={`
-          overflow-hidden
-          border-t
-          border-gray-200
-          bg-white
-          transition-all
-          duration-300
-          lg:hidden
-          ${
-            isMobileMenuOpen
-              ? "max-h-[500px] opacity-100"
-              : "max-h-0 opacity-0"
-          }
-        `}
+        className={`overflow-hidden border-t border-gray-200 bg-white transition-all duration-300 lg:hidden ${
+          isMobileMenuOpen
+            ? "max-h-[500px] opacity-100"
+            : "max-h-0 opacity-0"
+        }`}
       >
         <div className="px-6 pb-6 pt-5">
-
-          {/* MOBILE LINKS */}
-
           <nav>
             <ul className="space-y-1">
-
               {/* HOME */}
 
               <li>
                 <a
                   href="/"
                   onClick={closeMobileMenu}
-                  className="
-                    block
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
+                  className="block rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
                 >
                   Home
                 </a>
@@ -384,17 +281,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                 <a
                   href="/destinations"
                   onClick={closeMobileMenu}
-                  className="
-                    block
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
+                  className="block rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
                 >
                   Destinations
                 </a>
@@ -406,17 +293,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                 <a
                   href="/packages"
                   onClick={closeMobileMenu}
-                  className="
-                    block
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
+                  className="block rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
                 >
                   Packages
                 </a>
@@ -426,19 +303,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
 
               <li>
                 <a
-                  href="#"
+                  href="/experiences"
                   onClick={closeMobileMenu}
-                  className="
-                    block
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
+                  className="block rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
                 >
                   Experiences
                 </a>
@@ -448,54 +315,30 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
 
               <li>
                 <a
-                  href="#"
+                  href="/gallery"
                   onClick={closeMobileMenu}
-                  className="
-                    block
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
+                  className="block rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
                 >
                   Gallery
                 </a>
               </li>
 
+              {/* LOGIN */}
+
+              <li>
+                <a
+                  href="/login"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-2 rounded-xl px-4 py-3 font-semibold text-[#10264A] transition-colors hover:bg-[#F7F3E9] hover:text-[#C89A3D]"
+                >
+                  <User size={18} />
+                  Login
+                </a>
+              </li>
             </ul>
           </nav>
-
-          {/* MOBILE CTA */}
-
-          <button
-            type="button"
-            onClick={handleMobilePlanTrip}
-            className="
-              mt-5
-              w-full
-              rounded-full
-              bg-[#C89A3D]
-              px-6
-              py-3.5
-              font-semibold
-              text-[#10264A]
-              shadow-md
-              transition-all
-              duration-300
-              hover:bg-[#D7AE57]
-              active:scale-[0.98]
-            "
-          >
-            Plan My Journey
-          </button>
-
         </div>
       </div>
-
     </header>
   );
 }

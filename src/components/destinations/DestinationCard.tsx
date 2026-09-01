@@ -29,10 +29,7 @@ export default function DestinationCard({
         hover:shadow-2xl
       "
     >
-      {/* Image */}
-
-      <div className="relative h-[340px] overflow-hidden">
-
+      <div className="relative h-[300px] overflow-hidden">
         <Image
           src={destination.image}
           alt={destination.name}
@@ -45,37 +42,26 @@ export default function DestinationCard({
           "
         />
 
-        {/* Overlay */}
-
-        <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/90 via-transparent to-transparent" />
-
-        {/* Category Badge */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/90 via-[#081526]/15 to-transparent" />
 
         {destination.category && (
-          <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-[#10264A] backdrop-blur">
+          <div className="absolute left-5 top-5 rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#10264A] backdrop-blur">
             {destination.category}
           </div>
         )}
 
-        {/* Title */}
-
-        <div className="absolute bottom-6 left-6 right-6 text-white">
-
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">
+        <div className="absolute bottom-5 left-5 right-5 text-white">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D4AF37]">
             {destination.subtitle}
           </p>
 
-          <h3 className="mt-2 text-3xl font-bold">
+          <h3 className="mt-1.5 text-2xl font-bold">
             {destination.name}
           </h3>
-
         </div>
       </div>
 
-      {/* Content */}
-
-      <div className="p-7">
-
+      <div className="p-6">
         <p className="leading-7 text-gray-600">
           {destination.description}
         </p>
@@ -83,7 +69,7 @@ export default function DestinationCard({
         <Link
           href={`/destinations/${destination.slug}`}
           className="
-            mt-7
+            mt-6
             inline-flex
             items-center
             font-semibold
@@ -99,7 +85,6 @@ export default function DestinationCard({
             →
           </span>
         </Link>
-
       </div>
     </article>
   );

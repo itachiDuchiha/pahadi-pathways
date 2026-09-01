@@ -1,5 +1,7 @@
+import SiteLayout from "@/components/layout/SiteLayout";
 import DestinationsHero from "@/components/destinations/DestinationsHero";
 import DestinationSection from "@/components/destinations/DestinationSection";
+import TravelThemes from "@/components/destinations/TravelThemes";
 
 import {
   featuredJourneys,
@@ -10,37 +12,24 @@ import {
 
 export default function DestinationsPage() {
   return (
-    <main className="bg-[#FCFBF8]">
+    <SiteLayout>
+      {/* ================= HERO ================= */}
 
       <DestinationsHero />
 
-      {/* ================= INTRO ================= */}
+      {/* ================= TRAVEL THEMES ================= */}
 
-      <section className="mx-auto max-w-5xl px-6 py-20 text-center">
+      <TravelThemes />
 
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-          Explore Himachal
-        </p>
+      {/* ================= FEATURED JOURNEYS ================= */}
 
-        <h2 className="mt-4 text-3xl font-bold text-[#10264A] md:text-4xl">
-          Every Journey Begins With A Place
-        </h2>
-
-        <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600">
-          From famous hill stations to hidden Himalayan villages,
-          discover destinations that inspire unforgettable journeys.
-          Browse by travel style and find the places that speak to you.
-        </p>
-
-      </section>
-
-      {/* ================= FEATURED ================= */}
-
-      <DestinationSection
-        title="Featured Journeys"
-        subtitle="Our Most Loved Destinations"
-        destinations={featuredJourneys}
-      />
+      <div id="destinations" className="scroll-mt-[96px]">
+        <DestinationSection
+          title="Featured Journeys"
+          subtitle="Our Most Loved Destinations"
+          destinations={featuredJourneys}
+        />
+      </div>
 
       {/* ================= ALONG THE WAY ================= */}
 
@@ -66,32 +55,99 @@ export default function DestinationsPage() {
         destinations={cultureAndSoul}
       />
 
+      {/* ================= DESTINATION GUIDE ================= */}
+
+      <section className="bg-[#F7F3E9] py-14 md:py-16">
+        <div className="mx-auto max-w-5xl px-6">
+          <div className="text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+              Himalayan Guide
+            </p>
+
+            <h2 className="mt-3 font-serif text-3xl font-medium text-[#10264A] md:text-4xl">
+              Places to Visit in Himachal Pradesh
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-3xl leading-7 text-gray-600">
+              Himachal is not one single kind of destination. Each region has
+              its own landscape, atmosphere and character — from popular hill
+              stations and adventure valleys to remote villages and ancient
+              Himalayan settlements.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {/* WESTERN HIMACHAL */}
+
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-[#10264A]">
+                Western Himachal
+              </h3>
+
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                Explore destinations such as Dharamshala, McLeod Ganj,
+                Dalhousie and Khajjiar, where forests, valleys and mountain
+                culture come together.
+              </p>
+            </div>
+
+            {/* CENTRAL HIMACHAL */}
+
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-[#10264A]">
+                Central Himachal
+              </h3>
+
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                Discover classic Himalayan escapes around Shimla, Manali,
+                Kullu and nearby valleys, with a mix of scenery, adventure and
+                familiar mountain towns.
+              </p>
+            </div>
+
+            {/* HIGH HIMALAYAS */}
+
+            <div className="rounded-2xl bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-[#10264A]">
+                High Himalayas
+              </h3>
+
+              <p className="mt-3 text-sm leading-7 text-gray-600">
+                Travel deeper into Kinnaur and Spiti for dramatic landscapes,
+                ancient monasteries, high mountain roads and remote Himalayan
+                villages.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ================= CTA ================= */}
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
-
-        <div className="relative overflow-hidden rounded-3xl bg-[#10264A] px-8 py-16 text-center text-white md:px-16">
+      <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+        <div className="relative overflow-hidden rounded-3xl bg-[#10264A] px-8 py-12 text-center text-white md:px-16 md:py-16">
+          {/* Decorative glow */}
 
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#C89A3D]/10 blur-3xl" />
 
           <div className="relative">
-
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
               Can't Decide?
             </p>
 
-            <h2 className="mt-4 text-3xl font-bold md:text-4xl">
+            <h2 className="mt-3 font-serif text-3xl font-medium md:text-4xl">
               Let Us Plan Your Himalayan Journey
             </h2>
 
-            <p className="mx-auto mt-5 max-w-2xl leading-8 text-gray-300">
-              Tell us your travel dates, interests and budget.
-              We'll recommend the perfect route through Himachal Pradesh.
+            <p className="mx-auto mt-4 max-w-2xl leading-7 text-gray-300">
+              Tell us your travel dates, interests and budget. We'll recommend
+              the perfect route through Himachal Pradesh.
             </p>
 
             <button
+              type="button"
               className="
-                mt-8
+                mt-7
                 rounded-full
                 bg-[#C89A3D]
                 px-8
@@ -108,13 +164,9 @@ export default function DestinationsPage() {
             >
               Plan My Journey
             </button>
-
           </div>
-
         </div>
-
       </section>
-
-    </main>
+    </SiteLayout>
   );
 }
