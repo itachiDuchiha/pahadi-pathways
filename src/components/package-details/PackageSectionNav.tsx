@@ -14,19 +14,15 @@ const sections: Section[] = [
   },
   {
     id: "itinerary",
-    label: "Day-by-Day Journey",
+    label: "Detailed Itinerary",
   },
   {
     id: "stays",
     label: "Stays",
   },
   {
-    id: "highlights",
-    label: "Journey Highlights",
-  },
-  {
     id: "inclusions",
-    label: "Inclusions & Exclusions",
+    label: "What's Included",
   },
   {
     id: "things-to-know",
@@ -43,37 +39,75 @@ const sections: Section[] = [
 ];
 
 export default function PackageSectionNav() {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] =
+    useState("overview");
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSections = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              a.boundingClientRect.top - b.boundingClientRect.top
-          );
+    let ticking = false;
 
-        if (visibleSections.length > 0) {
-          setActiveSection(visibleSections[0].target.id);
+    const updateActiveSection = () => {
+      /*
+       * Main navbar = approximately 96px
+       * Package section navbar = approximately 52px
+       *
+       * We use a point slightly below both navbars
+       * to decide which section is currently being viewed.
+       */
+      const activationPoint = 175;
+
+      let currentSection = sections[0].id;
+
+      for (const section of sections) {
+        const element = document.getElementById(section.id);
+
+        if (!element) continue;
+
+        const top =
+          element.getBoundingClientRect().top;
+
+        if (top <= activationPoint) {
+          currentSection = section.id;
         }
-      },
-      {
-        rootMargin: "-150px 0px -55% 0px",
-        threshold: 0,
       }
+
+      setActiveSection(currentSection);
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(
+          updateActiveSection
+        );
+
+        ticking = true;
+      }
+    };
+
+    updateActiveSection();
+
+    window.addEventListener(
+      "scroll",
+      handleScroll,
+      { passive: true }
     );
 
-    sections.forEach(({ id }) => {
-      const element = document.getElementById(id);
+    window.addEventListener(
+      "resize",
+      updateActiveSection
+    );
 
-      if (element) {
-        observer.observe(element);
-      }
-    });
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
 
-    return () => observer.disconnect();
+      window.removeEventListener(
+        "resize",
+        updateActiveSection
+      );
+    };
   }, []);
 
   const handleClick = (
@@ -82,90 +116,90 @@ export default function PackageSectionNav() {
   ) => {
     event.preventDefault();
 
-    const element = document.getElementById(id);
+    const element =
+      document.getElementById(id);
 
     if (!element) return;
 
-    const navbarOffset = 135;
+    /*
+     * Leave enough space for:
+     * Main navbar + package navbar.
+     */
+    const offset = 155;
 
-    const elementPosition =
-      element.getBoundingClientRect().top + window.scrollY;
+    const elementTop =
+      element.getBoundingClientRect().top +
+      window.scrollY;
 
     window.scrollTo({
-      top: elementPosition - navbarOffset,
+      top: elementTop - offset,
       behavior: "smooth",
     });
 
     setActiveSection(id);
+
+    window.history.replaceState(
+      null,
+      "",
+      `#${id}`
+    );
   };
 
   return (
     <nav
+      aria-label="Package sections"
       className="
         sticky
-        top-[72px]
+        top-[96px]
         z-40
+        w-full
         border-y
         border-[#10264A]/10
-        bg-white/95
-        shadow-[0_4px_18px_rgba(16,38,74,0.06)]
+        bg-white/97
+        shadow-[0_4px_18px_rgba(16,38,74,0.08)]
         backdrop-blur-md
       "
-      aria-label="Package sections"
     >
-      <div className="mx-auto max-w-6xl overflow-x-auto px-5 sm:px-6">
-        <div className="flex min-w-max items-center gap-1">
+      <div className="w-full px-3 sm:px-5 lg:px-6">
+        <div className="flex w-full items-stretch">
           {sections.map((section) => {
-            const isActive = activeSection === section.id;
+            const isActive =
+              activeSection === section.id;
 
             return (
               <a
                 key={section.id}
                 href={`#${section.id}`}
                 onClick={(event) =>
-                  handleClick(event, section.id)
+                  handleClick(
+                    event,
+                    section.id
+                  )
                 }
                 className={`
-                  relative
+                  flex
+                  flex-1
+                  items-center
+                  justify-center
                   whitespace-nowrap
-                  px-3
+                  px-2
                   py-4
-                  text-[11px]
+                  text-center
+                  text-[13px]
                   font-semibold
                   tracking-[0.01em]
                   transition-colors
                   duration-200
-                  sm:px-4
-                  sm:text-[12px]
+                  sm:px-2
+                  sm:text-[14px]
                   ${
                     isActive
-                      ? "text-[#10264A]"
-                      : "text-gray-500 hover:text-[#10264A]"
+                      ? "bg-[#DDBE73] text-[#10264A]"
+                      : "text-[#52627A] hover:bg-[#F7F3E9] hover:text-[#10264A]"
                   }
                 `}
               >
                 {section.label}
-
-                <span
-                  className={`
-                    absolute
-                    bottom-0
-                    left-3
-                    right-3
-                    h-[2px]
-                    rounded-full
-                    bg-[#C89A3D]
-                    transition-all
-                    duration-200
-                    sm:left-4
-                    sm:right-4
-                    ${
-                      isActive
-                        ? "scale-x-100 opacity-100"
-                        : "scale-x-0 opacity-0"
-                    }
-                  `}
-                />
               </a>
             );
           })}

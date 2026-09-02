@@ -21,8 +21,8 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /*
-   * Package detail pages use a light navbar from the start
-   * because their Hero begins with a light cream background.
+   * Package detail pages use a light premium navbar from the start
+   * because their Hero begins with a light background.
    *
    * /packages itself is NOT included here, so its existing
    * transparent-over-hero behavior remains unchanged.
@@ -90,9 +90,11 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
           duration-500
           ease-in-out
           ${
-            lightNavbar
-              ? "border-gray-200 bg-white/95 shadow-md backdrop-blur-md"
-              : "border-white/10 bg-transparent"
+            isPackageDetailPage
+              ? "border-[#10264A]/10 bg-[#FAF9F5]/95 shadow-[0_4px_20px_rgba(16,38,74,0.08)] backdrop-blur-md"
+              : lightNavbar
+                ? "border-gray-200 bg-white/95 shadow-md backdrop-blur-md"
+                : "border-white/10 bg-transparent"
           }
         `}
       />
@@ -119,7 +121,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
         ========================================================= */}
 
         <div className="hidden shrink-0 items-center gap-5 lg:flex">
-          {/* LOGIN */}
+          {/* =====================================================
+              LOGIN
+          ===================================================== */}
 
           <a
             href="/login"
@@ -140,7 +144,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
             <span className="absolute bottom-0 left-0 h-[2px] w-0 rounded-full bg-[#C89A3D] transition-all duration-300 group-hover/login:w-full" />
           </a>
 
-          {/* PHONE */}
+          {/* =====================================================
+              PHONE
+          ===================================================== */}
 
           <div
             className="relative"
@@ -162,7 +168,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
               <Phone size={21} strokeWidth={2} />
             </button>
 
-            {/* PHONE POPUP */}
+            {/* ===================================================
+                PHONE POPUP
+            =================================================== */}
 
             <div
               onMouseEnter={openPhonePopup}
@@ -209,7 +217,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
         ========================================================= */}
 
         <div className="flex items-center gap-2 lg:hidden">
-          {/* MOBILE PHONE */}
+          {/* =====================================================
+              MOBILE PHONE
+          ===================================================== */}
 
           <a
             href="tel:+919876543210"
@@ -223,7 +233,9 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
             <Phone size={20} strokeWidth={2} />
           </a>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* =====================================================
+              MOBILE MENU BUTTON
+          ===================================================== */}
 
           <button
             type="button"

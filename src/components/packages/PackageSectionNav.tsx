@@ -37,35 +37,61 @@ export default function PackageSectionNav() {
   const [activeSection, setActiveSection] = useState("overview");
 
   useEffect(() => {
-    const sectionElements = sections
-      .map((section) => document.getElementById(section.id))
-      .filter(Boolean) as HTMLElement[];
+    let ticking = false;
 
-    if (!sectionElements.length) return;
+    const updateActiveSection = () => {
+      const scrollPosition = window.scrollY;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleSections = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort(
-            (a, b) =>
-              a.boundingClientRect.top - b.boundingClientRect.top
-          );
+      /*
+        Main website navbar:
+        96px tall
 
-        if (visibleSections.length > 0) {
-          setActiveSection(visibleSections[0].target.id);
+        Package section navbar:
+        sits directly underneath it
+
+        We use a combined offset so the active section
+        changes at the correct visual position.
+      */
+      const offset = 150;
+
+      let currentSection = sections[0].id;
+
+      for (const section of sections) {
+        const element = document.getElementById(section.id);
+
+        if (!element) continue;
+
+        const sectionTop =
+          element.getBoundingClientRect().top + window.scrollY;
+
+        if (scrollPosition + offset >= sectionTop) {
+          currentSection = section.id;
         }
-      },
-      {
-        root: null,
-        rootMargin: "-130px 0px -55% 0px",
-        threshold: 0,
       }
-    );
 
-    sectionElements.forEach((section) => observer.observe(section));
+      setActiveSection(currentSection);
+      ticking = false;
+    };
 
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateActiveSection);
+        ticking = true;
+      }
+    };
+
+    updateActiveSection();
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateActiveSection);
+    };
   }, []);
 
   const scrollToSection = (id: string) => {
@@ -73,20 +99,47 @@ export default function PackageSectionNav() {
 
     if (!element) return;
 
-    element.scrollIntoView({
+    /*
+      Main navbar = 96px
+      Package section nav = approximately 50px
+
+      This keeps the selected heading visible
+      instead of hiding it behind either navbar.
+    */
+    const offset = 150;
+
+    const elementPosition =
+      element.getBoundingClientRect().top + window.scrollY;
+
+    window.scrollTo({
+      top: elementPosition - offset,
       behavior: "smooth",
-      block: "start",
     });
 
     window.history.replaceState(null, "", `#${id}`);
   };
 
   return (
-    <div className="sticky top-24 z-40 border-y border-[#10264A]/10 bg-white/95 shadow-sm backdrop-blur-md">
+    <div
+      className="
+        sticky
+        top-[96px]
+        z-40
+        border-y
+        border-[#10264A]/10
+        bg-white/95
+        shadow-sm
+        backdrop-blur-md
+      "
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6">
         <nav
           aria-label="Package sections"
-          className="flex overflow-x-auto scrollbar-none"
+          className="
+            flex
+            overflow-x-auto
+            scrollbar-none
+          "
         >
           {sections.map((section) => {
             const isActive = activeSection === section.id;
@@ -111,19 +164,20 @@ export default function PackageSectionNav() {
                   ${
                     isActive
                       ? "text-[#10264A]"
-                      : "text-gray-500 hover:text-[#10264A]"
+                      : "text-[#64748B] hover:text-[#10264A]"
                   }
                 `}
               >
                 {section.label}
 
+                {/* Active gold indicator */}
                 <span
                   className={`
                     absolute
                     bottom-0
                     left-3
                     right-3
-                    h-[2px]
+                    h-[3px]
                     rounded-full
                     bg-[#C89A3D]
                     transition-all

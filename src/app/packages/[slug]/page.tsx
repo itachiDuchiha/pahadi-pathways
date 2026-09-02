@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import SiteLayout from "@/components/layout/SiteLayout";
 
 import Hero from "@/components/package-details/Hero";
+import PackageSectionNav from "@/components/package-details/PackageSectionNav";
+
 import Overview from "@/components/package-details/Overview";
 import QuickFacts from "@/components/package-details/QuickFacts";
 import StayPlan from "@/components/package-details/StayPlan";
@@ -10,9 +12,11 @@ import DayTimeline from "@/components/package-details/DayTimeline";
 import Highlights from "@/components/package-details/Highlights";
 import IncludedExcluded from "@/components/package-details/IncludedExcluded";
 import TravelNote from "@/components/package-details/TravelNote";
-import BookingCard from "@/components/package-details/BookingCard";
 
-import PackageSectionNav from "@/components/packages/PackageSectionNav";
+import CancellationPolicy from "@/components/package-details/CancellationPolicy";
+import TermsConditions from "@/components/package-details/TermsConditions";
+
+import PackageBookingPanel from "@/components/package-details/PackageBookingPanel";
 
 import { packages } from "@/data/packages";
 
@@ -36,6 +40,7 @@ export default async function PackageDetailsPage({
   return (
     <SiteLayout>
       <main>
+
         {/* =========================================================
             PACKAGE HERO
         ========================================================= */}
@@ -49,52 +54,118 @@ export default async function PackageDetailsPage({
         <PackageSectionNav />
 
         {/* =========================================================
-            OVERVIEW
+            MAIN PACKAGE CONTENT
         ========================================================= */}
 
-        <Overview pkg={pkg} />
+        <div className="mx-auto max-w-7xl px-5 sm:px-6">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
 
-        {/* =========================================================
-            QUICK FACTS
-        ========================================================= */}
+            {/* =====================================================
+                LEFT — PACKAGE DETAILS
+            ===================================================== */}
 
-        <QuickFacts pkg={pkg} />
+            <div className="min-w-0">
 
-        {/* =========================================================
-            STAY PLAN
-        ========================================================= */}
+              {/* OVERVIEW */}
 
-        <StayPlan pkg={pkg} />
+              <section
+                id="overview"
+                className="scroll-mt-32"
+              >
+                <Overview pkg={pkg} />
+              </section>
 
-        {/* =========================================================
-            DAY-BY-DAY ITINERARY
-        ========================================================= */}
+              {/* QUICK FACTS */}
 
-        <DayTimeline pkg={pkg} />
+              <section
+                id="quick-facts"
+                className="scroll-mt-32"
+              >
+                <QuickFacts pkg={pkg} />
+              </section>
 
-        {/* =========================================================
-            HIGHLIGHTS
-        ========================================================= */}
+              {/* DETAILED ITINERARY */}
 
-        <Highlights pkg={pkg} />
+              <section
+                id="itinerary"
+                className="scroll-mt-32"
+              >
+                <DayTimeline pkg={pkg} />
+              </section>
 
-        {/* =========================================================
-            INCLUDED / EXCLUDED
-        ========================================================= */}
+              {/* STAYS */}
 
-        <IncludedExcluded pkg={pkg} />
+              <section
+                id="stays"
+                className="scroll-mt-32"
+              >
+                <StayPlan pkg={pkg} />
+              </section>
 
-        {/* =========================================================
-            TRAVEL NOTE
-        ========================================================= */}
+              {/* INCLUSIONS */}
 
-        <TravelNote pkg={pkg} />
+              <section
+                id="inclusions"
+                className="scroll-mt-32"
+              >
+                <IncludedExcluded pkg={pkg} />
+              </section>
 
-        {/* =========================================================
-            BOOKING / ENQUIRY
-        ========================================================= */}
+              {/* THINGS TO KNOW */}
 
-        <BookingCard pkg={pkg} />
+              <section
+                id="things-to-know"
+                className="scroll-mt-32"
+              >
+                <TravelNote pkg={pkg} />
+              </section>
+
+              {/* TERMS & CONDITIONS */}
+
+              <section
+                id="terms"
+                className="scroll-mt-32"
+              >
+                <TermsConditions />
+              </section>
+
+              {/* CANCELLATION POLICY */}
+
+              <section
+                id="cancellation"
+                className="scroll-mt-32"
+              >
+                <CancellationPolicy />
+              </section>
+
+            </div>
+
+            {/* =====================================================
+                RIGHT — PACKAGE PLANNER
+            ===================================================== */}
+
+            <aside className="hidden lg:block">
+
+              <div
+                className="
+                  sticky
+                  top-[145px]
+                  max-h-[calc(100vh-165px)]
+                  overflow-y-auto
+                  pr-1
+                  scrollbar-thin
+                  scrollbar-thumb-[#C89A3D]/40
+                  scrollbar-track-transparent
+                "
+              >
+                <PackageBookingPanel pkg={pkg} />
+              </div>
+
+            </aside>
+
+          </div>
+        </div>
+
       </main>
     </SiteLayout>
   );
