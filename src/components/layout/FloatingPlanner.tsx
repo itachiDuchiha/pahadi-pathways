@@ -1,6 +1,6 @@
 "use client";
 
-import { Map } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 
 type FloatingPlannerProps = {
   onOpen: () => void;
@@ -11,8 +11,9 @@ export default function FloatingPlanner({
 }: FloatingPlannerProps) {
   return (
     <button
+      type="button"
       onClick={onOpen}
-      aria-label="Plan a custom trip"
+      aria-label="Plan my trip"
       className="
         fixed
         bottom-6
@@ -20,22 +21,22 @@ export default function FloatingPlanner({
         z-40
         flex
         items-center
-        gap-2.5
+        gap-2
         rounded-full
         bg-[#10264A]
         px-3
         py-2.5
         text-white
-        shadow-lg
+        shadow-[0_8px_30px_rgba(16,38,74,0.25)]
         transition-all
         duration-300
         hover:-translate-y-1
-        hover:shadow-xl
+        hover:shadow-[0_12px_35px_rgba(16,38,74,0.35)]
         active:scale-95
-        md:left-6
       "
     >
       {/* Icon */}
+
       <span
         className="
           flex
@@ -48,17 +49,23 @@ export default function FloatingPlanner({
           bg-[#C89A3D]
         "
       >
-        <Map
-          size={17}
-          strokeWidth={2}
+        <Compass
+          size={18}
+          strokeWidth={1.8}
           className="text-[#10264A]"
         />
       </span>
 
       {/* Text */}
-      <span className="pr-1 text-sm font-semibold">
-        Need a custom trip?
+
+      <span className="text-sm font-semibold tracking-wide">
+        Plan My Trip
       </span>
+
+      <ArrowRight
+        size={15}
+        className="mr-1 text-[#C89A3D] transition-transform duration-300 group-hover:translate-x-1"
+      />
     </button>
   );
 }

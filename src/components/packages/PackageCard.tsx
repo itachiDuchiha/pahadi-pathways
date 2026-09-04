@@ -1,14 +1,22 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  Car,
+  CarFront,
   Clock3,
   Hotel,
   MapPin,
-  Star,
   UtensilsCrossed,
 } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import type { Package } from "@/data/packages";
 
@@ -17,10 +25,229 @@ type Props = {
 };
 
 export default function PackageCard({ pkg }: Props) {
+  /* =========================================================
+     ROUTE — DYNAMIC FITTING
+     ========================================================= */
+
+  const routeRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+
+  const [visibleCount, setVisibleCount] = useState(
+    pkg.itinerary.length
+  );
+
+  const calculateVisibleStops = useCallback(() => {
+    const container = routeRef.current;
+    const measureContainer = measureRef.current;
+
+    if (!container || !measureContainer) return;
+
+    const availableWidth = container.clientWidth;
+
+    if (availableWidth <= 0) return;
+
+    const stopElements = Array.from(
+      measureContainer.children
+    ).filter(
+      (element) =>
+        !(element as HTMLElement).hasAttribute(
+          "data-more-measure"
+        )
+    ) as HTMLElement[];
+
+    const moreElement =
+      measureContainer.querySelector(
+        "[data-more-measure]"
+      ) as HTMLElement | null;
+
+    const gap = 10;
+
+    let usedWidth = 0;
+    let count = 0;
+
+    /*
+     * Fit as many COMPLETE location names as possible.
+     */
+    for (let i = 0; i < stopElements.length; i++) {
+      const stopWidth = stopElements[i].offsetWidth;
+
+      const newWidth =
+        usedWidth +
+        (count > 0 ? gap : 0) +
+        stopWidth;
+
+      if (newWidth <= availableWidth) {
+        usedWidth = newWidth;
+        count++;
+        continue;
+      }
+
+      /*
+       * More locations remain.
+       * Reserve space for +N More.
+       */
+      const remaining =
+        pkg.itinerary.length - count;
+
+      if (remaining > 0) {
+        const moreWidth =
+          moreElement?.offsetWidth ?? 45;
+
+        let currentCount = count;
+
+        while (currentCount > 0) {
+          let currentWidth = 0;
+
+          for (let j = 0; j < currentCount; j++) {
+            currentWidth +=
+              (j > 0 ? gap : 0) +
+              stopElements[j].offsetWidth;
+          }
+
+          const currentRemaining =
+            pkg.itinerary.length - currentCount;
+
+          const currentMoreText =
+            `+${currentRemaining} More`;
+
+          const measuredMoreWidth =
+            currentRemaining ===
+            pkg.itinerary.length
+              ? moreWidth
+              : Math.max(
+                  moreWidth,
+                  currentMoreText.length * 6
+                );
+
+          const finalWidth =
+            currentWidth +
+            (currentCount > 0 ? gap : 0) +
+            measuredMoreWidth;
+
+          if (finalWidth <= availableWidth) {
+            count = currentCount;
+            break;
+          }
+
+          currentCount--;
+        }
+      }
+
+      break;
+    }
+
+    /*
+     * Always show at least one location.
+     */
+    setVisibleCount(
+      Math.max(
+        1,
+        Math.min(count, pkg.itinerary.length)
+      )
+    );
+  }, [pkg.itinerary.length]);
+
+  useLayoutEffect(() => {
+    calculateVisibleStops();
+  }, [calculateVisibleStops]);
+
+  useEffect(() => {
+    const container = routeRef.current;
+
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      calculateVisibleStops();
+    });
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [calculateVisibleStops]);
+
+  /*
+   * Recalculate after fonts/layout settle.
+   */
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      calculateVisibleStops();
+    }, 100);
+
+    return () => window.clearTimeout(timer);
+  }, [calculateVisibleStops]);
+
+  const visibleStops = pkg.itinerary.slice(
+    0,
+    visibleCount
+  );
+
+  const hiddenStops = pkg.itinerary.slice(
+    visibleCount
+  );
+
+  /* =========================================================
+     INCLUDES — ROBUST DETECTION
+     ========================================================= */
+
+  /*
+   * Normalize everything first.
+   *
+   * We intentionally use includes() instead of exact matching.
+   * This means values such as:
+   *
+   * "Transfer"
+   * "Transfers"
+   * "Airport Transfer"
+   * "Cab / Transfer"
+   *
+   * will all correctly trigger the Transfer item.
+   */
+
+  const normalizedIncludes = pkg.includes.map((item) =>
+    String(item)
+      .trim()
+      .toLowerCase()
+  );
+
+  const hasTransfer = normalizedIncludes.some(
+    (item) =>
+      item.includes("transfer") ||
+      item.includes("transport") ||
+      item.includes("cab") ||
+      item.includes("car") ||
+      item.includes("vehicle")
+  );
+
+  const hasStay = normalizedIncludes.some(
+    (item) =>
+      item.includes("stay") ||
+      item.includes("hotel") ||
+      item.includes("accommodation") ||
+      item.includes("lodging")
+  );
+
+  const hasMeals = normalizedIncludes.some(
+    (item) =>
+      item.includes("meal") ||
+      item.includes("food") ||
+      item.includes("dining") ||
+      item.includes("breakfast") ||
+      item.includes("lunch") ||
+      item.includes("dinner")
+  );
+
+  const hasAnyInclude =
+    hasTransfer ||
+    hasStay ||
+    hasMeals;
+
   return (
     <article
       className="
         group
+        flex
+        h-full
+        flex-col
         overflow-visible
         rounded-2xl
         border
@@ -40,7 +267,7 @@ export default function PackageCard({ pkg }: Props) {
       <Link
         href={`/packages/${pkg.slug}`}
         aria-label={`View ${pkg.title}`}
-        className="block"
+        className="block shrink-0"
       >
         <div className="relative h-[205px] overflow-hidden rounded-t-2xl">
           <Image
@@ -58,32 +285,11 @@ export default function PackageCard({ pkg }: Props) {
           />
 
           {/* Dark image gradient */}
+
           <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/70 via-transparent to-transparent" />
 
-          {/* Popular badge */}
-          {pkg.popular && (
-            <span
-              className="
-                absolute
-                left-4
-                top-4
-                rounded-full
-                bg-[#D4AF37]
-                px-3
-                py-1.5
-                text-[9px]
-                font-bold
-                uppercase
-                tracking-[0.18em]
-                text-[#10264A]
-                shadow-md
-              "
-            >
-              Most Popular
-            </span>
-          )}
-
           {/* Duration */}
+
           <div
             className="
               absolute
@@ -102,36 +308,12 @@ export default function PackageCard({ pkg }: Props) {
               backdrop-blur-sm
             "
           >
-            <Clock3 size={12} className="text-[#D4AF37]" />
-            {pkg.duration}
-          </div>
-
-          {/* Rating */}
-          <div
-            className="
-              absolute
-              bottom-3.5
-              right-4
-              flex
-              items-center
-              gap-1
-              rounded-full
-              bg-white
-              px-2.5
-              py-1.5
-              text-[#10264A]
-              shadow-md
-            "
-          >
-            <Star
+            <Clock3
               size={12}
-              fill="currentColor"
-              className="text-[#C89A3D]"
+              className="text-[#D4AF37]"
             />
 
-            <span className="text-[10px] font-bold">
-              {pkg.rating}
-            </span>
+            {pkg.duration}
           </div>
         </div>
       </Link>
@@ -140,30 +322,110 @@ export default function PackageCard({ pkg }: Props) {
           CONTENT
       ========================================================= */}
 
-      <div className="p-4">
-        {/* Title */}
+      <div className="flex flex-1 flex-col p-4">
 
-        <Link
-          href={`/packages/${pkg.slug}`}
+        {/* =======================================================
+            TITLE
+        ======================================================= */}
+
+        <div className="group/title relative min-w-0">
+
+          <Link
+            href={`/packages/${pkg.slug}`}
+            title={pkg.title}
+            className="
+              block
+              h-[1.4rem]
+              min-w-0
+              truncate
+              whitespace-nowrap
+              font-serif
+              text-[1.2rem]
+              font-medium
+              leading-[1.15]
+              text-[#10264A]
+              transition-colors
+              duration-300
+              hover:text-[#C89A3D]
+            "
+          >
+            {pkg.title}
+          </Link>
+
+          {/* =====================================================
+              FULL TITLE HOVER
+          ===================================================== */}
+
+          <div
+            className="
+              pointer-events-none
+              invisible
+              absolute
+              left-0
+              top-full
+              z-[100]
+              mt-2
+              max-w-[280px]
+              rounded-lg
+              border
+              border-[#10264A]/10
+              bg-[#081526]
+              px-3
+              py-2
+              text-[10px]
+              font-medium
+              leading-4
+              text-white
+              opacity-0
+              shadow-[0_10px_30px_rgba(16,38,74,0.20)]
+              transition-all
+              duration-200
+              group-hover/title:visible
+              group-hover/title:opacity-100
+            "
+          >
+            {pkg.title}
+
+            <span
+              className="
+                absolute
+                -top-1
+                left-4
+                h-2
+                w-2
+                rotate-45
+                border-l
+                border-t
+                border-[#10264A]/10
+                bg-[#081526]
+              "
+            />
+          </div>
+
+        </div>
+
+        {/* =========================================================
+            DURATION + PICKUP
+        ========================================================= */}
+
+        <div
           className="
-            block
-            font-serif
-            text-[1.2rem]
-            font-medium
-            leading-[1.15]
-            text-[#10264A]
-            transition-colors
-            duration-300
-            hover:text-[#C89A3D]
+            mt-2.5
+            flex
+            h-[18px]
+            items-center
+            gap-4
+            overflow-hidden
+            whitespace-nowrap
+            text-[11px]
+            text-gray-600
           "
         >
-          {pkg.title}
-        </Link>
 
-        {/* Duration + Pickup */}
+          {/* Duration */}
 
-        <div className="mt-2.5 flex items-center gap-4 text-[11px] text-gray-600">
-          <div className="flex items-center gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
+
             <Clock3
               size={13}
               className="text-[#C89A3D]"
@@ -172,59 +434,125 @@ export default function PackageCard({ pkg }: Props) {
             <span className="font-medium">
               {pkg.duration}
             </span>
+
           </div>
 
-          <div className="flex items-center gap-1.5">
+          {/* Pickup */}
+
+          <div className="flex min-w-0 items-center gap-1.5">
+
             <MapPin
               size={13}
-              className="text-[#C89A3D]"
+              className="shrink-0 text-[#C89A3D]"
             />
 
-            <span>
+            <span className="truncate">
               Ex{" "}
               <span className="font-semibold text-[#10264A]">
                 {pkg.pickup}
               </span>
             </span>
+
           </div>
+
         </div>
 
         {/* =========================================================
             ROUTE
         ========================================================= */}
 
-        <div className="mt-3 border-t border-gray-100 pt-3">
-          <div className="flex items-center gap-2">
-            <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.18em] text-[#C89A3D]">
+        <div
+          className="
+            mt-3
+            h-[48px]
+            border-t
+            border-gray-100
+            pt-3
+          "
+        >
+
+          <div className="flex min-w-0 items-center">
+
+            {/* ROUTE LABEL */}
+
+            <span
+              className="
+                mr-3
+                shrink-0
+                text-[9px]
+                font-bold
+                uppercase
+                tracking-[0.18em]
+                text-[#C89A3D]
+              "
+            >
               Route
             </span>
 
-            <div className="flex min-w-0 flex-1 items-center overflow-visible whitespace-nowrap">
-              {pkg.itinerary.map((stop, index) => (
-                <div
-                  key={stop}
-                  className="flex shrink-0 items-center"
-                >
-                  <span className="text-[11px] font-medium text-[#10264A]">
-                    {stop}
-                  </span>
+            {/* ROUTE CONTENT */}
 
-                  {index !== pkg.itinerary.length - 1 && (
-                    <span className="mx-1.5 text-[#C89A3D]">
-                      →
+            <div
+              ref={routeRef}
+              className="
+                relative
+                min-w-0
+                flex-1
+                overflow-visible
+              "
+            >
+
+              <div
+                className="
+                  flex
+                  min-w-0
+                  items-center
+                  overflow-visible
+                  whitespace-nowrap
+                "
+              >
+
+                {visibleStops.map((stop, index) => (
+                  <div
+                    key={`${stop}-${index}`}
+                    className="
+                      flex
+                      shrink-0
+                      items-center
+                    "
+                  >
+
+                    <span
+                      className="
+                        whitespace-nowrap
+                        text-[11px]
+                        font-medium
+                        text-[#10264A]
+                      "
+                    >
+                      {stop}
                     </span>
-                  )}
-                </div>
-              ))}
 
-              {/* More stops */}
+                    {/* Natural gap — NO ARROW */}
 
-              {pkg.hiddenItinerary &&
-                pkg.hiddenItinerary.length > 0 && (
-                  <div className="group/more relative ml-2 shrink-0">
+                    {index !==
+                      visibleStops.length - 1 && (
+                      <span className="w-[10px] shrink-0" />
+                    )}
+
+                  </div>
+                ))}
+
+                {/* =================================================
+                    +N MORE
+                ================================================= */}
+
+                {hiddenStops.length > 0 && (
+                  <div className="group/more relative ml-1 shrink-0">
+
                     <span
                       className="
                         cursor-default
+                        whitespace-nowrap
                         text-[10px]
                         font-semibold
                         text-[#C89A3D]
@@ -233,20 +561,23 @@ export default function PackageCard({ pkg }: Props) {
                         group-hover/more:text-[#10264A]
                       "
                     >
-                      +{pkg.hiddenItinerary.length} More
+                      +{hiddenStops.length} More
                     </span>
 
-                    {/* Hover card */}
+                    {/* =================================================
+                        MORE STOPS TOOLTIP
+                    ================================================= */}
 
                     <div
                       className="
+                        pointer-events-none
                         invisible
                         absolute
                         bottom-full
                         right-0
                         z-[100]
                         mb-2
-                        w-[125px]
+                        w-[135px]
                         rounded-xl
                         border
                         border-[#10264A]/10
@@ -261,6 +592,7 @@ export default function PackageCard({ pkg }: Props) {
                         group-hover/more:opacity-100
                       "
                     >
+
                       <p
                         className="
                           mb-1.5
@@ -275,22 +607,26 @@ export default function PackageCard({ pkg }: Props) {
                       </p>
 
                       <div className="space-y-1">
-                        {pkg.hiddenItinerary.map((item) => (
-                          <div
-                            key={item}
-                            className="
-                              text-[10px]
-                              font-medium
-                              leading-4
-                              text-[#10264A]
-                            "
-                          >
-                            {item}
-                          </div>
-                        ))}
+
+                        {hiddenStops.map(
+                          (item, index) => (
+                            <div
+                              key={`${item}-${index}`}
+                              className="
+                                text-[10px]
+                                font-medium
+                                leading-4
+                                text-[#10264A]
+                              "
+                            >
+                              {item}
+                            </div>
+                          )
+                        )}
+
                       </div>
 
-                      {/* Popup arrow */}
+                      {/* Tooltip arrow */}
 
                       <span
                         className="
@@ -306,74 +642,197 @@ export default function PackageCard({ pkg }: Props) {
                           bg-white
                         "
                       />
+
                     </div>
+
                   </div>
                 )}
+
+              </div>
+
+              {/* ===================================================
+                  HIDDEN MEASUREMENT ROW
+              =================================================== */}
+
+              <div
+                ref={measureRef}
+                className="
+                  pointer-events-none
+                  absolute
+                  left-0
+                  top-0
+                  flex
+                  h-0
+                  overflow-hidden
+                  whitespace-nowrap
+                  opacity-0
+                "
+                aria-hidden="true"
+              >
+
+                {pkg.itinerary.map((stop, index) => (
+                  <span
+                    key={`${stop}-${index}`}
+                    className="
+                      shrink-0
+                      text-[11px]
+                      font-medium
+                    "
+                  >
+                    {stop}
+                  </span>
+                ))}
+
+                <span
+                  data-more-measure
+                  className="
+                    text-[10px]
+                    font-semibold
+                  "
+                >
+                  +{pkg.itinerary.length} More
+                </span>
+
+              </div>
+
             </div>
+
           </div>
+
         </div>
 
         {/* =========================================================
             INCLUDES
         ========================================================= */}
 
-        <div className="mt-3 flex items-center gap-4 border-t border-gray-100 pt-3">
-          {pkg.includes.includes("Transfer") && (
-            <div className="flex items-center gap-1.5">
-              <Car
-                size={14}
-                className="text-[#10264A]"
-              />
+        {hasAnyInclude && (
+          <div
+            className="
+              mt-3
+              flex
+              h-[30px]
+              items-center
+              gap-5
+              overflow-hidden
+              border-t
+              border-gray-100
+              pt-3
+            "
+          >
 
-              <span className="text-[10px] text-gray-600">
-                Transfer
-              </span>
-            </div>
-          )}
+            {/* =======================================================
+                TRANSFER
+            ======================================================= */}
 
-          {pkg.includes.includes("Stay") && (
-            <div className="flex items-center gap-1.5">
-              <Hotel
-                size={14}
-                className="text-[#10264A]"
-              />
+            {hasTransfer && (
+              <div
+                className="
+                  flex
+                  shrink-0
+                  items-center
+                  gap-1.5
+                "
+              >
 
-              <span className="text-[10px] text-gray-600">
-                Stay
-              </span>
-            </div>
-          )}
+                <CarFront
+                  size={14}
+                  strokeWidth={1.8}
+                  className="text-[#10264A]"
+                />
 
-          {pkg.includes.includes("Meals") && (
-            <div className="flex items-center gap-1.5">
-              <UtensilsCrossed
-                size={14}
-                className="text-[#10264A]"
-              />
+                <span className="text-[10px] text-gray-600">
+                  Transfer
+                </span>
 
-              <span className="text-[10px] text-gray-600">
-                Meals
-              </span>
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+
+            {/* =======================================================
+                STAY
+            ======================================================= */}
+
+            {hasStay && (
+              <div
+                className="
+                  flex
+                  shrink-0
+                  items-center
+                  gap-1.5
+                "
+              >
+
+                <Hotel
+                  size={14}
+                  strokeWidth={1.8}
+                  className="text-[#10264A]"
+                />
+
+                <span className="text-[10px] text-gray-600">
+                  Stay
+                </span>
+
+              </div>
+            )}
+
+            {/* =======================================================
+                MEALS
+            ======================================================= */}
+
+            {hasMeals && (
+              <div
+                className="
+                  flex
+                  shrink-0
+                  items-center
+                  gap-1.5
+                "
+              >
+
+                <UtensilsCrossed
+                  size={14}
+                  strokeWidth={1.8}
+                  className="text-[#10264A]"
+                />
+
+                <span className="text-[10px] text-gray-600">
+                  Meals
+                </span>
+
+              </div>
+            )}
+
+          </div>
+        )}
 
         {/* =========================================================
             PRICE
         ========================================================= */}
 
-        <div className="mt-3 flex items-end justify-between border-t border-gray-100 pt-3">
+        <div
+          className="
+            mt-3
+            flex
+            h-[42px]
+            items-end
+            justify-between
+            border-t
+            border-gray-100
+            pt-3
+          "
+        >
+
           <div className="flex items-baseline gap-2">
+
             <span
               className="
                 text-[9px]
                 font-bold
                 uppercase
-                tracking-[0.16em]
+                tracking-[0.12em]
                 text-[#C89A3D]
               "
             >
-              From
+              Starting from
             </span>
 
             <span
@@ -389,11 +848,13 @@ export default function PackageCard({ pkg }: Props) {
             >
               {pkg.price}
             </span>
+
           </div>
 
           <span className="pb-0.5 text-[9px] text-gray-500">
             per person
           </span>
+
         </div>
 
         {/* =========================================================
@@ -405,14 +866,15 @@ export default function PackageCard({ pkg }: Props) {
           className="
             mt-3
             flex
+            h-[38px]
             w-full
+            shrink-0
             items-center
             justify-center
             gap-2
             rounded-lg
             bg-[#10264A]
             px-4
-            py-2.5
             text-[11px]
             font-bold
             uppercase
@@ -423,6 +885,7 @@ export default function PackageCard({ pkg }: Props) {
             hover:bg-[#18355F]
           "
         >
+
           View Journey Details
 
           <ArrowRight
@@ -433,7 +896,9 @@ export default function PackageCard({ pkg }: Props) {
               group-hover:translate-x-1
             "
           />
+
         </Link>
+
       </div>
     </article>
   );

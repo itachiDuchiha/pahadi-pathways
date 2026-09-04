@@ -1,22 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #F7F9FC;
   --foreground: #171717;
+
+  --brand-navy: #10264A;
+  --brand-gold: #C89A3D;
+  --brand-gold-light: #D7AE57;
+  --brand-gold-dark: #B5852F;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
@@ -24,12 +23,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-:root {
-  --brand-navy: #10264A;
-  --brand-gold: #C89A3D;
-  --brand-gold-light: #D7AE57;
-  --brand-gold-dark: #B5852F;
-}
+
 /* ===== Testimonials Auto Scroll ===== */
 
 @keyframes testimonialScroll {
@@ -50,7 +44,8 @@ body {
 .animate-testimonial-scroll:hover {
   animation-play-state: paused;
 }
-/* Hide Scrollbar */
+
+/* ===== Hide Scrollbar ===== */
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
