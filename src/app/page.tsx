@@ -10,8 +10,6 @@ import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 
 import Footer from "@/components/layout/Footer";
-import FloatingWhatsApp from "@/components/layout/FloatingWhatsApp";
-import FloatingPlanner from "@/components/layout/FloatingPlanner";
 
 import Modal from "@/components/ui/Modal";
 import TripPlannerForm from "@/components/forms/TripPlannerForm";
@@ -42,14 +40,6 @@ export default function Home() {
       >
         <TripPlannerForm />
       </Modal>
-
-      {/* Floating Buttons */}
-
-      <FloatingPlanner
-        onOpen={() => setIsModalOpen(true)}
-      />
-
-      <FloatingWhatsApp />
     </>
   );
 }
