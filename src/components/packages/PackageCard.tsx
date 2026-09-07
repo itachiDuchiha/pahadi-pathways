@@ -65,9 +65,6 @@ export default function PackageCard({ pkg }: Props) {
     let usedWidth = 0;
     let count = 0;
 
-    /*
-     * Fit as many COMPLETE location names as possible.
-     */
     for (let i = 0; i < stopElements.length; i++) {
       const stopWidth = stopElements[i].offsetWidth;
 
@@ -82,10 +79,6 @@ export default function PackageCard({ pkg }: Props) {
         continue;
       }
 
-      /*
-       * More locations remain.
-       * Reserve space for +N More.
-       */
       const remaining =
         pkg.itinerary.length - count;
 
@@ -136,9 +129,6 @@ export default function PackageCard({ pkg }: Props) {
       break;
     }
 
-    /*
-     * Always show at least one location.
-     */
     setVisibleCount(
       Math.max(
         1,
@@ -165,9 +155,6 @@ export default function PackageCard({ pkg }: Props) {
     return () => observer.disconnect();
   }, [calculateVisibleStops]);
 
-  /*
-   * Recalculate after fonts/layout settle.
-   */
   useEffect(() => {
     const timer = window.setTimeout(() => {
       calculateVisibleStops();
@@ -188,20 +175,6 @@ export default function PackageCard({ pkg }: Props) {
   /* =========================================================
      INCLUDES — ROBUST DETECTION
      ========================================================= */
-
-  /*
-   * Normalize everything first.
-   *
-   * We intentionally use includes() instead of exact matching.
-   * This means values such as:
-   *
-   * "Transfer"
-   * "Transfers"
-   * "Airport Transfer"
-   * "Cab / Transfer"
-   *
-   * will all correctly trigger the Transfer item.
-   */
 
   const normalizedIncludes = pkg.includes.map((item) =>
     String(item)
@@ -245,21 +218,66 @@ export default function PackageCard({ pkg }: Props) {
     <article
       className="
         group
+        relative
         flex
         h-full
         flex-col
         overflow-visible
-        rounded-2xl
-        border
-        border-[#10264A]/10
+        rounded-[18px]
         bg-white
-        shadow-[0_6px_24px_rgba(16,38,74,0.07)]
+        shadow-[0_8px_30px_rgba(16,38,74,0.07)]
         transition-all
-        duration-300
-        hover:-translate-y-1
-        hover:shadow-[0_14px_35px_rgba(16,38,74,0.12)]
+        duration-500
+        ease-out
+        hover:-translate-y-2
+        hover:shadow-[0_22px_50px_rgba(16,38,74,0.16)]
+        hover:shadow-[0_22px_50px_rgba(200,154,61,0.14)]
       "
     >
+      {/* =========================================================
+          CONSISTENT GOLD OUTLINE
+          ========================================================= */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          z-[30]
+          rounded-[18px]
+          border-[1.5px]
+          border-[#C89A3D]/65
+          transition-all
+          duration-500
+          group-hover:border-[#C89A3D]
+          group-hover:shadow-[0_0_0_1px_rgba(200,154,61,0.10),0_0_22px_rgba(200,154,61,0.16)]
+        "
+      />
+
+      {/* =========================================================
+          SUBTLE TOP GOLD HIGHLIGHT
+          ========================================================= */}
+
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-x-8
+          top-0
+          z-[40]
+          h-px
+          bg-gradient-to-r
+          from-transparent
+          via-[#E2B85C]
+          to-transparent
+          opacity-60
+          transition-all
+          duration-500
+          group-hover:inset-x-5
+          group-hover:opacity-100
+        "
+      />
+
       {/* =========================================================
           IMAGE
       ========================================================= */}
@@ -269,7 +287,15 @@ export default function PackageCard({ pkg }: Props) {
         aria-label={`View ${pkg.title}`}
         className="block shrink-0"
       >
-        <div className="relative h-[205px] overflow-hidden rounded-t-2xl">
+        <div
+          className="
+            relative
+            h-[218px]
+            overflow-hidden
+            rounded-t-[18px]
+            bg-[#E9EDF2]
+          "
+        >
           <Image
             src={pkg.image}
             alt={pkg.title}
@@ -278,38 +304,72 @@ export default function PackageCard({ pkg }: Props) {
             className="
               object-cover
               transition-transform
-              duration-700
+              duration-[900ms]
               ease-out
-              group-hover:scale-105
+              group-hover:scale-[1.045]
             "
           />
 
-          {/* Dark image gradient */}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/70 via-transparent to-transparent" />
-
-          {/* Duration */}
+          {/* IMAGE GRADIENT */}
 
           <div
             className="
               absolute
-              bottom-3.5
+              inset-0
+              bg-gradient-to-t
+              from-[#071525]/75
+              via-[#071525]/5
+              to-transparent
+            "
+          />
+
+          {/* SUBTLE TOP IMAGE FADE */}
+
+          <div
+            className="
+              absolute
+              inset-x-0
+              top-0
+              h-20
+              bg-gradient-to-b
+              from-black/10
+              to-transparent
+            "
+          />
+
+          {/* =====================================================
+              DURATION BADGE
+          ===================================================== */}
+
+          <div
+            className="
+              absolute
+              bottom-4
               left-4
               flex
               items-center
-              gap-1.5
+              gap-2
               rounded-full
-              bg-[#081526]/80
+              border
+              border-[#C89A3D]/50
+              bg-[#071525]/85
               px-3
               py-1.5
               text-[10px]
               font-semibold
+              tracking-[0.02em]
               text-white
-              backdrop-blur-sm
+              shadow-[0_4px_15px_rgba(0,0,0,0.20)]
+              backdrop-blur-md
+              transition-all
+              duration-300
+              group-hover:border-[#C89A3D]
+              group-hover:shadow-[0_5px_18px_rgba(200,154,61,0.22)]
             "
           >
             <Clock3
               size={12}
+              strokeWidth={2}
               className="text-[#D4AF37]"
             />
 
@@ -322,39 +382,45 @@ export default function PackageCard({ pkg }: Props) {
           CONTENT
       ========================================================= */}
 
-      <div className="flex flex-1 flex-col p-4">
-
+      <div
+        className="
+          flex
+          flex-1
+          flex-col
+          px-[17px]
+          pb-[17px]
+          pt-[15px]
+        "
+      >
         {/* =======================================================
             TITLE
         ======================================================= */}
 
         <div className="group/title relative min-w-0">
-
           <Link
             href={`/packages/${pkg.slug}`}
             title={pkg.title}
             className="
               block
-              h-[1.4rem]
+              h-[1.55rem]
               min-w-0
               truncate
               whitespace-nowrap
               font-serif
-              text-[1.2rem]
+              text-[1.18rem]
               font-medium
-              leading-[1.15]
+              leading-[1.2]
+              tracking-[-0.01em]
               text-[#10264A]
               transition-colors
               duration-300
-              hover:text-[#C89A3D]
+              hover:text-[#B5852F]
             "
           >
             {pkg.title}
           </Link>
 
-          {/* =====================================================
-              FULL TITLE HOVER
-          ===================================================== */}
+          {/* FULL TITLE HOVER */}
 
           <div
             className="
@@ -366,18 +432,18 @@ export default function PackageCard({ pkg }: Props) {
               z-[100]
               mt-2
               max-w-[280px]
-              rounded-lg
+              rounded-xl
               border
-              border-[#10264A]/10
+              border-white/10
               bg-[#081526]
-              px-3
-              py-2
+              px-3.5
+              py-2.5
               text-[10px]
               font-medium
               leading-4
               text-white
               opacity-0
-              shadow-[0_10px_30px_rgba(16,38,74,0.20)]
+              shadow-[0_15px_35px_rgba(16,38,74,0.22)]
               transition-all
               duration-200
               group-hover/title:visible
@@ -396,12 +462,11 @@ export default function PackageCard({ pkg }: Props) {
                 rotate-45
                 border-l
                 border-t
-                border-[#10264A]/10
+                border-white/10
                 bg-[#081526]
               "
             />
           </div>
-
         </div>
 
         {/* =========================================================
@@ -417,33 +482,48 @@ export default function PackageCard({ pkg }: Props) {
             gap-4
             overflow-hidden
             whitespace-nowrap
-            text-[11px]
-            text-gray-600
+            text-[10.5px]
+            text-[#687386]
           "
         >
-
           {/* Duration */}
 
-          <div className="flex shrink-0 items-center gap-1.5">
-
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              gap-1.5
+            "
+          >
             <Clock3
               size={13}
+              strokeWidth={1.8}
               className="text-[#C89A3D]"
             />
 
             <span className="font-medium">
               {pkg.duration}
             </span>
-
           </div>
 
           {/* Pickup */}
 
-          <div className="flex min-w-0 items-center gap-1.5">
-
+          <div
+            className="
+              flex
+              min-w-0
+              items-center
+              gap-1.5
+            "
+          >
             <MapPin
               size={13}
-              className="shrink-0 text-[#C89A3D]"
+              strokeWidth={1.8}
+              className="
+                shrink-0
+                text-[#C89A3D]
+              "
             />
 
             <span className="truncate">
@@ -452,9 +532,7 @@ export default function PackageCard({ pkg }: Props) {
                 {pkg.pickup}
               </span>
             </span>
-
           </div>
-
         </div>
 
         {/* =========================================================
@@ -466,13 +544,11 @@ export default function PackageCard({ pkg }: Props) {
             mt-3
             h-[48px]
             border-t
-            border-gray-100
+            border-[#10264A]/[0.07]
             pt-3
           "
         >
-
           <div className="flex min-w-0 items-center">
-
             {/* ROUTE LABEL */}
 
             <span
@@ -482,8 +558,8 @@ export default function PackageCard({ pkg }: Props) {
                 text-[9px]
                 font-bold
                 uppercase
-                tracking-[0.18em]
-                text-[#C89A3D]
+                tracking-[0.2em]
+                text-[#B5852F]
               "
             >
               Route
@@ -500,7 +576,6 @@ export default function PackageCard({ pkg }: Props) {
                 overflow-visible
               "
             >
-
               <div
                 className="
                   flex
@@ -510,7 +585,6 @@ export default function PackageCard({ pkg }: Props) {
                   whitespace-nowrap
                 "
               >
-
                 {visibleStops.map((stop, index) => (
                   <div
                     key={`${stop}-${index}`}
@@ -520,11 +594,10 @@ export default function PackageCard({ pkg }: Props) {
                       items-center
                     "
                   >
-
                     <span
                       className="
                         whitespace-nowrap
-                        text-[11px]
+                        text-[10.5px]
                         font-medium
                         text-[#10264A]
                       "
@@ -532,13 +605,10 @@ export default function PackageCard({ pkg }: Props) {
                       {stop}
                     </span>
 
-                    {/* Natural gap — NO ARROW */}
-
                     {index !==
                       visibleStops.length - 1 && (
                       <span className="w-[10px] shrink-0" />
                     )}
-
                   </div>
                 ))}
 
@@ -547,8 +617,14 @@ export default function PackageCard({ pkg }: Props) {
                 ================================================= */}
 
                 {hiddenStops.length > 0 && (
-                  <div className="group/more relative ml-1 shrink-0">
-
+                  <div
+                    className="
+                      group/more
+                      relative
+                      ml-1
+                      shrink-0
+                    "
+                  >
                     <span
                       className="
                         cursor-default
@@ -564,9 +640,7 @@ export default function PackageCard({ pkg }: Props) {
                       +{hiddenStops.length} More
                     </span>
 
-                    {/* =================================================
-                        MORE STOPS TOOLTIP
-                    ================================================= */}
+                    {/* MORE STOPS TOOLTIP */}
 
                     <div
                       className="
@@ -585,14 +659,13 @@ export default function PackageCard({ pkg }: Props) {
                         px-3
                         py-2.5
                         opacity-0
-                        shadow-[0_10px_30px_rgba(16,38,74,0.16)]
+                        shadow-[0_12px_35px_rgba(16,38,74,0.16)]
                         transition-all
                         duration-200
                         group-hover/more:visible
                         group-hover/more:opacity-100
                       "
                     >
-
                       <p
                         className="
                           mb-1.5
@@ -607,7 +680,6 @@ export default function PackageCard({ pkg }: Props) {
                       </p>
 
                       <div className="space-y-1">
-
                         {hiddenStops.map(
                           (item, index) => (
                             <div
@@ -623,10 +695,7 @@ export default function PackageCard({ pkg }: Props) {
                             </div>
                           )
                         )}
-
                       </div>
-
-                      {/* Tooltip arrow */}
 
                       <span
                         className="
@@ -642,12 +711,9 @@ export default function PackageCard({ pkg }: Props) {
                           bg-white
                         "
                       />
-
                     </div>
-
                   </div>
                 )}
-
               </div>
 
               {/* ===================================================
@@ -669,13 +735,12 @@ export default function PackageCard({ pkg }: Props) {
                 "
                 aria-hidden="true"
               >
-
                 {pkg.itinerary.map((stop, index) => (
                   <span
                     key={`${stop}-${index}`}
                     className="
                       shrink-0
-                      text-[11px]
+                      text-[10.5px]
                       font-medium
                     "
                   >
@@ -692,13 +757,9 @@ export default function PackageCard({ pkg }: Props) {
                 >
                   +{pkg.itinerary.length} More
                 </span>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
 
         {/* =========================================================
@@ -715,14 +776,11 @@ export default function PackageCard({ pkg }: Props) {
               gap-5
               overflow-hidden
               border-t
-              border-gray-100
+              border-[#10264A]/[0.07]
               pt-3
             "
           >
-
-            {/* =======================================================
-                TRANSFER
-            ======================================================= */}
+            {/* TRANSFER */}
 
             {hasTransfer && (
               <div
@@ -733,23 +791,24 @@ export default function PackageCard({ pkg }: Props) {
                   gap-1.5
                 "
               >
-
                 <CarFront
                   size={14}
-                  strokeWidth={1.8}
+                  strokeWidth={1.7}
                   className="text-[#10264A]"
                 />
 
-                <span className="text-[10px] text-gray-600">
+                <span
+                  className="
+                    text-[10px]
+                    text-[#687386]
+                  "
+                >
                   Transfer
                 </span>
-
               </div>
             )}
 
-            {/* =======================================================
-                STAY
-            ======================================================= */}
+            {/* STAY */}
 
             {hasStay && (
               <div
@@ -760,23 +819,24 @@ export default function PackageCard({ pkg }: Props) {
                   gap-1.5
                 "
               >
-
                 <Hotel
                   size={14}
-                  strokeWidth={1.8}
+                  strokeWidth={1.7}
                   className="text-[#10264A]"
                 />
 
-                <span className="text-[10px] text-gray-600">
+                <span
+                  className="
+                    text-[10px]
+                    text-[#687386]
+                  "
+                >
                   Stay
                 </span>
-
               </div>
             )}
 
-            {/* =======================================================
-                MEALS
-            ======================================================= */}
+            {/* MEALS */}
 
             {hasMeals && (
               <div
@@ -787,20 +847,22 @@ export default function PackageCard({ pkg }: Props) {
                   gap-1.5
                 "
               >
-
                 <UtensilsCrossed
                   size={14}
-                  strokeWidth={1.8}
+                  strokeWidth={1.7}
                   className="text-[#10264A]"
                 />
 
-                <span className="text-[10px] text-gray-600">
+                <span
+                  className="
+                    text-[10px]
+                    text-[#687386]
+                  "
+                >
                   Meals
                 </span>
-
               </div>
             )}
-
           </div>
         )}
 
@@ -816,20 +878,18 @@ export default function PackageCard({ pkg }: Props) {
             items-end
             justify-between
             border-t
-            border-gray-100
+            border-[#10264A]/[0.07]
             pt-3
           "
         >
-
           <div className="flex items-baseline gap-2">
-
             <span
               className="
                 text-[9px]
                 font-bold
                 uppercase
-                tracking-[0.12em]
-                text-[#C89A3D]
+                tracking-[0.13em]
+                text-[#B5852F]
               "
             >
               Starting from
@@ -848,13 +908,17 @@ export default function PackageCard({ pkg }: Props) {
             >
               {pkg.price}
             </span>
-
           </div>
 
-          <span className="pb-0.5 text-[9px] text-gray-500">
+          <span
+            className="
+              pb-0.5
+              text-[9px]
+              text-[#7B8492]
+            "
+          >
             per person
           </span>
-
         </div>
 
         {/* =========================================================
@@ -866,39 +930,42 @@ export default function PackageCard({ pkg }: Props) {
           className="
             mt-3
             flex
-            h-[38px]
+            h-[40px]
             w-full
             shrink-0
             items-center
             justify-center
             gap-2
             rounded-lg
+            border
+            border-[#10264A]
             bg-[#10264A]
             px-4
-            text-[11px]
+            text-[10px]
             font-bold
             uppercase
-            tracking-[0.08em]
+            tracking-[0.1em]
             text-white
+            shadow-[0_4px_12px_rgba(16,38,74,0.12)]
             transition-all
             duration-300
+            hover:border-[#18355F]
             hover:bg-[#18355F]
+            hover:shadow-[0_7px_18px_rgba(16,38,74,0.18)]
           "
         >
-
           View Journey Details
 
           <ArrowRight
             size={14}
+            strokeWidth={1.8}
             className="
               transition-transform
               duration-300
               group-hover:translate-x-1
             "
           />
-
         </Link>
-
       </div>
     </article>
   );

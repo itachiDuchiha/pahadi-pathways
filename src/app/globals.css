@@ -1,13 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F7F9FC;
+  /* =========================================================
+     LUXURY HIMALAYAN PALETTE
+  ========================================================= */
+
+  --background: #F6F4EF;
+  --background-soft: #FAF9F5;
+  --background-cool: #F1F4F7;
+
   --foreground: #171717;
 
   --brand-navy: #10264A;
+  --brand-navy-deep: #0A1B33;
+
   --brand-gold: #C89A3D;
   --brand-gold-light: #D7AE57;
-  --brand-gold-dark: #B5852F;
+  --brand-gold-dark: #A97925;
+
+  --text-primary: #10264A;
+  --text-secondary: #596678;
+  --text-muted: #7A8491;
+
+  --border-soft: rgba(16, 38, 74, 0.10);
+  --border-gold: rgba(200, 154, 61, 0.30);
 }
 
 @theme inline {
@@ -18,13 +34,43 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+/* =========================================================
+   BASE
+========================================================= */
+
+html {
+  scroll-behavior: smooth;
 }
 
-/* ===== Testimonials Auto Scroll ===== */
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+  background: rgba(200, 154, 61, 0.22);
+  color: var(--brand-navy);
+}
+
+
+/* =========================================================
+   TESTIMONIALS AUTO SCROLL
+========================================================= */
 
 @keyframes testimonialScroll {
   0% {
@@ -45,7 +91,123 @@ body {
   animation-play-state: paused;
 }
 
-/* ===== Hide Scrollbar ===== */
+
+/* =========================================================
+   SUBTLE LUXURY FLOAT
+========================================================= */
+
+@keyframes luxuryFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-luxury-float {
+  animation: luxuryFloat 4s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   SUBTLE GOLD PULSE
+   Used for the functional trip-planner control.
+========================================================= */
+
+@keyframes goldPulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(200, 154, 61, 0.28),
+      0 10px 30px rgba(16, 38, 74, 0.12);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 10px rgba(200, 154, 61, 0),
+      0 10px 30px rgba(16, 38, 74, 0.12);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(200, 154, 61, 0),
+      0 10px 30px rgba(16, 38, 74, 0.12);
+  }
+}
+
+.animate-gold-pulse {
+  animation: goldPulse 3s ease-out infinite;
+}
+
+
+/* =========================================================
+   PREMIUM IMAGE HOVER
+========================================================= */
+
+.luxury-image {
+  transition:
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 700ms ease;
+}
+
+.luxury-image:hover {
+  transform: scale(1.035);
+}
+
+
+/* =========================================================
+   PREMIUM CARD HOVER
+========================================================= */
+
+.luxury-card {
+  transition:
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 450ms ease,
+    border-color 450ms ease;
+}
+
+.luxury-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 22px 55px rgba(16, 38, 74, 0.10);
+}
+
+
+/* =========================================================
+   GOLD UNDERLINE
+========================================================= */
+
+.gold-underline {
+  position: relative;
+}
+
+.gold-underline::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: -6px;
+
+  width: 0;
+  height: 1.5px;
+
+  background: var(--brand-gold);
+
+  transition: width 350ms ease;
+}
+
+.gold-underline:hover::after {
+  width: 100%;
+}
+
+
+/* =========================================================
+   HIDE SCROLLBAR
+========================================================= */
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -54,4 +216,23 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
