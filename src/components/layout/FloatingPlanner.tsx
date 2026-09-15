@@ -97,10 +97,10 @@ export default function FloatingPlanner({
             className="
               mt-0.5
               whitespace-nowrap
-              text-[6px]
+              text-[8px]
               font-semibold
               uppercase
-              tracking-[0.13em]
+              tracking-[0.10em]
               text-[#6D604B]
             "
           >

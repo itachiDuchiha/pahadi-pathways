@@ -571,14 +571,37 @@ export default function HeroPlanner() {
     const handleClickOutside = (
       event: MouseEvent
     ) => {
+      const target = event.target as Node;
+
+      const clickedInsidePlanner =
+        plannerRef.current?.contains(target);
+
+      const clickedInsideDestinationPopup =
+        destinationPopupRef.current?.contains(target);
+
+      const clickedInsideCalendar =
+        calendarRef.current?.contains(target);
+
+      const clickedInsideTravelerPopup =
+        travelerPopupRef.current?.contains(target);
+
+      /*
+        Popups are rendered outside the planner section,
+        so they must also be treated as "inside".
+
+        Without these checks, clicking any option inside
+        a popup triggers closeAllPopups() immediately.
+      */
       if (
-        plannerRef.current &&
-        !plannerRef.current.contains(
-          event.target as Node
-        )
+        clickedInsidePlanner ||
+        clickedInsideDestinationPopup ||
+        clickedInsideCalendar ||
+        clickedInsideTravelerPopup
       ) {
-        closeAllPopups();
+        return;
       }
+
+      closeAllPopups();
     };
 
     document.addEventListener(
@@ -859,7 +882,7 @@ export default function HeroPlanner() {
               DESTINATION
           ================================================= */}
 
-          <div className="relative min-w-0 flex-[2.25]">
+          <div className="relative min-w-0 flex-[1.9]">
             <button
               ref={destinationButtonRef}
               type="button"
@@ -883,7 +906,6 @@ export default function HeroPlanner() {
                 hover:bg-[#F7F9FC]
               "
             >
-              {/* ICON — moved slightly left */}
               <div
                 className="
                   flex
@@ -979,8 +1001,6 @@ export default function HeroPlanner() {
             </button>
           </div>
 
-          {/* DIVIDER */}
-
           <div className="h-8 w-px shrink-0 bg-gray-200" />
 
           {/* =================================================
@@ -994,7 +1014,7 @@ export default function HeroPlanner() {
             className={`
               flex
               min-w-0
-              flex-[1.12]
+              flex-[1.25]
               items-center
               gap-2.5
               rounded-xl
@@ -1071,10 +1091,6 @@ export default function HeroPlanner() {
               `}
             />
           </button>
-
-          {/* =================================================
-              DIVIDER
-          ================================================= */}
 
           <div className="h-8 w-px shrink-0 bg-gray-200" />
 

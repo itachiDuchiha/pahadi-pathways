@@ -241,7 +241,7 @@ export default function Hero({ onPlanTrip }: HeroProps) {
             </div>
 
             {/* ===================================================
-                SUBTITLE
+                TAGLINE
             =================================================== */}
 
             <p
@@ -260,9 +260,7 @@ export default function Hero({ onPlanTrip }: HeroProps) {
                 md:leading-8
               "
             >
-              Curated journeys through the Himalayas,
-              <br />
-              crafted for unforgettable adventures and authentic experiences.
+              Your journey, our direction.
             </p>
 
             {/* ===================================================
@@ -551,8 +549,7 @@ export default function Hero({ onPlanTrip }: HeroProps) {
       {/* =========================================================
           SEARCH PLANNER
 
-          Position remains visually unchanged.
-          Hero image now extends farther downward.
+          Moved slightly lower.
       ========================================================= */}
 
       <div
@@ -560,7 +557,7 @@ export default function Hero({ onPlanTrip }: HeroProps) {
           relative
           z-30
           mx-auto
-          -mt-[176px]
+          -mt-[160px]
           max-w-6xl
           px-6
         "
