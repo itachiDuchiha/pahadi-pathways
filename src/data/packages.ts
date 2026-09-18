@@ -41,7 +41,7 @@ export const packages: Package[] = [
   {
     slug: "shimla-kinnaur-spiti-chandratal",
     title: "Kinnaur & Spiti: The Himalayan Circuit",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/spiti.jpg",
     duration: "9N / 10D",
     rating: 5.0,
     pickup: "Chandigarh",
@@ -250,7 +250,7 @@ export const packages: Package[] = [
   {
     slug: "shimla-manali-getaway",
     title: "Shimla & Manali Getaway",
-    image: "/images/packages/shimla-package.jpg",
+    image: "/images/packages/shimla.jpg",
     duration: "6N / 7D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -358,7 +358,7 @@ export const packages: Package[] = [
   {
     slug: "himachal-grand-circuit",
     title: "Himachal Grand Circuit",
-    image: "/images/packages/shimla-package.jpg",
+    image: "/images/packages/dharamshala.jpg",
     duration: "9N / 10D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -466,7 +466,7 @@ export const packages: Package[] = [
   {
     slug: "shimla-manali-jibhi",
     title: "Shimla, Manali & Jibhi Escape",
-    image: "/images/packages/manali-package.jpg",
+    image: "/images/packages/manali.jpg",
     duration: "7N / 8D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -565,7 +565,7 @@ export const packages: Package[] = [
   {
     slug: "shimla-kinnaur-spiti-kalpa",
     title: "Shimla, Kinnaur & Spiti Explorer",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/kalpa.jpg",
     duration: "8N / 9D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -671,7 +671,7 @@ export const packages: Package[] = [
   {
     slug: "manali-keylong-spiti-chandratal",
     title: "Manali, Lahaul & Spiti Expedition",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/keylong.jpg",
     duration: "9N / 10D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -807,7 +807,7 @@ export const packages: Package[] = [
   {
     slug: "manali-spiti-chandratal",
     title: "Manali & Spiti: High Himalayan Escape",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/chandratal.jpg",
     duration: "5N / 6D",
     rating: 4.9,
     pickup: "Chandigarh",
