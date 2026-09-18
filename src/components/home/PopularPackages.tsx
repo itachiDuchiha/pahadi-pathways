@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { packages } from "@/data/packages";
 import PackageCard from "@/components/packages/PackageCard";
 
@@ -209,8 +211,10 @@ export default function PopularPackages() {
         ===================================================== */}
 
         <div className="mt-9 text-center md:mt-10">
-          <button
+          <Link
+            href="/packages"
             className="
+              inline-block
               rounded-full
               border
               border-[#10264A]
@@ -228,7 +232,7 @@ export default function PopularPackages() {
             "
           >
             View All Packages
-          </button>
+          </Link>
         </div>
 
       </div>

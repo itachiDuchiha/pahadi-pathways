@@ -17,9 +17,17 @@ import TripPlannerForm from "@/components/forms/TripPlannerForm";
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const openPlanner = () => {
+    setIsModalOpen(true);
+  };
+
+  const closePlanner = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <>
-      <Hero onPlanTrip={() => setIsModalOpen(true)} />
+      <Hero onPlanTrip={openPlanner} />
 
       <PopularPackages />
 
@@ -29,13 +37,13 @@ export default function Home() {
 
       <WhyChooseUs />
 
-      <CallToAction />
+      <CallToAction onOpen={openPlanner} />
 
       <Footer />
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={closePlanner}
         title="Plan Your Himalayan Journey"
       >
         <TripPlannerForm />

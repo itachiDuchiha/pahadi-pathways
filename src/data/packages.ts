@@ -807,7 +807,7 @@ export const packages: Package[] = [
   {
     slug: "manali-spiti-chandratal",
     title: "Manali & Spiti: High Himalayan Escape",
-    image: "/images/packages/chandratal.jpg",
+    image: "/images/packages/chandratal1.jpg",
     duration: "5N / 6D",
     rating: 4.9,
     pickup: "Chandigarh",

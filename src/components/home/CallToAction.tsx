@@ -1,4 +1,12 @@
-export default function CallToAction() {
+import Link from "next/link";
+
+type CallToActionProps = {
+  onOpen: () => void;
+};
+
+export default function CallToAction({
+  onOpen,
+}: CallToActionProps) {
   return (
     <section
       className="relative my-20 overflow-hidden rounded-3xl"
@@ -10,7 +18,7 @@ export default function CallToAction() {
     >
       {/* Overlay */}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-[#10264A]/85 via-[#10264A]/70 to-black/60"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#10264A]/85 via-[#10264A]/70 to-black/60" />
 
       {/* Content */}
 
@@ -19,7 +27,7 @@ export default function CallToAction() {
         {/* Small Label */}
 
         <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#D9B255]">
-          LET'S PLAN YOUR JOURNEY
+          LET&apos;S PLAN YOUR JOURNEY
         </p>
 
         {/* Heading */}
@@ -30,14 +38,14 @@ export default function CallToAction() {
 
         {/* Gold Divider */}
 
-        <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#D9B255]"></div>
+        <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#D9B255]" />
 
         {/* Text */}
 
         <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-200">
-          Whether you're dreaming of a peaceful retreat in Shimla,
+          Whether you&apos;re dreaming of a peaceful retreat in Shimla,
           an adventure in Manali, or the breathtaking landscapes
-          of Spiti, we'll help you plan a journey that's comfortable,
+          of Spiti, we&apos;ll help you plan a journey that&apos;s comfortable,
           memorable, and tailored to you.
         </p>
 
@@ -45,9 +53,11 @@ export default function CallToAction() {
 
         <div className="mt-10 flex flex-col justify-center gap-5 sm:flex-row">
 
-          {/* Primary */}
+          {/* Primary — Opens the same Trip Planner Modal */}
 
           <button
+            type="button"
+            onClick={onOpen}
             className="
               rounded-full
               bg-[#C89A3D]
@@ -67,9 +77,10 @@ export default function CallToAction() {
             Plan My Journey
           </button>
 
-          {/* Secondary */}
+          {/* Secondary — Opens Contact Page */}
 
-          <button
+          <Link
+            href="/contact"
             className="
               rounded-full
               border
@@ -91,7 +102,7 @@ export default function CallToAction() {
             "
           >
             Contact Us
-          </button>
+          </Link>
 
         </div>
 

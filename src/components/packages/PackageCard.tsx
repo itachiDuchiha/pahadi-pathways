@@ -5,9 +5,11 @@ import Link from "next/link";
 import {
   ArrowRight,
   CarFront,
+  Check,
   Clock3,
   Hotel,
   MapPin,
+  Star,
   UtensilsCrossed,
 } from "lucide-react";
 import {
@@ -55,12 +57,11 @@ export default function PackageCard({ pkg }: Props) {
         )
     ) as HTMLElement[];
 
-    const moreElement =
-      measureContainer.querySelector(
-        "[data-more-measure]"
-      ) as HTMLElement | null;
+    const moreElement = measureContainer.querySelector(
+      "[data-more-measure]"
+    ) as HTMLElement | null;
 
-    const gap = 10;
+    const gap = 18;
 
     let usedWidth = 0;
     let count = 0;
@@ -84,7 +85,7 @@ export default function PackageCard({ pkg }: Props) {
 
       if (remaining > 0) {
         const moreWidth =
-          moreElement?.offsetWidth ?? 45;
+          moreElement?.offsetWidth ?? 50;
 
         let currentCount = count;
 
@@ -104,8 +105,7 @@ export default function PackageCard({ pkg }: Props) {
             `+${currentRemaining} More`;
 
           const measuredMoreWidth =
-            currentRemaining ===
-            pkg.itinerary.length
+            currentRemaining === pkg.itinerary.length
               ? moreWidth
               : Math.max(
                   moreWidth,
@@ -177,9 +177,7 @@ export default function PackageCard({ pkg }: Props) {
      ========================================================= */
 
   const normalizedIncludes = pkg.includes.map((item) =>
-    String(item)
-      .trim()
-      .toLowerCase()
+    String(item).trim().toLowerCase()
   );
 
   const hasTransfer = normalizedIncludes.some(
@@ -214,6 +212,10 @@ export default function PackageCard({ pkg }: Props) {
     hasStay ||
     hasMeals;
 
+  /* =========================================================
+     RENDER
+     ========================================================= */
+
   return (
     <article
       className="
@@ -222,65 +224,23 @@ export default function PackageCard({ pkg }: Props) {
         flex
         h-full
         flex-col
-        overflow-visible
-        rounded-[18px]
+        overflow-hidden
+        rounded-[22px]
+        border
+        border-[#10264A]/[0.10]
         bg-white
-        shadow-[0_8px_30px_rgba(16,38,74,0.07)]
+        shadow-[0_8px_30px_rgba(16,38,74,0.065)]
         transition-all
         duration-500
         ease-out
         hover:-translate-y-2
-        hover:shadow-[0_22px_50px_rgba(16,38,74,0.16)]
-        hover:shadow-[0_22px_50px_rgba(200,154,61,0.14)]
+        hover:border-[#C89A3D]
+        hover:shadow-[0_24px_55px_rgba(16,38,74,0.14),0_0_0_1px_rgba(200,154,61,0.28)]
       "
     >
-      {/* =========================================================
-          CONSISTENT GOLD OUTLINE
-          ========================================================= */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-0
-          z-[30]
-          rounded-[18px]
-          border-[1.5px]
-          border-[#C89A3D]/65
-          transition-all
-          duration-500
-          group-hover:border-[#C89A3D]
-          group-hover:shadow-[0_0_0_1px_rgba(200,154,61,0.10),0_0_22px_rgba(200,154,61,0.16)]
-        "
-      />
-
-      {/* =========================================================
-          SUBTLE TOP GOLD HIGHLIGHT
-          ========================================================= */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute
-          inset-x-8
-          top-0
-          z-[40]
-          h-px
-          bg-gradient-to-r
-          from-transparent
-          via-[#E2B85C]
-          to-transparent
-          opacity-60
-          transition-all
-          duration-500
-          group-hover:inset-x-5
-          group-hover:opacity-100
-        "
-      />
-
-      {/* =========================================================
+      {/* =====================================================
           IMAGE
-      ========================================================= */}
+      ===================================================== */}
 
       <Link
         href={`/packages/${pkg.slug}`}
@@ -290,9 +250,8 @@ export default function PackageCard({ pkg }: Props) {
         <div
           className="
             relative
-            h-[218px]
+            h-[225px]
             overflow-hidden
-            rounded-t-[18px]
             bg-[#E9EDF2]
           "
         >
@@ -300,46 +259,128 @@ export default function PackageCard({ pkg }: Props) {
             src={pkg.image}
             alt={pkg.title}
             fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            sizes="
+              (max-width: 768px) 100vw,
+              (max-width: 1280px) 50vw,
+              33vw
+            "
             className="
               object-cover
               transition-transform
-              duration-[900ms]
+              duration-[1100ms]
               ease-out
               group-hover:scale-[1.045]
             "
           />
 
-          {/* IMAGE GRADIENT */}
+          {/* Bottom cinematic gradient */}
 
           <div
             className="
               absolute
-              inset-0
+              inset-x-0
+              bottom-0
+              h-32
               bg-gradient-to-t
-              from-[#071525]/75
-              via-[#071525]/5
+              from-[#071525]/80
+              via-[#071525]/30
               to-transparent
             "
           />
 
-          {/* SUBTLE TOP IMAGE FADE */}
+          {/* Top protection */}
 
           <div
             className="
               absolute
               inset-x-0
               top-0
-              h-20
+              h-24
               bg-gradient-to-b
-              from-black/10
+              from-black/15
               to-transparent
             "
           />
 
-          {/* =====================================================
-              DURATION BADGE
-          ===================================================== */}
+          {/* =================================================
+              POPULAR BADGE
+          ================================================= */}
+
+          {pkg.popular && (
+            <div
+              className="
+                absolute
+                left-4
+                top-4
+                flex
+                items-center
+                gap-1.5
+                rounded-full
+                border
+                border-white/20
+                bg-[#10264A]/90
+                px-3
+                py-1.5
+                text-[9px]
+                font-bold
+                uppercase
+                tracking-[0.15em]
+                text-white
+                shadow-[0_5px_18px_rgba(0,0,0,0.18)]
+                backdrop-blur-md
+              "
+            >
+              <span
+                className="
+                  h-1.5
+                  w-1.5
+                  rounded-full
+                  bg-[#D4AF37]
+                "
+              />
+
+              Most Popular
+            </div>
+          )}
+
+          {/* =================================================
+              RATING
+          ================================================= */}
+
+          <div
+            className="
+              absolute
+              right-4
+              top-4
+              flex
+              items-center
+              gap-1.5
+              rounded-full
+              border
+              border-white/50
+              bg-white/95
+              px-2.5
+              py-1.5
+              text-[#10264A]
+              shadow-[0_5px_18px_rgba(0,0,0,0.15)]
+              backdrop-blur-md
+            "
+          >
+            <Star
+              size={11}
+              strokeWidth={1.8}
+              fill="currentColor"
+              className="text-[#C89A3D]"
+            />
+
+            <span className="text-[10px] font-bold">
+              {pkg.rating.toFixed(1)}
+            </span>
+          </div>
+
+          {/* =================================================
+              DURATION
+          ================================================= */}
 
           <div
             className="
@@ -351,25 +392,21 @@ export default function PackageCard({ pkg }: Props) {
               gap-2
               rounded-full
               border
-              border-[#C89A3D]/50
-              bg-[#071525]/85
+              border-white/15
+              bg-[#071525]/88
               px-3
               py-1.5
               text-[10px]
               font-semibold
-              tracking-[0.02em]
+              tracking-[0.03em]
               text-white
-              shadow-[0_4px_15px_rgba(0,0,0,0.20)]
+              shadow-[0_5px_18px_rgba(0,0,0,0.20)]
               backdrop-blur-md
-              transition-all
-              duration-300
-              group-hover:border-[#C89A3D]
-              group-hover:shadow-[0_5px_18px_rgba(200,154,61,0.22)]
             "
           >
             <Clock3
               size={12}
-              strokeWidth={2}
+              strokeWidth={1.9}
               className="text-[#D4AF37]"
             />
 
@@ -378,23 +415,23 @@ export default function PackageCard({ pkg }: Props) {
         </div>
       </Link>
 
-      {/* =========================================================
+      {/* =====================================================
           CONTENT
-      ========================================================= */}
+      ===================================================== */}
 
       <div
         className="
           flex
           flex-1
           flex-col
-          px-[17px]
-          pb-[17px]
+          px-5
+          pb-4
           pt-[15px]
         "
       >
-        {/* =======================================================
+        {/* =================================================
             TITLE
-        ======================================================= */}
+        ================================================= */}
 
         <div className="group/title relative min-w-0">
           <Link
@@ -402,91 +439,95 @@ export default function PackageCard({ pkg }: Props) {
             title={pkg.title}
             className="
               block
-              h-[1.55rem]
               min-w-0
-              truncate
-              whitespace-nowrap
               font-serif
-              text-[1.18rem]
+              text-[1.22rem]
               font-medium
-              leading-[1.2]
-              tracking-[-0.01em]
+              leading-[1.25]
+              tracking-[-0.012em]
               text-[#10264A]
               transition-colors
               duration-300
               hover:text-[#B5852F]
             "
           >
-            {pkg.title}
-          </Link>
-
-          {/* FULL TITLE HOVER */}
-
-          <div
-            className="
-              pointer-events-none
-              invisible
-              absolute
-              left-0
-              top-full
-              z-[100]
-              mt-2
-              max-w-[280px]
-              rounded-xl
-              border
-              border-white/10
-              bg-[#081526]
-              px-3.5
-              py-2.5
-              text-[10px]
-              font-medium
-              leading-4
-              text-white
-              opacity-0
-              shadow-[0_15px_35px_rgba(16,38,74,0.22)]
-              transition-all
-              duration-200
-              group-hover/title:visible
-              group-hover/title:opacity-100
-            "
-          >
-            {pkg.title}
-
             <span
               className="
+                block
+                truncate
+              "
+            >
+              {pkg.title}
+            </span>
+          </Link>
+
+          {/* Full title tooltip — ABOVE title */}
+
+          {pkg.title.length > 30 && (
+            <div
+              className="
+                pointer-events-none
+                invisible
                 absolute
-                -top-1
-                left-4
-                h-2
-                w-2
-                rotate-45
-                border-l
-                border-t
+                bottom-full
+                left-0
+                z-[100]
+                mb-2.5
+                max-w-[320px]
+                rounded-xl
+                border
                 border-white/10
                 bg-[#081526]
+                px-3.5
+                py-2.5
+                text-[10px]
+                font-medium
+                leading-4
+                text-white
+                opacity-0
+                shadow-[0_15px_35px_rgba(16,38,74,0.22)]
+                transition-all
+                duration-200
+                group-hover/title:visible
+                group-hover/title:opacity-100
               "
-            />
-          </div>
+            >
+              {pkg.title}
+
+              <span
+                className="
+                  absolute
+                  -bottom-1
+                  left-4
+                  h-2
+                  w-2
+                  rotate-45
+                  border-b
+                  border-r
+                  border-white/10
+                  bg-[#081526]
+                "
+              />
+            </div>
+          )}
         </div>
 
-        {/* =========================================================
-            DURATION + PICKUP
-        ========================================================= */}
+        {/* =================================================
+            BASIC INFO
+        ================================================= */}
 
         <div
           className="
             mt-2.5
             flex
-            h-[18px]
+            min-w-0
             items-center
-            gap-4
-            overflow-hidden
+            gap-3
+            overflow-visible
             whitespace-nowrap
-            text-[10.5px]
-            text-[#687386]
           "
         >
-          {/* Duration */}
+          {/* DURATION */}
 
           <div
             className="
@@ -494,478 +535,557 @@ export default function PackageCard({ pkg }: Props) {
               shrink-0
               items-center
               gap-1.5
+              text-[10.5px]
+              font-bold
+              text-[#10264A]
             "
           >
             <Clock3
-              size={13}
-              strokeWidth={1.8}
-              className="text-[#C89A3D]"
-            />
-
-            <span className="font-medium">
-              {pkg.duration}
-            </span>
-          </div>
-
-          {/* Pickup */}
-
-          <div
-            className="
-              flex
-              min-w-0
-              items-center
-              gap-1.5
-            "
-          >
-            <MapPin
-              size={13}
-              strokeWidth={1.8}
+              size={13.5}
+              strokeWidth={2}
               className="
                 shrink-0
                 text-[#C89A3D]
               "
             />
 
-            <span className="truncate">
-              Ex{" "}
-              <span className="font-semibold text-[#10264A]">
+            <span>
+              {pkg.duration}
+            </span>
+          </div>
+
+          {/* DIVIDER */}
+
+          <span
+            className="
+              h-4
+              w-px
+              shrink-0
+              bg-[#10264A]/15
+            "
+          />
+
+          {/* PICKUP */}
+
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              gap-1.5
+              text-[10.5px]
+              font-medium
+              text-[#10264A]
+            "
+          >
+            <MapPin
+              size={13.5}
+              strokeWidth={2}
+              className="
+                shrink-0
+                text-[#C89A3D]
+              "
+            />
+
+            <span>
+              From{" "}
+              <span
+                className="
+                  font-bold
+                  text-[#10264A]
+                "
+              >
                 {pkg.pickup}
               </span>
             </span>
           </div>
+
+          {/* SECOND DIVIDER */}
+
+          {hasAnyInclude && (
+            <span
+              className="
+                h-4
+                w-px
+                shrink-0
+                bg-[#10264A]/15
+              "
+            />
+          )}
+
+          {/* =================================================
+              FEATURE ICONS
+          ================================================= */}
+
+          {hasTransfer && (
+            <div
+              title="Transport"
+              className="
+                flex
+                h-[27px]
+                w-[27px]
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#10264A]/10
+                bg-[#F8F8F6]
+                text-[#10264A]
+                shadow-[0_2px_7px_rgba(16,38,74,0.07)]
+                transition-all
+                duration-200
+                hover:border-[#C89A3D]/60
+                hover:bg-[#FFF9EC]
+              "
+            >
+              <CarFront
+                size={13}
+                strokeWidth={1.9}
+              />
+            </div>
+          )}
+
+          {hasStay && (
+            <div
+              title="Stay"
+              className="
+                flex
+                h-[27px]
+                w-[27px]
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#10264A]/10
+                bg-[#F8F8F6]
+                text-[#10264A]
+                shadow-[0_2px_7px_rgba(16,38,74,0.07)]
+                transition-all
+                duration-200
+                hover:border-[#C89A3D]/60
+                hover:bg-[#FFF9EC]
+              "
+            >
+              <Hotel
+                size={13}
+                strokeWidth={1.9}
+              />
+            </div>
+          )}
+
+          {hasMeals && (
+            <div
+              title="Meals"
+              className="
+                flex
+                h-[27px]
+                w-[27px]
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#10264A]/10
+                bg-[#F8F8F6]
+                text-[#10264A]
+                shadow-[0_2px_7px_rgba(16,38,74,0.07)]
+                transition-all
+                duration-200
+                hover:border-[#C89A3D]/60
+                hover:bg-[#FFF9EC]
+              "
+            >
+              <UtensilsCrossed
+                size={13}
+                strokeWidth={1.9}
+              />
+            </div>
+          )}
         </div>
 
-        {/* =========================================================
-            ROUTE
-        ========================================================= */}
+        {/* =================================================
+            JOURNEY
+        ================================================= */}
 
         <div
           className="
             mt-3
-            h-[48px]
-            border-t
+            rounded-[14px]
+            border
             border-[#10264A]/[0.07]
-            pt-3
+            bg-[#F7F6F2]
+            px-3.5
+            py-2.5
           "
         >
-          <div className="flex min-w-0 items-center">
-            {/* ROUTE LABEL */}
-
-            <span
-              className="
-                mr-3
-                shrink-0
-                text-[9px]
-                font-bold
-                uppercase
-                tracking-[0.2em]
-                text-[#B5852F]
-              "
-            >
-              Route
-            </span>
-
-            {/* ROUTE CONTENT */}
-
+          <div
+            ref={routeRef}
+            className="
+              relative
+              min-w-0
+              overflow-visible
+            "
+          >
             <div
-              ref={routeRef}
               className="
-                relative
+                flex
                 min-w-0
-                flex-1
+                items-center
                 overflow-visible
+                whitespace-nowrap
               "
             >
-              <div
-                className="
-                  flex
-                  min-w-0
-                  items-center
-                  overflow-visible
-                  whitespace-nowrap
-                "
-              >
-                {visibleStops.map((stop, index) => (
-                  <div
-                    key={`${stop}-${index}`}
-                    className="
-                      flex
-                      shrink-0
-                      items-center
-                    "
-                  >
-                    <span
-                      className="
-                        whitespace-nowrap
-                        text-[10.5px]
-                        font-medium
-                        text-[#10264A]
-                      "
-                    >
-                      {stop}
-                    </span>
-
-                    {index !==
-                      visibleStops.length - 1 && (
-                      <span className="w-[10px] shrink-0" />
-                    )}
-                  </div>
-                ))}
-
-                {/* =================================================
-                    +N MORE
-                ================================================= */}
-
-                {hiddenStops.length > 0 && (
-                  <div
-                    className="
-                      group/more
-                      relative
-                      ml-1
-                      shrink-0
-                    "
-                  >
-                    <span
-                      className="
-                        cursor-default
-                        whitespace-nowrap
-                        text-[10px]
-                        font-semibold
-                        text-[#C89A3D]
-                        transition-colors
-                        duration-200
-                        group-hover/more:text-[#10264A]
-                      "
-                    >
-                      +{hiddenStops.length} More
-                    </span>
-
-                    {/* MORE STOPS TOOLTIP */}
-
-                    <div
-                      className="
-                        pointer-events-none
-                        invisible
-                        absolute
-                        bottom-full
-                        right-0
-                        z-[100]
-                        mb-2
-                        w-[135px]
-                        rounded-xl
-                        border
-                        border-[#10264A]/10
-                        bg-white
-                        px-3
-                        py-2.5
-                        opacity-0
-                        shadow-[0_12px_35px_rgba(16,38,74,0.16)]
-                        transition-all
-                        duration-200
-                        group-hover/more:visible
-                        group-hover/more:opacity-100
-                      "
-                    >
-                      <p
-                        className="
-                          mb-1.5
-                          text-[8px]
-                          font-bold
-                          uppercase
-                          tracking-[0.18em]
-                          text-[#C89A3D]
-                        "
-                      >
-                        More Stops
-                      </p>
-
-                      <div className="space-y-1">
-                        {hiddenStops.map(
-                          (item, index) => (
-                            <div
-                              key={`${item}-${index}`}
-                              className="
-                                text-[10px]
-                                font-medium
-                                leading-4
-                                text-[#10264A]
-                              "
-                            >
-                              {item}
-                            </div>
-                          )
-                        )}
-                      </div>
-
-                      <span
-                        className="
-                          absolute
-                          -bottom-1
-                          right-4
-                          h-2
-                          w-2
-                          rotate-45
-                          border-b
-                          border-r
-                          border-[#10264A]/10
-                          bg-white
-                        "
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* ===================================================
-                  HIDDEN MEASUREMENT ROW
-              =================================================== */}
-
-              <div
-                ref={measureRef}
-                className="
-                  pointer-events-none
-                  absolute
-                  left-0
-                  top-0
-                  flex
-                  h-0
-                  overflow-hidden
-                  whitespace-nowrap
-                  opacity-0
-                "
-                aria-hidden="true"
-              >
-                {pkg.itinerary.map((stop, index) => (
+              {visibleStops.map((stop, index) => (
+                <div
+                  key={`${stop}-${index}`}
+                  className="
+                    flex
+                    min-w-0
+                    shrink-0
+                    items-center
+                  "
+                >
                   <span
-                    key={`${stop}-${index}`}
                     className="
-                      shrink-0
+                      max-w-[110px]
+                      truncate
                       text-[10.5px]
-                      font-medium
+                      font-bold
+                      text-[#10264A]
                     "
+                    title={stop}
                   >
                     {stop}
                   </span>
-                ))}
 
-                <span
-                  data-more-measure
+                  {index !==
+                    visibleStops.length - 1 && (
+                    <span
+                      className="
+                        mx-[9px]
+                        shrink-0
+                        text-[10px]
+                        font-semibold
+                        text-[#B5852F]
+                      "
+                    >
+                      →
+                    </span>
+                  )}
+                </div>
+              ))}
+
+              {/* =================================================
+                  +N MORE
+              ================================================= */}
+
+              {hiddenStops.length > 0 && (
+                <div
                   className="
-                    text-[10px]
+                    group/more
+                    relative
+                    ml-1
+                    shrink-0
+                  "
+                >
+                  <span
+                    className="
+                      cursor-default
+                      whitespace-nowrap
+                      rounded-full
+                      bg-white
+                      px-2
+                      py-1
+                      text-[9px]
+                      font-bold
+                      text-[#B5852F]
+                      shadow-[0_2px_8px_rgba(16,38,74,0.06)]
+                      transition-colors
+                      duration-200
+                      group-hover/more:text-[#10264A]
+                    "
+                  >
+                    +{hiddenStops.length} More
+                  </span>
+
+                  {/* MORE STOPS TOOLTIP */}
+
+                  <div
+                    className="
+                      pointer-events-none
+                      invisible
+                      absolute
+                      bottom-full
+                      right-0
+                      z-[100]
+                      mb-2.5
+                      w-[150px]
+                      rounded-xl
+                      border
+                      border-[#10264A]/10
+                      bg-white
+                      px-3.5
+                      py-3
+                      opacity-0
+                      shadow-[0_15px_35px_rgba(16,38,74,0.16)]
+                      transition-all
+                      duration-200
+                      group-hover/more:visible
+                      group-hover/more:opacity-100
+                    "
+                  >
+                    <p
+                      className="
+                        mb-2
+                        text-[8px]
+                        font-bold
+                        uppercase
+                        tracking-[0.18em]
+                        text-[#C89A3D]
+                      "
+                    >
+                      More Stops
+                    </p>
+
+                    <div className="space-y-1.5">
+                      {hiddenStops.map(
+                        (item, index) => (
+                          <div
+                            key={`${item}-${index}`}
+                            className="
+                              flex
+                              items-center
+                              gap-1.5
+                              text-[10px]
+                              font-medium
+                              leading-4
+                              text-[#10264A]
+                            "
+                          >
+                            <span
+                              className="
+                                h-1
+                                w-1
+                                shrink-0
+                                rounded-full
+                                bg-[#C89A3D]
+                              "
+                            />
+
+                            {item}
+                          </div>
+                        )
+                      )}
+                    </div>
+
+                    <span
+                      className="
+                        absolute
+                        -bottom-1
+                        right-4
+                        h-2
+                        w-2
+                        rotate-45
+                        border-b
+                        border-r
+                        border-[#10264A]/10
+                        bg-white
+                      "
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* =================================================
+                HIDDEN MEASUREMENT ROW
+            ================================================= */}
+
+            <div
+              ref={measureRef}
+              className="
+                pointer-events-none
+                absolute
+                left-0
+                top-0
+                flex
+                h-0
+                overflow-hidden
+                whitespace-nowrap
+                opacity-0
+              "
+              aria-hidden="true"
+            >
+              {pkg.itinerary.map((stop, index) => (
+                <span
+                  key={`${stop}-${index}`}
+                  className="
+                    shrink-0
+                    text-[10.5px]
                     font-semibold
                   "
                 >
-                  +{pkg.itinerary.length} More
+                  {stop}
                 </span>
-              </div>
+              ))}
+
+              <span
+                data-more-measure
+                className="
+                  text-[9px]
+                  font-bold
+                "
+              >
+                +{pkg.itinerary.length} More
+              </span>
             </div>
           </div>
         </div>
 
-        {/* =========================================================
-            INCLUDES
-        ========================================================= */}
-
-        {hasAnyInclude && (
-          <div
-            className="
-              mt-3
-              flex
-              h-[30px]
-              items-center
-              gap-5
-              overflow-hidden
-              border-t
-              border-[#10264A]/[0.07]
-              pt-3
-            "
-          >
-            {/* TRANSFER */}
-
-            {hasTransfer && (
-              <div
-                className="
-                  flex
-                  shrink-0
-                  items-center
-                  gap-1.5
-                "
-              >
-                <CarFront
-                  size={14}
-                  strokeWidth={1.7}
-                  className="text-[#10264A]"
-                />
-
-                <span
-                  className="
-                    text-[10px]
-                    text-[#687386]
-                  "
-                >
-                  Transfer
-                </span>
-              </div>
-            )}
-
-            {/* STAY */}
-
-            {hasStay && (
-              <div
-                className="
-                  flex
-                  shrink-0
-                  items-center
-                  gap-1.5
-                "
-              >
-                <Hotel
-                  size={14}
-                  strokeWidth={1.7}
-                  className="text-[#10264A]"
-                />
-
-                <span
-                  className="
-                    text-[10px]
-                    text-[#687386]
-                  "
-                >
-                  Stay
-                </span>
-              </div>
-            )}
-
-            {/* MEALS */}
-
-            {hasMeals && (
-              <div
-                className="
-                  flex
-                  shrink-0
-                  items-center
-                  gap-1.5
-                "
-              >
-                <UtensilsCrossed
-                  size={14}
-                  strokeWidth={1.7}
-                  className="text-[#10264A]"
-                />
-
-                <span
-                  className="
-                    text-[10px]
-                    text-[#687386]
-                  "
-                >
-                  Meals
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* =========================================================
-            PRICE
-        ========================================================= */}
+        {/* =================================================
+            PRICE + CTA AREA
+        ================================================= */}
 
         <div
           className="
-            mt-3
-            flex
-            h-[42px]
-            items-end
-            justify-between
-            border-t
-            border-[#10264A]/[0.07]
+            mt-auto
             pt-3
           "
         >
-          <div className="flex items-baseline gap-2">
-            <span
-              className="
-                text-[9px]
-                font-bold
-                uppercase
-                tracking-[0.13em]
-                text-[#B5852F]
-              "
-            >
-              Starting from
-            </span>
+          {/* TOP DIVIDER */}
 
-            <span
-              className="
-                font-sans
-                text-[1.35rem]
-                font-bold
-                leading-none
-                tracking-tight
-                tabular-nums
-                text-[#10264A]
-              "
-            >
-              {pkg.price}
-            </span>
-          </div>
-
-          <span
+          <div
             className="
-              pb-0.5
-              text-[9px]
-              text-[#7B8492]
-            "
-          >
-            per person
-          </span>
-        </div>
-
-        {/* =========================================================
-            CTA
-        ========================================================= */}
-
-        <Link
-          href={`/packages/${pkg.slug}`}
-          className="
-            mt-3
-            flex
-            h-[40px]
-            w-full
-            shrink-0
-            items-center
-            justify-center
-            gap-2
-            rounded-lg
-            border
-            border-[#10264A]
-            bg-[#10264A]
-            px-4
-            text-[10px]
-            font-bold
-            uppercase
-            tracking-[0.1em]
-            text-white
-            shadow-[0_4px_12px_rgba(16,38,74,0.12)]
-            transition-all
-            duration-300
-            hover:border-[#18355F]
-            hover:bg-[#18355F]
-            hover:shadow-[0_7px_18px_rgba(16,38,74,0.18)]
-          "
-        >
-          View Journey Details
-
-          <ArrowRight
-            size={14}
-            strokeWidth={1.8}
-            className="
-              transition-transform
-              duration-300
-              group-hover:translate-x-1
+              mb-3
+              h-px
+              w-full
+              bg-[#10264A]/[0.09]
             "
           />
-        </Link>
+
+          <div
+            className="
+              flex
+              items-end
+              justify-between
+            "
+          >
+            {/* PRICE */}
+
+            <div>
+              <div
+                className="
+                  mb-1
+                  text-[8px]
+                  font-bold
+                  uppercase
+                  tracking-[0.20em]
+                  text-[#B5852F]
+                "
+              >
+                Starting from
+              </div>
+
+              <div
+                className="
+                  flex
+                  items-baseline
+                  gap-1.5
+                "
+              >
+                <span
+                  className="
+                    font-sans
+                    text-[1.55rem]
+                    font-bold
+                    leading-none
+                    tracking-[-0.025em]
+                    tabular-nums
+                    text-[#10264A]
+                  "
+                >
+                  {pkg.price}
+                </span>
+
+                <span
+                  className="
+                    text-[9px]
+                    font-medium
+                    text-[#687386]
+                  "
+                >
+                  / person
+                </span>
+              </div>
+            </div>
+
+            {/* PRIVATE TRIP */}
+
+            <div
+              className="
+                flex
+                items-center
+                gap-1
+                pb-0.5
+                text-[8px]
+                font-semibold
+                uppercase
+                tracking-[0.12em]
+                text-[#687386]
+              "
+            >
+              <Check
+                size={11}
+                strokeWidth={2}
+                className="text-[#C89A3D]"
+              />
+
+              Private trip
+            </div>
+          </div>
+
+          {/* CTA */}
+
+          <Link
+            href={`/packages/${pkg.slug}`}
+            className="
+              mt-3
+              flex
+              h-[46px]
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-[#10264A]
+              px-4
+              text-[9.5px]
+              font-bold
+              uppercase
+              tracking-[0.14em]
+              text-white
+              shadow-[0_6px_16px_rgba(16,38,74,0.12)]
+              transition-all
+              duration-300
+              hover:bg-[#18355F]
+              hover:shadow-[0_9px_22px_rgba(16,38,74,0.20)]
+            "
+          >
+            Explore Journey
+
+            <ArrowRight
+              size={14}
+              strokeWidth={1.8}
+              className="
+                transition-transform
+                duration-300
+                group-hover:translate-x-1
+              "
+            />
+          </Link>
+        </div>
       </div>
     </article>
   );
