@@ -16,76 +16,182 @@ export default function DestinationCard({
   destination,
 }: DestinationCardProps) {
   return (
-    <article
+    <Link
+      href={`/destinations/${destination.slug}`}
       className="
         group
+        block
         overflow-hidden
         rounded-3xl
+        border
+        border-[#10264A]/8
         bg-white
-        shadow-lg
+        shadow-[0_8px_30px_rgba(16,38,74,0.08)]
         transition-all
         duration-500
         hover:-translate-y-2
-        hover:shadow-2xl
+        hover:border-[#C89A3D]/60
+        hover:shadow-[0_18px_45px_rgba(16,38,74,0.14)]
+        focus:outline-none
+        focus:ring-2
+        focus:ring-[#C89A3D]
+        focus:ring-offset-2
       "
     >
-      <div className="relative h-[300px] overflow-hidden">
+      {/* ================= IMAGE ================= */}
+
+      <div className="relative h-[285px] overflow-hidden">
         <Image
           src={destination.image}
-          alt={destination.name}
+          alt={`${destination.name}, Himachal Pradesh`}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="
             object-cover
             transition-transform
             duration-700
+            ease-out
             group-hover:scale-105
           "
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/90 via-[#081526]/15 to-transparent" />
+        {/* Dark cinematic gradient */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            bg-gradient-to-t
+            from-[#081526]/95
+            via-[#081526]/25
+            to-transparent
+          "
+        />
+
+        {/* Subtle golden hover glow */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            bg-gradient-to-t
+            from-[#C89A3D]/10
+            via-transparent
+            to-transparent
+            opacity-0
+            transition-opacity
+            duration-500
+            group-hover:opacity-100
+          "
+        />
+
+        {/* ================= FEATURED BADGE ================= */}
 
         {destination.category && (
-          <div className="absolute left-5 top-5 rounded-full bg-white/90 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#10264A] backdrop-blur">
-            {destination.category}
+          <div
+            className="
+              absolute
+              left-5
+              top-5
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-[#C89A3D]/70
+              bg-[#081526]/65
+              px-3.5
+              py-1.5
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-[#D4AF37]
+              shadow-[0_4px_15px_rgba(0,0,0,0.18)]
+              backdrop-blur-md
+              transition-all
+              duration-300
+              group-hover:border-[#D4AF37]
+              group-hover:bg-[#081526]/80
+            "
+          >
+            <span className="text-[8px] text-[#D4AF37]">✦</span>
+
+            <span>{destination.category}</span>
+
+            <span className="h-px w-4 bg-[#C89A3D]/70" />
           </div>
         )}
 
+        {/* ================= IMAGE CONTENT ================= */}
+
         <div className="absolute bottom-5 left-5 right-5 text-white">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#D4AF37]">
+          <p
+            className="
+              text-[10px]
+              font-semibold
+              uppercase
+              tracking-[0.25em]
+              text-[#D4AF37]
+            "
+          >
             {destination.subtitle}
           </p>
 
-          <h3 className="mt-1.5 text-2xl font-bold">
+          <h3
+            className="
+              mt-1.5
+              font-serif
+              text-3xl
+              font-medium
+              leading-tight
+              tracking-[-0.01em]
+            "
+          >
             {destination.name}
           </h3>
         </div>
       </div>
 
-      <div className="p-6">
-        <p className="leading-7 text-gray-600">
+      {/* ================= CARD CONTENT ================= */}
+
+      <div className="flex min-h-[170px] flex-col p-6">
+        <p className="text-[15px] leading-7 text-gray-600">
           {destination.description}
         </p>
 
-        <Link
-          href={`/destinations/${destination.slug}`}
+        {/* ================= CTA ================= */}
+
+        <div
           className="
-            mt-6
+            mt-auto
             inline-flex
+            w-fit
             items-center
-            font-semibold
+            gap-2
+            pt-5
+            text-sm
+            font-bold
             text-[#10264A]
             transition-all
             duration-300
-            hover:text-[#C89A3D]
+            group-hover:text-[#C89A3D]
           "
         >
-          Explore Destination
+          <span>Explore Destination</span>
 
-          <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+          <span
+            className="
+              text-base
+              transition-transform
+              duration-300
+              group-hover:translate-x-1
+            "
+          >
             →
           </span>
-        </Link>
+        </div>
       </div>
-    </article>
+    </Link>
   );
 }

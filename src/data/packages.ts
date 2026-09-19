@@ -565,7 +565,7 @@ export const packages: Package[] = [
   {
     slug: "shimla-kinnaur-spiti-kalpa",
     title: "Shimla, Kinnaur & Spiti Explorer",
-    image: "/images/packages/kalpa.jpg",
+    image: "/images/packages/kalpa1.jpg",
     duration: "8N / 9D",
     rating: 4.9,
     pickup: "Chandigarh",

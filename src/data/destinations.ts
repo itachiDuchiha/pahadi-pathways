@@ -7,7 +7,7 @@ export const allDestinations = [
     subtitle: "The Queen of Hills",
     description:
       "Colonial charm, pine forests and beautiful Himalayan views.",
-    image: "/images/destinations/shimla.jpg",
+    image: "/images/destinations/destination-shimla.png",
     category: "Featured Journeys",
   },
 
@@ -17,7 +17,23 @@ export const allDestinations = [
     subtitle: "Adventure in the Mountains",
     description:
       "Snow peaks, rivers, forests and unforgettable mountain adventures.",
-    image: "/images/destinations/manali.jpg",
+
+    fullDescription:
+      "Manali is one of Himachal Pradesh's most loved mountain destinations, surrounded by snow-covered peaks, pine forests and the beautiful Beas River. From peaceful old villages and temples to scenic valleys and adventure-filled excursions, Manali offers something for families, couples and adventure travellers alike.",
+
+    // Images used INSIDE the Manali destination page
+    gallery: [
+      "/images/destinations/manali-1.png",
+      "/images/destinations/manali-2.png",
+      "/images/destinations/manali-3.png",
+      "/images/destinations/manali-5.png",
+    ],
+
+    // IMPORTANT:
+    // This is the image used on the Manali card
+    // on the main Destinations page.
+    image: "/images/destinations/destination-manali.png",
+
     category: "Featured Journeys",
   },
 
@@ -27,7 +43,7 @@ export const allDestinations = [
     subtitle: "The Middle Land",
     description:
       "Ancient monasteries and dramatic Himalayan landscapes.",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/destination-spiti.png",
     category: "Featured Journeys",
   },
 
@@ -39,7 +55,7 @@ export const allDestinations = [
     subtitle: "Snow & Scenic Views",
     description:
       "A popular stop near Shimla known for panoramic Himalayan views.",
-    image: "/images/destinations/shimla.jpg",
+    image: "/images/destinations/kufri.png",
     category: "Along the Way",
   },
 
@@ -49,7 +65,7 @@ export const allDestinations = [
     subtitle: "Adventure Hub",
     description:
       "A scenic valley surrounded by majestic mountains.",
-    image: "/images/destinations/manali.jpg",
+    image: "/images/destinations/solang.png",
     category: "Along the Way",
   },
 
@@ -59,7 +75,7 @@ export const allDestinations = [
     subtitle: "Mini Switzerland",
     description:
       "Rolling green meadows surrounded by cedar forests.",
-    image: "/images/destinations/shimla.jpg",
+    image: "/images/destinations/khajjiar.png",
     category: "Along the Way",
   },
 
@@ -71,7 +87,7 @@ export const allDestinations = [
     subtitle: "India's Last Village",
     description:
       "A peaceful Himalayan village near the Indo-Tibet border.",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/chitkul.png",
     category: "Hidden Himachal",
   },
 
@@ -81,7 +97,7 @@ export const allDestinations = [
     subtitle: "Views of Kinner Kailash",
     description:
       "Traditional Himalayan villages and breathtaking scenery.",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/kalpa.png",
     category: "Hidden Himachal",
   },
 
@@ -91,7 +107,7 @@ export const allDestinations = [
     subtitle: "Mountain Escape",
     description:
       "A peaceful village overlooking the beautiful Parvati Valley.",
-    image: "/images/destinations/manali.jpg",
+    image: "/images/destinations/tosh.png",
     category: "Hidden Himachal",
   },
 
@@ -103,7 +119,7 @@ export const allDestinations = [
     subtitle: "Ajanta of the Himalayas",
     description:
       "One of the world's oldest functioning Buddhist monasteries.",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/tabo.png",
     category: "Culture & Soul",
   },
 
@@ -113,7 +129,7 @@ export const allDestinations = [
     subtitle: "Cliffside Monastery",
     description:
       "Historic monastery dramatically perched above Spiti Valley.",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/dhankar.png",
     category: "Culture & Soul",
   },
 
@@ -123,7 +139,7 @@ export const allDestinations = [
     subtitle: "Sacred Hot Springs",
     description:
       "A revered pilgrimage destination in Parvati Valley.",
-    image: "/images/destinations/manali.jpg",
+    image: "/images/destinations/manikaran.png",
     category: "Culture & Soul",
   },
 ];

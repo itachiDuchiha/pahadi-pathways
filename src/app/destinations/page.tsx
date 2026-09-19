@@ -1,7 +1,13 @@
+"use client";
+
+import { useState } from "react";
+
 import SiteLayout from "@/components/layout/SiteLayout";
 import DestinationsHero from "@/components/destinations/DestinationsHero";
 import DestinationSection from "@/components/destinations/DestinationSection";
-import TravelThemes from "@/components/destinations/TravelThemes";
+
+import Modal from "@/components/ui/Modal";
+import TripPlannerForm from "@/components/forms/TripPlannerForm";
 
 import {
   featuredJourneys,
@@ -11,15 +17,21 @@ import {
 } from "@/data/destinations";
 
 export default function DestinationsPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openPlanner = () => {
+    setIsModalOpen(true);
+  };
+
+  const closePlanner = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <SiteLayout>
       {/* ================= HERO ================= */}
 
       <DestinationsHero />
-
-      {/* ================= TRAVEL THEMES ================= */}
-
-      <TravelThemes />
 
       {/* ================= FEATURED JOURNEYS ================= */}
 
@@ -55,99 +67,155 @@ export default function DestinationsPage() {
         destinations={cultureAndSoul}
       />
 
-      {/* ================= DESTINATION GUIDE ================= */}
-
-      <section className="bg-[#F7F3E9] py-14 md:py-16">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-              Himalayan Guide
-            </p>
-
-            <h2 className="mt-3 font-serif text-3xl font-medium text-[#10264A] md:text-4xl">
-              Places to Visit in Himachal Pradesh
-            </h2>
-
-            <p className="mx-auto mt-4 max-w-3xl leading-7 text-gray-600">
-              Himachal is not one single kind of destination. Each region has
-              its own landscape, atmosphere and character — from popular hill
-              stations and adventure valleys to remote villages and ancient
-              Himalayan settlements.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {/* WESTERN HIMACHAL */}
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-[#10264A]">
-                Western Himachal
-              </h3>
-
-              <p className="mt-3 text-sm leading-7 text-gray-600">
-                Explore destinations such as Dharamshala, McLeod Ganj,
-                Dalhousie and Khajjiar, where forests, valleys and mountain
-                culture come together.
-              </p>
-            </div>
-
-            {/* CENTRAL HIMACHAL */}
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-[#10264A]">
-                Central Himachal
-              </h3>
-
-              <p className="mt-3 text-sm leading-7 text-gray-600">
-                Discover classic Himalayan escapes around Shimla, Manali,
-                Kullu and nearby valleys, with a mix of scenery, adventure and
-                familiar mountain towns.
-              </p>
-            </div>
-
-            {/* HIGH HIMALAYAS */}
-
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-[#10264A]">
-                High Himalayas
-              </h3>
-
-              <p className="mt-3 text-sm leading-7 text-gray-600">
-                Travel deeper into Kinnaur and Spiti for dramatic landscapes,
-                ancient monasteries, high mountain roads and remote Himalayan
-                villages.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= CTA ================= */}
+      {/* ================= PLAN YOUR JOURNEY CTA ================= */}
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-        <div className="relative overflow-hidden rounded-3xl bg-[#10264A] px-8 py-12 text-center text-white md:px-16 md:py-16">
-          {/* Decorative glow */}
 
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#C89A3D]/10 blur-3xl" />
+        <div
+          className="
+            relative
+            overflow-hidden
+            rounded-3xl
+            shadow-[0_20px_60px_rgba(16,38,74,0.18)]
+          "
+          style={{
+            backgroundImage:
+              "url('/images/destinations/destination-manali.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
 
-          <div className="relative">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-              Can't Decide?
+          {/* ================= BACKGROUND OVERLAY ================= */}
+
+          {/* Main dark overlay */}
+          <div className="absolute inset-0 bg-[#081526]/30" />
+
+          {/* Gradient overlay for text readability */}
+          <div
+            className="
+              absolute
+              inset-0
+              bg-gradient-to-r
+              from-[#081526]/50
+              via-[#10264A]/20
+              to-[#081526]/40
+            "
+          />
+
+          {/* ================= GOLDEN ATMOSPHERIC GLOW ================= */}
+
+          <div
+            className="
+              absolute
+              -right-24
+              -top-24
+              h-72
+              w-72
+              rounded-full
+              bg-[#C89A3D]/10
+              blur-3xl
+            "
+          />
+
+          <div
+            className="
+              absolute
+              -bottom-24
+              -left-24
+              h-72
+              w-72
+              rounded-full
+              bg-[#C89A3D]/5
+              blur-3xl
+            "
+          />
+
+          {/* ================= CTA CONTENT ================= */}
+
+          <div
+            className="
+              relative
+              px-6
+              py-14
+              text-center
+              text-white
+              md:px-16
+              md:py-20
+            "
+          >
+
+            {/* Small heading */}
+
+            <p
+              className="
+                flex
+                items-center
+                justify-center
+                gap-3
+                text-[11px]
+                font-bold
+                uppercase
+                tracking-[0.3em]
+                text-[#D4AF37]
+              "
+            >
+              <span className="h-px w-10 bg-[#C89A3D]" />
+
+              Your Himalayan Journey
+
+              <span className="h-px w-10 bg-[#C89A3D]" />
             </p>
 
-            <h2 className="mt-3 font-serif text-3xl font-medium md:text-4xl">
-              Let Us Plan Your Himalayan Journey
+            {/* Main heading */}
+
+            <h2
+              className="
+                mx-auto
+                mt-5
+                max-w-3xl
+                font-serif
+                text-4xl
+                font-medium
+                leading-tight
+                md:text-5xl
+              "
+            >
+              Your Trip. Your Pace.
+
+              <span className="block text-[#D4AF37]">
+                Your Mountains.
+              </span>
             </h2>
 
-            <p className="mx-auto mt-4 max-w-2xl leading-7 text-gray-300">
-              Tell us your travel dates, interests and budget. We'll recommend
-              the perfect route through Himachal Pradesh.
+            {/* Description */}
+
+            <p
+              className="
+                mx-auto
+                mt-6
+                max-w-2xl
+                text-[15px]
+                leading-7
+                text-gray-100
+                md:text-base
+              "
+            >
+              Tell us where you want to go, how you like to travel and what
+              you want to experience. We&apos;ll help shape it into a journey
+              that fits you.
             </p>
+
+            {/* ================= PLAN BUTTON ================= */}
 
             <button
               type="button"
+              onClick={openPlanner}
               className="
-                mt-7
+                mt-8
+                inline-flex
+                items-center
+                gap-2
                 rounded-full
                 bg-[#C89A3D]
                 px-8
@@ -160,13 +228,55 @@ export default function DestinationsPage() {
                 hover:-translate-y-1
                 hover:bg-[#D7AE57]
                 hover:shadow-xl
+                focus:outline-none
+                focus:ring-2
+                focus:ring-[#D4AF37]
+                focus:ring-offset-2
+                focus:ring-offset-[#10264A]
               "
             >
-              Plan My Journey
+              <span>Plan My Journey</span>
+
+              <span
+                className="
+                  text-lg
+                  transition-transform
+                  duration-300
+                  group-hover:translate-x-1
+                "
+              >
+                →
+              </span>
             </button>
+
+            {/* Supporting text */}
+
+            <p
+              className="
+                mt-4
+                text-xs
+                tracking-wide
+                text-gray-200
+              "
+            >
+              Tell us your dates, interests &amp; budget
+            </p>
+
           </div>
         </div>
+
       </section>
+
+      {/* ================= TRIP PLANNER MODAL ================= */}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closePlanner}
+        title="Plan Your Himalayan Journey"
+      >
+        <TripPlannerForm />
+      </Modal>
+
     </SiteLayout>
   );
 }
