@@ -6,26 +6,66 @@ type Props = {
 
 export default function Overview({ pkg }: Props) {
   return (
-    <section className="bg-white py-20">
-      <div className="mx-auto max-w-7xl px-6">
+    <section className="border-b border-[#10264A]/8 bg-white">
+      <div className="px-6 py-8 sm:px-8 md:px-10 md:py-9">
 
-        <div className="max-w-4xl">
+        {/* =========================================================
+            SECTION LABEL
+        ========================================================= */}
 
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#C89A3D]">
-            Tour Overview
-          </p>
+        <p
+          className="
+            text-[9px]
+            font-bold
+            uppercase
+            tracking-[0.32em]
+            text-[#C89A3D]
+          "
+        >
+          Tour Overview
+        </p>
 
-          <h2 className="mt-4 text-4xl font-bold text-[#10264A]">
-            Discover the Real Spiti Valley
-          </h2>
+        {/* =========================================================
+            TITLE
+        ========================================================= */}
 
-          <div className="mt-5 h-1 w-20 rounded-full bg-[#C89A3D]" />
+        <h2
+          className="
+            mt-2
+            font-serif
+            text-2xl
+            font-medium
+            leading-tight
+            text-[#10264A]
+            sm:text-[28px]
+          "
+        >
+          Discover the Real Spiti Valley
+        </h2>
 
-          <p className="mt-8 text-lg leading-9 text-gray-700">
-            {pkg.overview}
-          </p>
+        {/* =========================================================
+            GOLD DIVIDER
+        ========================================================= */}
 
-        </div>
+        <div className="mt-3 h-[3px] w-12 rounded-full bg-[#C89A3D]" />
+
+        {/* =========================================================
+            OVERVIEW TEXT
+        ========================================================= */}
+
+        <p
+          className="
+            mt-5
+            max-w-4xl
+            text-[14px]
+            leading-7
+            text-[#25446D]
+            sm:text-[15px]
+            sm:leading-7
+          "
+        >
+          {pkg.overview}
+        </p>
 
       </div>
     </section>

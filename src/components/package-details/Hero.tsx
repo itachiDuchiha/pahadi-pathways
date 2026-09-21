@@ -1,5 +1,7 @@
 import Image from "next/image";
+
 import Link from "next/link";
+
 import {
   ArrowRight,
   Clock3,
@@ -21,32 +23,12 @@ export default function Hero({ pkg }: Props) {
    *
    * Arrows are rendered BETWEEN stops only.
    */
-
   const visibleStops = pkg.itinerary.slice(0, 5);
   const hiddenStops = pkg.itinerary.slice(5);
 
   return (
     <section className="bg-[#F5F6F8] pt-24 md:pt-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
-        {/* =========================================================
-            BREADCRUMB
-        ========================================================= */}
-
-        <div className="mb-4 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.12em] text-gray-500">
-          <Link
-            href="/packages"
-            className="transition-colors hover:text-[#C89A3D]"
-          >
-            Packages
-          </Link>
-
-          <span className="text-gray-300">/</span>
-
-          <span className="truncate text-[#10264A]">
-            {pkg.title}
-          </span>
-        </div>
 
         {/* =========================================================
             HERO
@@ -76,19 +58,15 @@ export default function Hero({ pkg }: Props) {
           />
 
           {/* =======================================================
-              CINEMATIC OVERLAY
+              REFINED IMAGE OVERLAY
           ======================================================= */}
 
-          <div className="absolute inset-0 bg-gradient-to-r from-[#081526]/95 via-[#081526]/65 to-[#081526]/15" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#081526]/85 via-[#081526]/50 to-[#081526]/10" />
 
-          <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/95 via-[#081526]/15 to-[#081526]/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/90 via-[#081526]/10 to-transparent" />
 
           {/* =======================================================
               MAIN HERO CONTENT
-              
-              IMPORTANT:
-              Content now starts from a fixed top position instead
-              of being pushed down by shorter titles.
           ======================================================= */}
 
           <div
@@ -96,10 +74,10 @@ export default function Hero({ pkg }: Props) {
               relative
               z-10
               flex
-              min-h-[405px]
+              min-h-[440px]
               flex-col
-              sm:min-h-[425px]
-              md:min-h-[430px]
+              sm:min-h-[455px]
+              md:min-h-[470px]
             "
           >
 
@@ -111,13 +89,13 @@ export default function Hero({ pkg }: Props) {
               className="
                 px-5
                 pt-10
-                pb-8
+                pb-10
                 sm:px-8
-                sm:pt-10
-                sm:pb-9
+                sm:pt-11
+                sm:pb-10
                 md:px-12
-                md:pt-10
-                md:pb-10
+                md:pt-12
+                md:pb-12
               "
             >
 
@@ -126,7 +104,7 @@ export default function Hero({ pkg }: Props) {
               =================================================== */}
 
               <div className="flex items-center gap-3">
-                <span className="h-px w-9 bg-[#D4AF37]" />
+                <span className="h-px w-10 bg-[#D4AF37]" />
 
                 <p
                   className="
@@ -148,16 +126,16 @@ export default function Hero({ pkg }: Props) {
               <h1
                 className="
                   mt-4
-                  max-w-6xl
+                  max-w-5xl
                   font-serif
                   text-4xl
                   font-medium
-                  leading-[1.02]
+                  leading-[1.05]
                   tracking-tight
                   text-white
                   sm:text-5xl
                   md:text-6xl
-                  lg:text-[4.25rem]
+                  lg:text-[4.15rem]
                 "
               >
                 {pkg.title}
@@ -167,7 +145,7 @@ export default function Hero({ pkg }: Props) {
                   JOURNEY ROUTE
               =================================================== */}
 
-              <div className="mt-7">
+              <div className="mt-8">
 
                 <p
                   className="
@@ -237,7 +215,6 @@ export default function Hero({ pkg }: Props) {
                             →
                           </span>
                         )}
-
                       </div>
                     );
                   })}
@@ -388,6 +365,7 @@ export default function Hero({ pkg }: Props) {
                         />
 
                       </div>
+
                     </div>
                   )}
 
@@ -398,10 +376,6 @@ export default function Hero({ pkg }: Props) {
 
             {/* =======================================================
                 BOTTOM INFORMATION BAR
-
-                mt-auto keeps this anchored to the bottom of the
-                hero regardless of whether the title is one or
-                two lines.
             ======================================================= */}
 
             <div
@@ -409,7 +383,7 @@ export default function Hero({ pkg }: Props) {
                 mt-auto
                 border-t
                 border-white/10
-                bg-[#081526]/85
+                bg-[#081526]/78
                 backdrop-blur-md
               "
             >
@@ -465,7 +439,7 @@ export default function Hero({ pkg }: Props) {
                 </div>
 
                 {/* =================================================
-                    STARTING POINT
+                    PICKUP LOCATION
                 ================================================= */}
 
                 <div
@@ -496,7 +470,7 @@ export default function Hero({ pkg }: Props) {
                         text-white/45
                       "
                     >
-                      Starting From
+                      Pickup Location
                     </span>
 
                   </div>
@@ -587,7 +561,6 @@ export default function Hero({ pkg }: Props) {
                     Book This Tour
 
                     <ArrowRight size={14} />
-
                   </Link>
 
                 </div>
@@ -597,11 +570,13 @@ export default function Hero({ pkg }: Props) {
             </div>
 
           </div>
+
         </div>
+
       </div>
 
       {/* =========================================================
-          SPACE BEFORE SECTION NAV
+          SMALL SPACE BEFORE SECTION NAV
       ========================================================= */}
 
       <div className="h-5 md:h-7" />

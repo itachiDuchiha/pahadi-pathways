@@ -6,7 +6,6 @@ import Hero from "@/components/package-details/Hero";
 import PackageSectionNav from "@/components/package-details/PackageSectionNav";
 
 import Overview from "@/components/package-details/Overview";
-import QuickFacts from "@/components/package-details/QuickFacts";
 import StayPlan from "@/components/package-details/StayPlan";
 import DayTimeline from "@/components/package-details/DayTimeline";
 import Highlights from "@/components/package-details/Highlights";
@@ -73,15 +72,6 @@ export default async function PackageDetailsPage({
                 className="scroll-mt-32"
               >
                 <Overview pkg={pkg} />
-              </section>
-
-              {/* QUICK FACTS */}
-
-              <section
-                id="quick-facts"
-                className="scroll-mt-32"
-              >
-                <QuickFacts pkg={pkg} />
               </section>
 
               {/* DETAILED ITINERARY */}

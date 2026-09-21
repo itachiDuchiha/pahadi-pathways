@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import {
+  ChevronDown,
+  MapPin,
+  Moon,
+  Navigation,
+} from "lucide-react";
 
 import type { Package } from "@/data/packages";
 
@@ -12,220 +17,373 @@ type Props = {
 export default function DayTimeline({ pkg }: Props) {
   const [openDay, setOpenDay] = useState<number | null>(1);
 
-  if (!pkg.itineraryDays || pkg.itineraryDays.length === 0) {
+  const days = pkg.itineraryDays ?? [];
+
+  if (!days.length) {
     return null;
   }
 
-  const toggleDay = (day: number) => {
-    setOpenDay((current) =>
-      current === day ? null : day
-    );
-  };
-
   return (
-    <section className="bg-[#F8F8F6] py-16">
-      <div className="mx-auto max-w-6xl px-6">
+    <section
+      id="itinerary"
+      className="border-b border-[#10264A]/8 bg-[#F8F7F3]"
+    >
+      <div className="px-5 py-6 sm:px-7 sm:py-7 md:px-8 md:py-8">
 
-        {/* =====================================================
-            SECTION HEADING
-        ===================================================== */}
+        {/* =========================================================
+            SECTION HEADER
+        ========================================================= */}
 
-        <div className="mb-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#C89A3D]">
-            Complete Itinerary
-          </p>
+        <div className="mb-5">
+          <div className="flex items-end justify-between gap-4">
 
-          <h2 className="mt-3 font-serif text-4xl font-medium text-[#10264A]">
-            Detailed Itinerary
-          </h2>
-
-          <div className="mt-4 h-[3px] w-16 rounded-full bg-[#C89A3D]" />
-        </div>
-
-
-        {/* =====================================================
-            DAY ACCORDION
-        ===================================================== */}
-
-        <div className="space-y-4">
-
-          {pkg.itineraryDays.map((day) => {
-            const isOpen = openDay === day.day;
-
-            return (
-              <div
-                key={day.day}
+            <div>
+              <p
                 className="
-                  overflow-hidden
-                  rounded-xl
-                  border
-                  border-[#10264A]/10
-                  bg-white
-                  shadow-[0_3px_14px_rgba(16,38,74,0.05)]
+                  text-[8px]
+                  font-bold
+                  uppercase
+                  tracking-[0.32em]
+                  text-[#C89A3D]
+                  sm:text-[9px]
                 "
               >
+                Complete Itinerary
+              </p>
 
-                {/* =================================================
-                    DAY HEADER
-                ================================================= */}
+              <h2
+                className="
+                  mt-1
+                  font-serif
+                  text-[26px]
+                  font-medium
+                  leading-tight
+                  text-[#10264A]
+                  sm:text-[29px]
+                "
+              >
+                Detailed Itinerary
+              </h2>
 
-                <button
-                  type="button"
-                  onClick={() => toggleDay(day.day)}
-                  aria-expanded={isOpen}
-                  className="
-                    flex
-                    w-full
-                    items-center
-                    gap-5
-                    px-5
-                    py-5
-                    text-left
-                    transition-colors
-                    duration-200
-                    hover:bg-[#FAF8F1]
-                    sm:px-6
-                  "
+              <div className="mt-2 h-[3px] w-11 rounded-full bg-[#C89A3D]" />
+            </div>
+
+          </div>
+        </div>
+
+        {/* =========================================================
+            ITINERARY TIMELINE
+        ========================================================= */}
+
+        <div className="relative">
+
+          {/* Vertical gold journey line */}
+
+          <div
+            className="
+              absolute
+              bottom-5
+              left-[20px]
+              top-5
+              w-px
+              bg-[#C89A3D]/25
+              sm:left-[22px]
+            "
+          />
+
+          <div className="space-y-2.5">
+
+            {days.map((day) => {
+              const isOpen = openDay === day.day;
+
+              return (
+                <div
+                  key={day.day}
+                  className="relative pl-[51px] sm:pl-[57px]"
                 >
 
-                  {/* DAY NUMBER */}
+                  {/* =================================================
+                      DAY NUMBER
+                  ================================================= */}
 
                   <div
                     className={`
+                      absolute
+                      left-0
+                      top-2.5
+                      z-10
                       flex
-                      h-12
-                      w-16
-                      shrink-0
+                      h-[40px]
+                      w-[40px]
                       items-center
                       justify-center
-                      text-lg
-                      font-semibold
-                      tracking-wide
-                      transition-colors
+                      rounded-full
+                      border
+                      text-[10px]
+                      font-bold
+                      transition-all
                       duration-200
+                      sm:h-[44px]
+                      sm:w-[44px]
                       ${
                         isOpen
-                          ? "text-[#C89A3D]"
-                          : "text-[#10264A]"
+                          ? "border-[#C89A3D] bg-[#C89A3D] text-white shadow-[0_3px_10px_rgba(200,154,61,0.20)]"
+                          : "border-[#C89A3D]/35 bg-[#F8F7F3] text-[#10264A]"
                       }
                     `}
                   >
-                    DAY {day.day}
+                    {String(day.day).padStart(2, "0")}
                   </div>
 
+                  {/* =================================================
+                      DAY CARD
+                  ================================================= */}
 
-                  {/* TITLE + ROUTE */}
-
-                  <div className="min-w-0 flex-1">
-
-                    <h3 className="text-base font-semibold uppercase tracking-[0.02em] text-[#10264A] sm:text-lg">
-                      {day.title}
-                    </h3>
-
-                    <p className="mt-1 text-sm text-[#52627A]">
-                      Overnight Stay:{" "}
-                      <span className="font-medium text-[#10264A]">
-                        {day.stay}
-                      </span>
-                    </p>
-
-                  </div>
-
-
-                  {/* ARROW */}
-
-                  <ChevronDown
-                    size={20}
-                    strokeWidth={1.8}
+                  <div
                     className={`
-                      shrink-0
-                      text-[#10264A]
-                      transition-transform
-                      duration-300
+                      overflow-hidden
+                      rounded-[11px]
+                      border
+                      bg-white
+                      transition-all
+                      duration-200
                       ${
                         isOpen
-                          ? "rotate-180"
-                          : "rotate-0"
+                          ? "border-[#C89A3D]/30 shadow-[0_4px_14px_rgba(16,38,74,0.055)]"
+                          : "border-[#10264A]/8 shadow-[0_2px_7px_rgba(16,38,74,0.025)]"
                       }
                     `}
-                  />
+                  >
 
-                </button>
+                    {/* =================================================
+                        COMPACT DAY HEADER
+                    ================================================= */}
 
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenDay(isOpen ? null : day.day)
+                      }
+                      aria-expanded={isOpen}
+                      className="
+                        flex
+                        min-h-[76px]
+                        w-full
+                        items-center
+                        gap-3
+                        px-4
+                        py-3
+                        text-left
+                        sm:min-h-[78px]
+                        sm:px-5
+                      "
+                    >
 
-                {/* =================================================
-                    DAY DETAILS
-                ================================================= */}
+                      <div className="min-w-0 flex-1">
 
-                <div
-                  className={`
-                    grid
-                    transition-[grid-template-rows]
-                    duration-300
-                    ease-in-out
-                    ${
-                      isOpen
-                        ? "grid-rows-[1fr]"
-                        : "grid-rows-[0fr]"
-                    }
-                  `}
-                >
+                        {/* Route */}
 
-                  <div className="overflow-hidden">
+                        <h3
+                          className="
+                            text-[12.5px]
+                            font-semibold
+                            leading-5
+                            text-[#10264A]
+                            sm:text-[13px]
+                          "
+                        >
+                          {day.title}
+                        </h3>
 
-                    <div className="border-t border-[#10264A]/10 px-5 pb-6 pt-6 sm:px-6">
+                        {/* Overnight */}
 
-                      <div className="max-w-4xl">
+                        {day.stay && day.stay !== "-" && (
+                          <div className="mt-1.5">
+                            <span
+                              className="
+                                inline-flex
+                                items-center
+                                gap-1
+                                rounded-full
+                                bg-[#10264A]/[0.045]
+                                px-2
+                                py-[3px]
+                                text-[8.5px]
+                                font-medium
+                                text-[#596579]
+                              "
+                            >
+                              <Moon
+                                size={9}
+                                strokeWidth={2}
+                                className="text-[#C89A3D]"
+                              />
 
-                        <p className="text-[15px] leading-7 text-[#52627A]">
-                          {day.description}
-                        </p>
+                              Overnight · {day.stay}
+                            </span>
+                          </div>
+                        )}
 
+                      </div>
 
-                        {/* OVERNIGHT BOX */}
+                      {/* Chevron */}
 
-                        {day.stay !== "-" && (
-                          <div
+                      <span
+                        className={`
+                          flex
+                          h-7
+                          w-7
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-full
+                          transition-all
+                          duration-200
+                          ${
+                            isOpen
+                              ? "bg-[#C89A3D]/10 text-[#C89A3D]"
+                              : "bg-[#10264A]/[0.035] text-[#667085]"
+                          }
+                        `}
+                      >
+                        <ChevronDown
+                          size={14}
+                          strokeWidth={2}
+                          className={`
+                            transition-transform
+                            duration-200
+                            ${isOpen ? "rotate-180" : ""}
+                          `}
+                        />
+                      </span>
+
+                    </button>
+
+                    {/* =================================================
+                        EXPANDED DAY DETAILS
+                    ================================================= */}
+
+                    {isOpen && (
+                      <div
+                        className="
+                          border-t
+                          border-[#10264A]/7
+                          px-4
+                          pb-4
+                          pt-3
+                          sm:px-5
+                          sm:pb-4.5
+                        "
+                      >
+
+                        {/* Description */}
+
+                        {day.description && (
+                          <p
                             className="
-                              mt-6
-                              flex
-                              items-center
-                              justify-between
-                              gap-4
-                              rounded-lg
-                              border
-                              border-[#C89A3D]/30
-                              bg-[#FBF6E8]
-                              px-4
-                              py-4
+                              max-w-2xl
+                              text-[11px]
+                              leading-[1.65]
+                              text-[#596579]
+                              sm:text-[11.5px]
                             "
                           >
+                            {day.description}
+                          </p>
+                        )}
 
-                            <div>
-                              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C89A3D]">
-                                Overnight Stay
-                              </p>
+                        {/* Places */}
 
-                              <p className="mt-1 font-medium text-[#10264A]">
-                                {day.stay}
-                              </p>
+                        {day.places && day.places.length > 0 && (
+                          <div className="mt-3">
+
+                            <div
+                              className="
+                                mb-1.5
+                                flex
+                                items-center
+                                gap-1.5
+                                text-[8px]
+                                font-bold
+                                uppercase
+                                tracking-[0.16em]
+                                text-[#C89A3D]
+                              "
+                            >
+                              <MapPin
+                                size={10}
+                                strokeWidth={2}
+                              />
+
+                              Places Along the Way
+                            </div>
+
+                            <div className="flex flex-wrap gap-1.5">
+                              {day.places.map((place) => (
+                                <span
+                                  key={place}
+                                  className="
+                                    rounded-full
+                                    border
+                                    border-[#10264A]/8
+                                    bg-[#F8F7F3]
+                                    px-2
+                                    py-1
+                                    text-[9px]
+                                    font-medium
+                                    text-[#34435A]
+                                  "
+                                >
+                                  {place}
+                                </span>
+                              ))}
                             </div>
 
                           </div>
                         )}
 
                       </div>
-
-                    </div>
+                    )}
 
                   </div>
-
                 </div>
+              );
+            })}
 
-              </div>
-            );
-          })}
+          </div>
+        </div>
 
+        {/* =========================================================
+            SMALL TRAVEL NOTE
+        ========================================================= */}
+
+        <div
+          className="
+            mt-5
+            flex
+            items-center
+            gap-2
+            rounded-lg
+            border
+            border-[#C89A3D]/15
+            bg-[#C89A3D]/[0.04]
+            px-3
+            py-2
+            text-[9px]
+            leading-4
+            text-[#667085]
+          "
+        >
+          <Navigation
+            size={11}
+            strokeWidth={1.8}
+            className="shrink-0 text-[#C89A3D]"
+          />
+
+          <span>
+            Daily timings may vary depending on road, weather and
+            local conditions.
+          </span>
         </div>
 
       </div>

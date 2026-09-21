@@ -20,7 +20,7 @@ const destinations = [
   },
   {
     name: "Shimla",
-    image: "/images/destinations/shimla.jpg",
+    image: "/images/destinations/shimla-3.png",
     tagline: "Queen of Hills",
     altitude: "2,276 m",
     bestTime: "Mar – Jun",
@@ -30,7 +30,7 @@ const destinations = [
   },
   {
     name: "Spiti Valley",
-    image: "/images/destinations/spiti.jpg",
+    image: "/images/destinations/spiti-1.png",
     tagline: "Cold Desert of India",
     altitude: "3,800 m",
     bestTime: "Jun – Sep",
@@ -79,6 +79,7 @@ export default function FeaturedDestinations() {
             md:mb-12
           "
         >
+
           {/* Eyebrow */}
 
           <div className="mb-4 flex items-center justify-center gap-3">
@@ -191,14 +192,14 @@ export default function FeaturedDestinations() {
               overflow-hidden
               rounded-[20px]
               border
-              border-[#C89A3D]/30
+              border-[#C89A3D]/35
               bg-[#10264A]
               shadow-[0_10px_35px_rgba(16,38,74,0.10)]
               transition-all
               duration-500
               hover:-translate-y-1
-              hover:border-[#D4AF37]
-              hover:shadow-[0_20px_45px_rgba(16,38,74,0.16),0_0_0_1px_rgba(212,175,55,0.18)]
+              hover:border-[#C89A3D]/70
+              hover:shadow-[0_20px_45px_rgba(16,38,74,0.16)]
               md:h-[490px]
             "
           >
@@ -210,7 +211,6 @@ export default function FeaturedDestinations() {
               sizes="(max-width:1024px) 100vw, 65vw"
               className="
                 object-cover
-                object-center
                 transition-transform
                 duration-[900ms]
                 ease-out
@@ -218,21 +218,18 @@ export default function FeaturedDestinations() {
               "
             />
 
-            {/* =================================================
-                MANALI IMAGE OVERLAY
-            ================================================= */}
+            {/* Image overlay */}
 
             <div
               className="
                 absolute
                 inset-0
                 bg-gradient-to-t
-                from-[#071525]/88
-                via-[#071525]/25
+                from-[#071525]/95
+                via-[#071525]/35
                 to-transparent
               "
             />
-
 
             {/* Top label */}
 
@@ -259,13 +256,9 @@ export default function FeaturedDestinations() {
             </div>
 
 
-            {/* =================================================
-                MANALI CONTENT
-            ================================================= */}
+            {/* Content */}
 
-            <div className="absolute bottom-8 left-7 right-7">
-
-              {/* Tagline */}
+            <div className="absolute bottom-7 left-7 right-7">
 
               <p
                 className="
@@ -273,15 +266,12 @@ export default function FeaturedDestinations() {
                   font-semibold
                   uppercase
                   tracking-[0.3em]
-                  text-[#F2D27B]
-                  drop-shadow-[0_2px_7px_rgba(0,0,0,0.75)]
+                  text-[#D9B255]
+                  drop-shadow-[0_2px_7px_rgba(0,0,0,0.7)]
                 "
               >
                 {destinations[0].tagline}
               </p>
-
-
-              {/* Destination Name */}
 
               <h3
                 className="
@@ -292,7 +282,6 @@ export default function FeaturedDestinations() {
                   leading-none
                   tracking-[-0.02em]
                   text-white
-                  drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]
                 "
               >
                 {destinations[0].name}
@@ -308,21 +297,20 @@ export default function FeaturedDestinations() {
                   items-center
                   gap-5
                   text-[10px]
-                  font-semibold
+                  font-medium
                   uppercase
                   tracking-[0.12em]
-                  text-[#F6D878]
-                  drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]
+                  text-[#F1D17A]
                 "
               >
 
                 <span className="flex items-center gap-1.5">
-                  <CalendarDays size={13} strokeWidth={1.9} />
+                  <CalendarDays size={13} strokeWidth={1.7} />
                   {destinations[0].bestTime}
                 </span>
 
                 <span className="flex items-center gap-1.5">
-                  <Mountain size={13} strokeWidth={1.9} />
+                  <Mountain size={13} strokeWidth={1.7} />
                   {destinations[0].altitude}
                 </span>
 
@@ -336,10 +324,8 @@ export default function FeaturedDestinations() {
                   mt-3
                   max-w-md
                   text-[13px]
-                  font-medium
                   leading-6
-                  text-white/90
-                  drop-shadow-[0_2px_7px_rgba(0,0,0,0.8)]
+                  text-white/80
                 "
               >
                 {destinations[0].description}
@@ -359,7 +345,6 @@ export default function FeaturedDestinations() {
                   uppercase
                   tracking-[0.16em]
                   text-[#F2D27B]
-                  drop-shadow-[0_2px_6px_rgba(0,0,0,0.75)]
                   transition-all
                   duration-300
                   group-hover:gap-3
@@ -369,7 +354,7 @@ export default function FeaturedDestinations() {
 
                 <ArrowRight
                   size={15}
-                  strokeWidth={1.9}
+                  strokeWidth={1.8}
                 />
               </div>
 
@@ -397,14 +382,14 @@ export default function FeaturedDestinations() {
                   overflow-hidden
                   rounded-[20px]
                   border
-                  border-[#C89A3D]/25
+                  border-[#C89A3D]/30
                   bg-[#10264A]
                   shadow-[0_8px_28px_rgba(16,38,74,0.08)]
                   transition-all
                   duration-500
                   hover:-translate-y-1
-                  hover:border-[#D4AF37]
-                  hover:shadow-[0_18px_38px_rgba(16,38,74,0.14),0_0_0_1px_rgba(212,175,55,0.18)]
+                  hover:border-[#C89A3D]/65
+                  hover:shadow-[0_18px_38px_rgba(16,38,74,0.14)]
                   lg:h-[232px]
                 "
               >
@@ -423,8 +408,6 @@ export default function FeaturedDestinations() {
                   "
                 />
 
-                {/* Image overlay */}
-
                 <div
                   className="
                     absolute
@@ -437,11 +420,7 @@ export default function FeaturedDestinations() {
                 />
 
 
-                {/* Content */}
-
                 <div className="absolute bottom-5 left-6 right-6">
-
-                  {/* Tagline */}
 
                   <p
                     className="
@@ -454,9 +433,6 @@ export default function FeaturedDestinations() {
                   >
                     {destination.tagline}
                   </p>
-
-
-                  {/* Destination Name */}
 
                   <h3
                     className="
@@ -471,8 +447,6 @@ export default function FeaturedDestinations() {
                     {destination.name}
                   </h3>
 
-
-                  {/* Meta */}
 
                   <div
                     className="
@@ -500,8 +474,6 @@ export default function FeaturedDestinations() {
 
                   </div>
 
-
-                  {/* CTA */}
 
                   <div
                     className="
@@ -565,10 +537,9 @@ export default function FeaturedDestinations() {
               shadow-[0_4px_14px_rgba(16,38,74,0.05)]
               transition-all
               duration-300
-              hover:border-[#D4AF37]
+              hover:border-[#C89A3D]
               hover:bg-white
               hover:text-[#B5852F]
-              hover:shadow-[0_6px_18px_rgba(200,154,61,0.12)]
             "
           >
             View All Destinations
