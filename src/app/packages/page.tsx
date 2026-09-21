@@ -1,5 +1,8 @@
 import SiteLayout from "@/components/layout/SiteLayout";
+
 import PackageCard from "@/components/packages/PackageCard";
+
+import CustomJourneyCTA from "@/components/packages/CustomJourneyCTA";
 
 import { packages } from "@/data/packages";
 
@@ -29,11 +32,11 @@ function normalizeText(value: string) {
 
    Examples:
 
-   "Spiti Valley"   -> "spiti"
-   "Tirthan Valley" -> "tirthan"
-   "McLeod Ganj"    -> "mcleod"
-   "Dharamshala"    -> "dharamshala"
-   "Kaza"           -> "kaza"
+   "Spiti Valley"     -> "spiti"
+   "Tirthan Valley"   -> "tirthan"
+   "McLeod Ganj"      -> "mcleod"
+   "Dharamshala"      -> "dharamshala"
+   "Kaza"             -> "kaza"
 ========================================================= */
 
 function getSearchKeyword(destination: string) {
@@ -61,16 +64,6 @@ function getSearchKeyword(destination: string) {
    - Highlights
    - Stay plan
    - Overview
-
-   Therefore:
-
-   Search "Dharamshala"
-   -> finds "1N Dharamshala" inside a route.
-
-   Search "Spiti Valley"
-   -> searches "spiti", so packages containing
-      "Spiti" are found even if they don't literally
-      contain "Spiti Valley".
 ========================================================= */
 
 function getPackageSearchText(
@@ -161,14 +154,11 @@ export default async function PackagesPage({
   /* =======================================================
      DISPLAYED PACKAGES
 
-     SEARCH PAGE:
+     When searching:
 
      1. Matching packages
      2. Popular packages
      3. Remaining packages
-
-     This keeps the customer's actual results
-     at the top.
   ======================================================= */
 
   let displayedPackages = packages;
@@ -209,20 +199,13 @@ export default async function PackagesPage({
 
   /* =======================================================
      SEARCH HERO IMAGE
-
-     Use the first matching package image if your
-     package data contains "image".
-
-     IMPORTANT:
-     If your package data uses a different image
-     property, change only this line.
   ======================================================= */
 
   const searchHeroImage =
     hasSearch
       ? (matchingPackages[0] as any)?.image ??
-        "/images/hero/hero.jpg"
-      : "/images/hero/hero.jpg";
+        "/images/hero/packages-hero.png"
+      : "/images/hero/packages-hero.png";
 
   /* =======================================================
      RETURN
@@ -239,17 +222,6 @@ export default async function PackagesPage({
         <>
           {/* =================================================
               SEARCH HERO
-
-              IMPORTANT:
-
-              pt-[96px] / mt-[96px] equivalent effect
-              keeps the fixed navbar completely OUTSIDE
-              the hero image.
-
-              Therefore:
-              - navbar stays readable
-              - image never sits behind navbar
-              - no transparency problem
           ================================================= */}
 
           <section
@@ -266,9 +238,7 @@ export default async function PackagesPage({
             "
           >
 
-            {/* =================================================
-                BACKGROUND IMAGE
-            ================================================= */}
+            {/* BACKGROUND IMAGE */}
 
             <img
               src={searchHeroImage}
@@ -284,12 +254,7 @@ export default async function PackagesPage({
               "
             />
 
-            {/* =================================================
-                OVERALL IMAGE TONE
-
-                Very subtle.
-                We don't want to wash out the photograph.
-            ================================================= */}
+            {/* SUBTLE IMAGE TONE */}
 
             <div
               className="
@@ -299,12 +264,7 @@ export default async function PackagesPage({
               "
             />
 
-            {/* =================================================
-                LEFT TEXT READABILITY
-
-                Stronger on the left.
-                Completely fades toward the image.
-            ================================================= */}
+            {/* LEFT READABILITY */}
 
             <div
               className="
@@ -317,9 +277,7 @@ export default async function PackagesPage({
               "
             />
 
-            {/* =================================================
-                CONTENT
-            ================================================= */}
+            {/* CONTENT */}
 
             <div
               className="
@@ -339,18 +297,12 @@ export default async function PackagesPage({
                 lg:px-12
               "
             >
-              <div
-                className="
-                  w-full
-                  max-w-[620px]
-                "
-              >
+              <div className="w-full max-w-[620px]">
 
-                {/* =================================================
-                    SMALL LABEL
-                ================================================= */}
+                {/* LABEL */}
 
                 <div className="flex items-center gap-3">
+
                   <span
                     className="
                       h-px
@@ -372,11 +324,10 @@ export default async function PackagesPage({
                   >
                     Your Search
                   </p>
+
                 </div>
 
-                {/* =================================================
-                    HEADING
-                ================================================= */}
+                {/* HEADING */}
 
                 <h1
                   className="
@@ -392,22 +343,24 @@ export default async function PackagesPage({
                     lg:text-[5rem]
                   "
                 >
-                  Journeys for
-                  <br />
-
-                  <span
-                    className="
-                      italic
-                      text-[#C89A3D]
-                    "
-                  >
-                    {destination}
-                  </span>
+                  {matchingCount > 0 ? (
+                    <>
+                      Journeys for{" "}
+                      <span className="italic text-[#C89A3D]">
+                        {destination}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Explore journeys around{" "}
+                      <span className="italic text-[#C89A3D]">
+                        {destination}
+                      </span>
+                    </>
+                  )}
                 </h1>
 
-                {/* =================================================
-                    RESULT COUNT
-                ================================================= */}
+                {/* RESULT DESCRIPTION */}
 
                 <p
                   className="
@@ -430,6 +383,7 @@ export default async function PackagesPage({
 
               </div>
             </div>
+
           </section>
 
           {/* =================================================
@@ -448,6 +402,7 @@ export default async function PackagesPage({
               md:pt-16
             "
           >
+
             <p
               className="
                 text-[10px]
@@ -493,6 +448,7 @@ export default async function PackagesPage({
                 ? "These journeys include your searched destination somewhere along the route."
                 : "We are still growing our collection. Explore these Himalayan journeys in the meantime."}
             </p>
+
           </section>
 
           {/* =================================================
@@ -508,6 +464,7 @@ export default async function PackagesPage({
               md:pb-20
             "
           >
+
             <div
               className="
                 grid
@@ -535,20 +492,12 @@ export default async function PackagesPage({
                   return (
                     <div
                       key={pkg.slug}
-                      className="
-                        contents
-                      "
+                      className="contents"
                     >
 
-                      {/* =========================================
+                      {/* =====================================
                           OTHER POPULAR ESCAPES
-
-                          This is intentionally OUTSIDE the
-                          matching cards.
-
-                          Therefore it appears ONLY AFTER
-                          ALL matching results.
-                      ========================================= */}
+                      ===================================== */}
 
                       {isFirstOtherPackage && (
                         <div
@@ -561,6 +510,7 @@ export default async function PackagesPage({
                             pt-10
                           "
                         >
+
                           <p
                             className="
                               text-[10px]
@@ -597,6 +547,7 @@ export default async function PackagesPage({
                             you want? Explore these
                             other journeys.
                           </p>
+
                         </div>
                       )}
 
@@ -618,140 +569,22 @@ export default async function PackagesPage({
               )}
 
             </div>
+
           </section>
 
           {/* =================================================
               CUSTOM JOURNEY
           ================================================= */}
 
-          <section
-            className="
-              mx-auto
-              max-w-6xl
-              px-6
-              pb-16
-              md:pb-20
-            "
-          >
-            <div
-              className="
-                relative
-                overflow-hidden
-                rounded-3xl
-                bg-[#10264A]
-                px-7
-                py-12
-                text-center
-                text-white
-                sm:px-10
-                md:px-16
-                md:py-14
-              "
-            >
+          <CustomJourneyCTA />
 
-              <div
-                className="
-                  absolute
-                  -right-24
-                  -top-24
-                  h-72
-                  w-72
-                  rounded-full
-                  bg-[#C89A3D]/10
-                  blur-3xl
-                "
-              />
-
-              <div
-                className="
-                  absolute
-                  -bottom-24
-                  -left-24
-                  h-64
-                  w-64
-                  rounded-full
-                  bg-white/5
-                  blur-3xl
-                "
-              />
-
-              <div className="relative">
-
-                <p
-                  className="
-                    text-[11px]
-                    font-bold
-                    uppercase
-                    tracking-[0.3em]
-                    text-[#D4AF37]
-                  "
-                >
-                  Travel Your Way
-                </p>
-
-                <h2
-                  className="
-                    mx-auto
-                    mt-3
-                    max-w-2xl
-                    font-serif
-                    text-3xl
-                    font-medium
-                    md:text-4xl
-                  "
-                >
-                  Want Something More Personal?
-                </h2>
-
-                <p
-                  className="
-                    mx-auto
-                    mt-4
-                    max-w-2xl
-                    text-sm
-                    leading-7
-                    text-gray-300
-                    sm:text-base
-                  "
-                >
-                  Every traveler is different.
-                  Tell us what you're looking for
-                  and we'll help create a Himalayan
-                  journey around you.
-                </p>
-
-                <button
-                  type="button"
-                  className="
-                    mt-7
-                    rounded-full
-                    bg-[#C89A3D]
-                    px-7
-                    py-3.5
-                    text-sm
-                    font-bold
-                    text-[#10264A]
-                    shadow-lg
-                    transition-all
-                    duration-300
-                    hover:-translate-y-1
-                    hover:bg-[#D7AE57]
-                    hover:shadow-xl
-                    active:scale-95
-                  "
-                >
-                  Plan My Journey
-                </button>
-
-              </div>
-            </div>
-          </section>
         </>
+
       ) : (
 
-        /* =====================================================
+        /* ===================================================
            NORMAL /packages PAGE
-        ===================================================== */
+        =================================================== */
 
         <>
           {/* =================================================
@@ -762,16 +595,18 @@ export default async function PackagesPage({
             className="
               relative
               flex
-              min-h-[520px]
+              min-h-[440px]
               items-center
               justify-center
               overflow-hidden
-              md:min-h-[560px]
+              md:min-h-[460px]
             "
           >
 
+            {/* BACKGROUND IMAGE */}
+
             <img
-              src="/images/hero/hero.jpg"
+              src="/images/hero/packages-hero.png"
               alt="Himalayan mountain journey"
               className="
                 absolute
@@ -782,16 +617,20 @@ export default async function PackagesPage({
               "
             />
 
+            {/* CINEMATIC OVERLAY */}
+
             <div
               className="
                 absolute
                 inset-0
                 bg-gradient-to-b
-                from-[#081526]/80
-                via-[#081526]/55
-                to-[#081526]/85
+                from-[#081526]/75
+                via-[#081526]/50
+                to-[#081526]/80
               "
             />
+
+            {/* SUBTLE CENTER GLOW */}
 
             <div
               className="
@@ -801,6 +640,8 @@ export default async function PackagesPage({
               "
             />
 
+            {/* HERO CONTENT */}
+
             <div
               className="
                 relative
@@ -809,13 +650,16 @@ export default async function PackagesPage({
                 w-full
                 max-w-4xl
                 px-6
-                pb-4
-                pt-24
+                pb-2
+                pt-16
                 text-center
                 text-white
                 sm:px-8
+                md:pt-20
               "
             >
+
+              {/* EYEBROW */}
 
               <div
                 className="
@@ -825,6 +669,7 @@ export default async function PackagesPage({
                   gap-3
                 "
               >
+
                 <span
                   className="
                     h-px
@@ -855,12 +700,15 @@ export default async function PackagesPage({
                     sm:w-14
                   "
                 />
+
               </div>
+
+              {/* MAIN HEADING */}
 
               <h1
                 className="
                   mx-auto
-                  mt-6
+                  mt-5
                   max-w-3xl
                   font-serif
                   text-[2.75rem]
@@ -884,16 +732,19 @@ export default async function PackagesPage({
                 </span>
               </h1>
 
+              {/* DIVIDER */}
+
               <div
                 className="
                   mx-auto
-                  mt-5
+                  mt-4
                   flex
                   items-center
                   justify-center
                   gap-3
                 "
               >
+
                 <span
                   className="
                     h-px
@@ -920,12 +771,15 @@ export default async function PackagesPage({
                     sm:w-16
                   "
                 />
+
               </div>
+
+              {/* DESCRIPTION */}
 
               <p
                 className="
                   mx-auto
-                  mt-5
+                  mt-4
                   max-w-2xl
                   text-sm
                   leading-6
@@ -934,13 +788,39 @@ export default async function PackagesPage({
                   sm:leading-7
                 "
               >
-                Thoughtfully planned journeys through
-                the mountains, designed around comfort,
-                discovery and authentic Himalayan
-                experiences.
+                Thoughtfully crafted journeys through
+                the Himalayas, designed around comfort,
+                discovery and authentic experiences.
+              </p>
+
+              {/* SUPPORTING LINE */}
+
+              <p
+                className="
+                  mt-4
+                  text-[9px]
+                  font-semibold
+                  uppercase
+                  tracking-[0.28em]
+                  text-[#D4AF37]/90
+                  sm:text-[10px]
+                  sm:tracking-[0.32em]
+                "
+              >
+                Private Trips
+                <span className="mx-2 text-[#C89A3D]/70">
+                  ·
+                </span>
+                Flexible Itineraries
+                <span className="mx-2 text-[#C89A3D]/70">
+                  ·
+                </span>
+                Local Expertise
               </p>
 
             </div>
+
+            {/* BOTTOM IMAGE FADE */}
 
             <div
               className="
@@ -948,9 +828,9 @@ export default async function PackagesPage({
                 bottom-0
                 left-0
                 right-0
-                h-20
+                h-16
                 bg-gradient-to-t
-                from-[#081526]/35
+                from-[#081526]/25
                 to-transparent
               "
             />
@@ -996,7 +876,7 @@ export default async function PackagesPage({
                 md:text-4xl
               "
             >
-              Choose Your Himalayan Experience
+              Explore Our Himalayan Journeys
             </h2>
 
             <p
@@ -1030,6 +910,7 @@ export default async function PackagesPage({
               md:pb-20
             "
           >
+
             <div
               className="
                 grid
@@ -1038,140 +919,23 @@ export default async function PackagesPage({
                 xl:grid-cols-3
               "
             >
+
               {packages.map((pkg) => (
                 <PackageCard
                   key={pkg.slug}
                   pkg={pkg}
                 />
               ))}
+
             </div>
+
           </section>
 
           {/* =================================================
               CUSTOM JOURNEY
           ================================================= */}
 
-          <section
-            className="
-              mx-auto
-              max-w-6xl
-              px-6
-              pb-16
-              md:pb-20
-            "
-          >
-            <div
-              className="
-                relative
-                overflow-hidden
-                rounded-3xl
-                bg-[#10264A]
-                px-7
-                py-12
-                text-center
-                text-white
-                sm:px-10
-                md:px-16
-                md:py-14
-              "
-            >
-
-              <div
-                className="
-                  absolute
-                  -right-24
-                  -top-24
-                  h-72
-                  w-72
-                  rounded-full
-                  bg-[#C89A3D]/10
-                  blur-3xl
-                "
-              />
-
-              <div
-                className="
-                  absolute
-                  -bottom-24
-                  -left-24
-                  h-64
-                  w-64
-                  rounded-full
-                  bg-white/5
-                  blur-3xl
-                "
-              />
-
-              <div className="relative">
-
-                <p
-                  className="
-                    text-[11px]
-                    font-bold
-                    uppercase
-                    tracking-[0.3em]
-                    text-[#D4AF37]
-                  "
-                >
-                  Travel Your Way
-                </p>
-
-                <h2
-                  className="
-                    mx-auto
-                    mt-3
-                    max-w-2xl
-                    font-serif
-                    text-3xl
-                    font-medium
-                    md:text-4xl
-                  "
-                >
-                  Want Something More Personal?
-                </h2>
-
-                <p
-                  className="
-                    mx-auto
-                    mt-4
-                    max-w-2xl
-                    text-sm
-                    leading-7
-                    text-gray-300
-                    sm:text-base
-                  "
-                >
-                  Every traveler is different. Tell us
-                  what you're looking for and we'll help
-                  create a Himalayan journey around you.
-                </p>
-
-                <button
-                  type="button"
-                  className="
-                    mt-7
-                    rounded-full
-                    bg-[#C89A3D]
-                    px-7
-                    py-3.5
-                    text-sm
-                    font-bold
-                    text-[#10264A]
-                    shadow-lg
-                    transition-all
-                    duration-300
-                    hover:-translate-y-1
-                    hover:bg-[#D7AE57]
-                    hover:shadow-xl
-                    active:scale-95
-                  "
-                >
-                  Plan My Journey
-                </button>
-
-              </div>
-            </div>
-          </section>
+          <CustomJourneyCTA />
 
         </>
       )}
