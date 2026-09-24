@@ -49,7 +49,7 @@ export default function Hero({ pkg }: Props) {
           ======================================================= */}
 
           <Image
-            src={pkg.image}
+            src={pkg.heroImage || pkg.image}
             alt={pkg.title}
             fill
             priority

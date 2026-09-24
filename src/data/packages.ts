@@ -2,6 +2,7 @@ export type Package = {
   slug: string;
   title: string;
   image: string;
+  heroImage?: string;
   duration: string;
   rating: number;
   pickup: string;
@@ -42,6 +43,7 @@ export const packages: Package[] = [
     slug: "shimla-kinnaur-spiti-chandratal",
     title: "Kinnaur & Spiti: The Himalayan Circuit",
     image: "/images/packages/spiti.jpg",
+    heroImage: "/images/packages/heroes/spiti.png",
     duration: "9N / 10D",
     rating: 5.0,
     pickup: "Chandigarh",
@@ -251,6 +253,7 @@ export const packages: Package[] = [
     slug: "shimla-manali-getaway",
     title: "Shimla & Manali Getaway",
     image: "/images/packages/shimla.jpg",
+    heroImage: "/images/packages/heroes/shimla.png",
     duration: "6N / 7D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -359,6 +362,7 @@ export const packages: Package[] = [
     slug: "himachal-grand-circuit",
     title: "Himachal Grand Circuit",
     image: "/images/packages/dharamshala.jpg",
+    heroImage: "/images/packages/heroes/dharamshala.png",
     duration: "9N / 10D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -467,6 +471,7 @@ export const packages: Package[] = [
     slug: "shimla-manali-jibhi",
     title: "Shimla, Manali & Jibhi Escape",
     image: "/images/packages/manali.jpg",
+    heroImage: "/images/packages/heroes/manali.png",
     duration: "7N / 8D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -566,6 +571,7 @@ export const packages: Package[] = [
     slug: "shimla-kinnaur-spiti-kalpa",
     title: "Shimla, Kinnaur & Spiti Explorer",
     image: "/images/packages/kalpa1.jpg",
+    heroImage: "/images/packages/heroes/kalpa.png",
     duration: "8N / 9D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -672,6 +678,7 @@ export const packages: Package[] = [
     slug: "manali-keylong-spiti-chandratal",
     title: "Manali, Lahaul & Spiti Expedition",
     image: "/images/packages/keylong.jpg",
+    heroImage: "/images/packages/heroes/keylong.png",
     duration: "9N / 10D",
     rating: 4.9,
     pickup: "Chandigarh",
@@ -808,6 +815,7 @@ export const packages: Package[] = [
     slug: "manali-spiti-chandratal",
     title: "Manali & Spiti: High Himalayan Escape",
     image: "/images/packages/chandratal1.jpg",
+    heroImage: "/images/packages/heroes/chandratal.png",
     duration: "5N / 6D",
     rating: 4.9,
     pickup: "Chandigarh",
