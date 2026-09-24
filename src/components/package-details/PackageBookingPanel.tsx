@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+
 import {
   Check,
   ChevronDown,
@@ -33,7 +34,6 @@ export default function PackageBookingPanel({ pkg }: Props) {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState<Child[]>([]);
 
-  // Child details stay collapsed until the user clicks the small arrow.
   const [childrenDetailsOpen, setChildrenDetailsOpen] =
     useState(false);
 
@@ -116,10 +116,6 @@ export default function PackageBookingPanel({ pkg }: Props) {
         age: 5,
       },
     ]);
-
-    // IMPORTANT:
-    // Do NOT automatically open the child details.
-    // User can open them using the small arrow.
   };
 
   const decreaseChildren = () => {
@@ -566,101 +562,142 @@ export default function PackageBookingPanel({ pkg }: Props) {
 
               <div
                 className="
+                  flex
+                  min-h-[58px]
+                  items-center
+                  justify-between
                   border-t
                   border-gray-100
+                  px-3
                 "
               >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setChildrenDetailsOpen(
-                      (current) => !current
-                    )
-                  }
-                  className="
-                    flex
-                    min-h-[58px]
-                    w-full
-                    items-center
-                    justify-between
-                    px-3
-                    text-left
-                    transition
-                    hover:bg-[#FAFAF8]
-                  "
-                >
-                  <div>
-                    <p
-                      className="
-                        text-[13px]
-                        font-bold
-                        text-[#10264A]
-                      "
-                    >
-                      Children
-                    </p>
-
-                    <p
-                      className="
-                        mt-0.5
-                        text-[10px]
-                        text-gray-400
-                      "
-                    >
-                      Age 1–10
-                    </p>
-                  </div>
-
-                  <div
+                <div>
+                  <p
                     className="
-                      flex
-                      items-center
-                      gap-2
+                      text-[13px]
+                      font-bold
+                      text-[#10264A]
                     "
                   >
-                    <span
+                    Children
+                  </p>
+
+                  <p
+                    className="
+                      mt-0.5
+                      text-[10px]
+                      text-gray-400
+                    "
+                  >
+                    Age 1–10
+                  </p>
+                </div>
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+                  {/* CHILD COUNT */}
+
+                  <span
+                    className="
+                      flex
+                      h-7
+                      min-w-7
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-[#F5F7FA]
+                      px-2
+                      text-[11px]
+                      font-bold
+                      text-[#10264A]
+                    "
+                  >
+                    {children.length}
+                  </span>
+
+                  {/* =================================================
+                      VISIBLE CHILD DETAIL INFO BUTTON
+
+                      This is intentionally larger and gold so it
+                      cannot be mistaken for the + / - controls.
+                  ================================================= */}
+
+                  {children.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setChildrenDetailsOpen(
+                          (current) => !current
+                        )
+                      }
+                      title="View child details"
+                      aria-label="View child details"
+                      aria-expanded={childrenDetailsOpen}
                       className="
                         flex
                         h-7
-                        min-w-7
+                        w-7
+                        shrink-0
                         items-center
                         justify-center
                         rounded-full
-                        bg-[#F5F7FA]
-                        px-2
-                        text-[11px]
-                        font-bold
-                        text-[#10264A]
+                        border-2
+                        border-[#C89A3D]
+                        bg-[#FFF8E8]
+                        text-[#9A6D16]
+                        shadow-[0_1px_4px_rgba(200,154,61,0.25)]
+                        transition
+                        hover:bg-[#C89A3D]
+                        hover:text-white
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-[#C89A3D]/30
                       "
                     >
-                      {children.length}
-                    </span>
+                      <Info
+                        size={15}
+                        strokeWidth={2.5}
+                      />
+                    </button>
+                  )}
 
-                    {/* Small info icon — only useful when
-                        children have been selected */}
-                    {children.length > 0 && (
-                      <span
-                        title="View child details"
-                        className="
-                          flex
-                          h-6
-                          w-6
-                          items-center
-                          justify-center
-                          rounded-full
-                          border
-                          border-[#C89A3D]/30
-                          text-[#C89A3D]
-                        "
-                      >
-                        <Info size={12} />
-                      </span>
-                    )}
+                  {/* CHILD DETAILS ARROW */}
 
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChildrenDetailsOpen(
+                        (current) => !current
+                      )
+                    }
+                    aria-label={
+                      childrenDetailsOpen
+                        ? "Hide child details"
+                        : "Show child details"
+                    }
+                    aria-expanded={childrenDetailsOpen}
+                    className="
+                      flex
+                      h-7
+                      w-7
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-[#F5F7FA]
+                      text-[#10264A]
+                      transition
+                      hover:bg-[#C89A3D]/10
+                    "
+                  >
                     <ChevronDown
                       size={15}
                       className={`
-                        text-[#10264A]
                         transition-transform
                         ${
                           childrenDetailsOpen
@@ -669,15 +706,12 @@ export default function PackageBookingPanel({ pkg }: Props) {
                         }
                       `}
                     />
-                  </div>
-                </button>
+                  </button>
+                </div>
               </div>
 
               {/* =================================================
                   HIDDEN CHILD DETAILS
-
-                  This section is NOT shown until the user
-                  clicks the small arrow/info area.
               ================================================= */}
 
               {childrenDetailsOpen && (
@@ -963,6 +997,7 @@ export default function PackageBookingPanel({ pkg }: Props) {
             </div>
 
             <div className="space-y-1.5 text-[11px]">
+
               {/* PACKAGE */}
 
               <div
