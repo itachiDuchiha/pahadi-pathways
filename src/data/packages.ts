@@ -28,9 +28,15 @@ export type Package = {
   itineraryDays?: {
     day: number;
     title: string;
+    start?: string;
+    end?: string;
     stay: string;
     description: string;
     places?: string[];
+    details?: {
+      title: string;
+      description: string;
+    }[];
   }[];
 };
 
@@ -129,90 +135,319 @@ export const packages: Package[] = [
       "Road conditions in Kinnaur and Spiti depend on weather and local administration. Sightseeing and route plans may change due to landslides, snowfall or road closures.",
 
     itineraryDays: [
+      // ========================================================
+      // DAY 1
+      // ========================================================
+
       {
         day: 1,
         title: "Chandigarh → Shimla",
+        start: "Chandigarh",
+        end: "Shimla",
         stay: "Shimla",
+
         description:
-          "Arrive at Chandigarh railway station or airport and enjoy a scenic drive to Shimla. Check in at the hotel and relax after the journey.",
+          "Arrive at Chandigarh railway station or airport and begin your Himalayan journey with a scenic drive towards Shimla. As the road climbs into the hills, the landscape gradually changes from the plains to pine-covered mountain slopes. On arrival, check in at your hotel and unwind after the journey.",
+
         places: ["Chandigarh", "Shimla"],
+
+        details: [
+          {
+            title: "Chandigarh",
+            description:
+              "Your journey begins at Chandigarh railway station or airport, where you will meet your driver and begin the drive towards the Himalayan hills.",
+          },
+          {
+            title: "Shimla",
+            description:
+              "The former summer capital of the British Raj and the present capital of Himachal Pradesh, Shimla is known for its colonial architecture, mountain setting, Mall Road and the historic Ridge. Spend the evening relaxing and enjoying the pleasant hill-station atmosphere.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 2
+      // ========================================================
+
       {
         day: 2,
         title: "Shimla → Sangla",
+        start: "Shimla",
+        end: "Sangla",
         stay: "Sangla",
+
         description:
-          "After breakfast, drive towards Sangla via Kufri, Fagu and Narkanda, following the scenic Sutlej River before entering the beautiful Baspa Valley.",
+          "After breakfast, leave Shimla and drive towards the remote Baspa Valley. The route passes through Kufri, Fagu and Narkanda before descending towards the Sutlej River and continuing deeper into Kinnaur. Arrive in Sangla by evening and check in at your hotel.",
+
         places: ["Kufri", "Fagu", "Narkanda", "Sangla"],
+
+        details: [
+          {
+            title: "Kufri",
+            description:
+              "Located near Shimla, Kufri is surrounded by dense deodar forests and offers beautiful Himalayan views. The area is also known for horse rides and winter activities.",
+          },
+          {
+            title: "Fagu",
+            description:
+              "A quiet mountain settlement surrounded by orchards, terraced fields and forested slopes. Fagu provides a peaceful introduction to the changing landscapes of the journey.",
+          },
+          {
+            title: "Narkanda",
+            description:
+              "Set among pine, cedar and oak forests, Narkanda is known for its apple orchards and wide Himalayan views. From here, the route gradually descends towards the Sutlej valley.",
+          },
+          {
+            title: "Sangla",
+            description:
+              "Sangla lies in the beautiful Baspa Valley of Kinnaur, surrounded by high mountains, deodar forests and apple orchards. The valley is also known for its distinctive Kinnauri culture and traditional architecture.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 3
+      // ========================================================
+
       {
         day: 3,
         title: "Sangla Local → Chitkul → Sangla",
+        start: "Sangla",
+        end: "Sangla",
         stay: "Sangla",
+
         description:
-          "Explore Sangla and visit the historic Kamru Fort and Kamakhya Devi Temple. Later continue to Chitkul, the last inhabited village on the old Indo-Tibetan trade route, before returning to Sangla.",
+          "After breakfast, explore the cultural side of Sangla with visits to Kamru Fort, Kamakhya Devi Temple and the local Nag Devta Temple. Later, drive towards Chitkul, one of the most scenic villages in the Baspa Valley, before returning to Sangla for the night.",
+
         places: [
           "Kamru Fort",
           "Kamakhya Devi Temple",
+          "Nag Devta Temple",
           "Chitkul Village",
-          "Baspa River",
+          "Baspa Valley",
+        ],
+
+        details: [
+          {
+            title: "Kamru Fort",
+            description:
+              "An ancient wooden structure overlooking the Sangla Valley, Kamru Fort reflects the traditional architecture and history of Kinnaur while offering impressive views of the surrounding mountains.",
+          },
+          {
+            title: "Kamakhya Devi Temple",
+            description:
+              "Located within the Kamru Fort complex, the temple is dedicated to Kamakhya Devi and adds an important spiritual and cultural element to the visit.",
+          },
+          {
+            title: "Nag Devta Temple",
+            description:
+              "A traditional local temple reflecting the deep connection between Kinnauri communities, their customs and the mountain landscape.",
+          },
+          {
+            title: "Chitkul Village",
+            description:
+              "Chitkul is a picturesque high-altitude village in the Baspa Valley, known for traditional wooden houses, apple orchards, mountain streams and dramatic Himalayan scenery.",
+          },
         ],
       },
+
+      // ========================================================
+      // DAY 4
+      // ========================================================
+
       {
         day: 4,
         title: "Sangla → Kalpa",
+        start: "Sangla",
+        end: "Kalpa",
         stay: "Kalpa",
+
         description:
-          "Drive from Sangla to Kalpa and explore the scenic Kinnaur region. After lunch and rest, visit the local monastery, Roghi Village and the famous viewpoint near Roghi.",
+          "After breakfast, leave Sangla and continue towards Kalpa through the spectacular landscapes of Kinnaur. On arrival, settle into the hotel and explore the peaceful surroundings of Kalpa, with its traditional houses, apple orchards and remarkable views towards the Kinner Kailash range.",
+
         places: [
           "Kalpa",
           "Hu-Bu-Lan-Kar Monastery",
           "Roghi Village",
-          "Suicide Point",
           "Kinner Kailash Views",
         ],
+
+        details: [
+          {
+            title: "Kalpa",
+            description:
+              "A peaceful Himalayan village known for its traditional Kinnauri character, apple orchards and spectacular views of the surrounding snow-covered mountains.",
+          },
+          {
+            title: "Kinner Kailash & Jorkanden Views",
+            description:
+              "On clear days, the mountains around Kalpa provide dramatic views of the Kinner Kailash range and Jorkanden Peak. These peaks hold deep cultural and religious significance in the region.",
+          },
+          {
+            title: "Hu-Bu-Lan-Kar Monastery",
+            description:
+              "A historic Buddhist monastery in Kalpa, offering a quiet atmosphere and an opportunity to experience the Buddhist heritage of the Kinnaur region.",
+          },
+          {
+            title: "Roghi Village",
+            description:
+              "A traditional Kinnauri village near Kalpa where visitors can experience mountain homes, orchards and local village life against a dramatic Himalayan backdrop.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 5
+      // ========================================================
+
       {
         day: 5,
-        title: "Kalpa → Nako → Tabo",
+        title: "Kalpa → Nako → Giu → Tabo",
+        start: "Kalpa",
+        end: "Tabo",
         stay: "Tabo",
+
         description:
-          "Drive deeper into Spiti Valley via Nako. Visit Nako Lake and the famous Padmasambhava Temple, with a stop at Giu to see the naturally preserved mummy before reaching Tabo.",
+          "After breakfast, leave Kalpa and enter the stark and dramatic landscapes of Spiti Valley. The route takes you through Nako and its high-altitude lake before continuing towards Giu and finally Tabo. Arrive in Tabo by evening and settle into your accommodation.",
+
         places: [
           "Nako",
           "Nako Lake",
           "Padmasambhava Temple",
+          "Giu",
           "Giu Mummy",
           "Tabo",
         ],
+
+        details: [
+          {
+            title: "Nako",
+            description:
+              "A remote Himalayan village surrounded by barren mountain slopes and traditional houses. Nako marks the transition from the greener landscapes of Kinnaur towards the high desert terrain of Spiti.",
+          },
+          {
+            title: "Nako Lake",
+            description:
+              "A small high-altitude lake located within the village of Nako. During the colder months, the lake can freeze, creating a striking contrast with the surrounding mountains.",
+          },
+          {
+            title: "Padmasambhava Temple",
+            description:
+              "A small but culturally important Buddhist shrine associated with Padmasambhava, reflecting the strong Buddhist traditions of the region.",
+          },
+          {
+            title: "Giu",
+            description:
+              "A small mountain settlement known for its unusual historical and religious attraction, located away from the main route between Kinnaur and Tabo.",
+          },
+          {
+            title: "Giu Mummy",
+            description:
+              "Giu is known for a naturally preserved mummified Buddhist monk kept at a small shrine in the village. It is an unusual cultural and historical stop along the route.",
+          },
+          {
+            title: "Tabo",
+            description:
+              "A historic Buddhist settlement and one of the most important cultural destinations in Spiti, known for its ancient monastery and remarkable Buddhist heritage.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 6
+      // ========================================================
+
       {
         day: 6,
         title: "Tabo → Dhankar → Kaza",
+        start: "Tabo",
+        end: "Kaza",
         stay: "Kaza",
+
         description:
-          "Visit the ancient Tabo Monastery before continuing towards Dhankar. Explore Dhankar Monastery and then drive onward to Kaza for your overnight stay.",
+          "Begin the day with a visit to the ancient Tabo Monastery before continuing towards Dhankar. Explore the historic monastery and dramatic mountain setting before driving onward to Kaza, the main town and commercial centre of Spiti Valley.",
+
         places: [
           "Tabo Monastery",
           "Tabo Caves",
           "Dhankar Monastery",
+          "Dhankar",
           "Kaza",
         ],
+
+        details: [
+          {
+            title: "Tabo Monastery",
+            description:
+              "Founded in the 10th century, Tabo Monastery is one of the most significant Buddhist monasteries in the Himalayas. Its ancient murals, sculptures and monastic spaces make it one of the cultural highlights of Spiti.",
+          },
+          {
+            title: "Tabo Caves",
+            description:
+              "The caves around Tabo reflect the area's long history of meditation and Buddhist practice and form part of the unique spiritual landscape surrounding the monastery.",
+          },
+          {
+            title: "Dhankar Monastery",
+            description:
+              "Perched dramatically above the Spiti landscape, Dhankar Monastery is surrounded by rugged mountains and deep river valleys. The setting offers some of the most striking views on this section of the journey.",
+          },
+          {
+            title: "Kaza",
+            description:
+              "Kaza is the main settlement of Spiti Valley and serves as the base for exploring several of the valley's high-altitude villages, monasteries and mountain landscapes.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 7
+      // ========================================================
+
       {
         day: 7,
-        title: "Kaza Local Sightseeing",
+        title: "Kaza → Kaza",
+        start: "Kaza",
+        end: "Kaza",
         stay: "Kaza",
+
         description:
-          "Explore the high-altitude villages around Kaza. Visit Langza, Hikkim and Komik and experience the unique landscape and culture of Spiti Valley.",
-        places: ["Langza", "Hikkim", "Komik"],
+          "After breakfast, head into the high-altitude villages surrounding Kaza. The day's route introduces you to the distinctive landscape, traditional settlements and Buddhist culture of upper Spiti before returning to Kaza for the night.",
+
+        places: ["Langza", "Hikkim", "Komik", "Kaza"],
+
+        details: [
+          {
+            title: "Langza",
+            description:
+              "Known for its fossil-rich surroundings and spectacular mountain views, Langza is one of Spiti's most recognizable villages. Traditional homes and the large Buddha statue add to its distinctive character.",
+          },
+          {
+            title: "Hikkim",
+            description:
+              "A remote high-altitude village famous for its post office and its isolated setting among the mountains. It offers a glimpse into everyday life in one of Spiti's remote settlements.",
+          },
+          {
+            title: "Komik",
+            description:
+              "A high-altitude village known for its traditional Spitian architecture, monastery and expansive views across the barren Himalayan landscape.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 8
+      // ========================================================
+
       {
         day: 8,
         title: "Kaza → Key → Kibber → Chicham → Chandratal",
+        start: "Kaza",
+        end: "Chandratal",
         stay: "Chandratal",
+
         description:
-          "Visit Key Monastery, Kibber Village and Chicham Bridge before crossing the spectacular Kunzum Pass towards Chandratal. Overnight stay at the camp near Chandratal.",
+          "After breakfast, leave Kaza and explore some of the most spectacular settlements of upper Spiti. Visit Key Monastery, Kibber and Chicham before crossing the high Kunzum Pass and continuing towards the magical Chandratal region for your overnight camp stay.",
+
         places: [
           "Key Monastery",
           "Kibber",
@@ -220,27 +455,109 @@ export const packages: Package[] = [
           "Kunzum Pass",
           "Chandratal",
         ],
+
+        details: [
+          {
+            title: "Key Monastery",
+            description:
+              "One of the most prominent Buddhist monasteries in Spiti, Key Monastery sits dramatically above the Spiti River and provides panoramic views across the surrounding valley.",
+          },
+          {
+            title: "Kibber",
+            description:
+              "A high-altitude Spitian village known for its traditional stone and mud houses, rugged landscape and proximity to the Kibber Wildlife Sanctuary.",
+          },
+          {
+            title: "Chicham Bridge",
+            description:
+              "The spectacular bridge near Chicham spans a deep mountain gorge and provides dramatic views of the surrounding terrain.",
+          },
+          {
+            title: "Kunzum Pass",
+            description:
+              "One of the major high mountain passes connecting Spiti with the Lahaul side of the Himalayas. Weather and road conditions can affect access to the pass.",
+          },
+          {
+            title: "Chandratal",
+            description:
+              "The approach to Chandratal takes you into a remote high-altitude landscape surrounded by rugged peaks. Depending on road and weather conditions, arrival at the campsite may be later in the day.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 9
+      // ========================================================
+
       {
         day: 9,
         title: "Chandratal → Manali",
+        start: "Chandratal",
+        end: "Manali",
         stay: "Manali",
+
         description:
-          "Visit the breathtaking Chandratal Lake in the morning before beginning the journey towards Manali through the high-altitude Lahaul landscape and Atal Tunnel.",
+          "Start the day with a visit to the beautiful Chandratal Lake before beginning the journey towards Manali. The route crosses the high-altitude Lahaul landscape and continues through the Atal Tunnel before reaching the Manali Valley.",
+
         places: [
           "Chandratal Lake",
           "Lahaul Valley",
           "Atal Tunnel",
           "Manali",
         ],
+
+        details: [
+          {
+            title: "Chandratal Lake",
+            description:
+              "Known as the 'Moon Lake', Chandratal is surrounded by dramatic mountain peaks and is one of the most memorable landscapes of the Spiti journey. Its appearance changes with the light and weather.",
+          },
+          {
+            title: "Lahaul Valley",
+            description:
+              "As the route leaves the Chandratal region, the landscape gradually changes from the stark terrain of Spiti towards the greener valleys of Lahaul.",
+          },
+          {
+            title: "Atal Tunnel",
+            description:
+              "The Atal Tunnel provides an important all-weather road connection between Manali and Lahaul, significantly shortening the route between the two regions.",
+          },
+          {
+            title: "Manali",
+            description:
+              "Arrive in Manali and settle into your hotel after the long mountain journey. The evening is kept free for rest.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 10
+      // ========================================================
+
       {
         day: 10,
         title: "Manali → Chandigarh",
+        start: "Manali",
+        end: "Chandigarh",
         stay: "-",
+
         description:
-          "After breakfast, begin the return journey from Manali to Chandigarh for your onward journey.",
+          "After breakfast, check out from the hotel and begin your return journey from Manali to Chandigarh. Enjoy the changing scenery as the road descends from the mountains towards the plains. On arrival, you will be dropped at Chandigarh Airport or Railway Station for your onward journey.",
+
         places: ["Manali", "Chandigarh"],
+
+        details: [
+          {
+            title: "Manali",
+            description:
+              "After breakfast, check out from your hotel and begin the final road journey of the trip.",
+          },
+          {
+            title: "Chandigarh",
+            description:
+              "The journey concludes with your drop-off at Chandigarh Airport or Railway Station for your onward travel.",
+          },
+        ],
       },
     ],
   },
@@ -641,7 +958,7 @@ export const packages: Package[] = [
         title: "Kaza Local Sightseeing",
         stay: "Kaza",
         description:
-          "Explore the monasteries and high-altitude villages around Kaza, including Key Monastery, Kibber and Chicham Bridge.",
+          "Explore the high-altitude villages around Kaza, including Key Monastery, Kibber and Chicham Bridge.",
         places: ["Key Monastery", "Kibber", "Chicham Bridge"],
       },
       {

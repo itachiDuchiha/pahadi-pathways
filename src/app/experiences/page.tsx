@@ -26,49 +26,49 @@ const experiences = [
     title: "Village Life & Homestays",
     description:
       "Slow down in mountain villages, stay close to local communities and experience a quieter side of the Himalayas.",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/spiti.jpg",
     icon: Home,
   },
   {
     title: "Monasteries & Culture",
     description:
       "Discover ancient monasteries, Buddhist traditions, mountain temples and the stories that have shaped Himalayan communities.",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/spiti.jpg",
     icon: Landmark,
   },
   {
     title: "Adventure & Trekking",
     description:
       "Explore mountain trails, valleys and lesser-known routes for journeys that go beyond the usual sightseeing.",
-    image: "/images/packages/manali-package.jpg",
+    image: "/images/packages/manali.jpg",
     icon: Footprints,
   },
   {
     title: "Food & Local Flavours",
     description:
       "Taste the Himalayas through traditional dishes, local ingredients and simple meals shared along the journey.",
-    image: "/images/packages/shimla-package.jpg",
+    image: "/images/packages/shimla.jpg",
     icon: Utensils,
   },
   {
     title: "Stargazing & Night Skies",
     description:
       "Far from city lights, experience remarkably clear Himalayan skies and nights filled with stars.",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/packages/spiti.jpg",
     icon: Star,
   },
   {
     title: "Photography & Scenic Views",
     description:
       "From sunrise over mountain ranges to winding roads and quiet villages, every journey offers moments worth capturing.",
-    image: "/images/hero/hero.jpg",
+    image: "/images/packages/dharamshala.jpg",
     icon: Camera,
   },
   {
     title: "Offbeat Himalayan Exploration",
     description:
       "Go beyond the familiar routes and discover hidden corners, remote landscapes and places that feel genuinely untouched.",
-    image: "/images/packages/manali-package.jpg",
+    image: "/images/packages/manali.jpg",
     icon: Compass,
   },
 ];
@@ -76,52 +76,84 @@ const experiences = [
 export default function ExperiencesPage() {
   return (
     <SiteLayout>
-      {/* HERO */}
-      <section className="relative flex min-h-[70vh] items-center overflow-hidden">
+      {/* =========================================================
+          HERO
+      ========================================================= */}
+      <section className="relative flex min-h-[68vh] items-center overflow-hidden">
         <Image
-          src="/images/hero/hero.jpg"
-          alt="Himalayan mountain landscape"
+          src="/images/hero/experiences-paragliding.png"
+          alt="Paragliding over the Himalayan mountains"
           fill
           priority
-          className="object-cover"
+          sizes="100vw"
+          className="object-cover object-top"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-[#081526]/90 via-[#081526]/70 to-[#081526]/35" />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#081526]/55 via-[#081526]/45 to-[#081526]/75" />
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:px-8 lg:px-10">
-          <div className="max-w-3xl text-white">
-            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.35em] text-[#D4AF37]">
-              THE HIMALAYAN COMPASS
-            </p>
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-6 pb-12 pt-28 text-center sm:px-8 lg:px-10">
+          <div className="max-w-4xl text-white">
+            {/* Eyebrow */}
+            <div className="mb-6 flex items-center justify-center gap-4">
+              <span className="h-px w-12 bg-[#D4AF37]" />
 
-            <h1 className="text-5xl font-extrabold leading-[1.05] md:text-7xl">
-              Experiences
-              <span className="block font-light text-white/90">
-                beyond the itinerary.
+              <p className="text-xs font-semibold uppercase tracking-[0.38em] text-[#D4AF37] sm:text-sm">
+                THE HIMALAYAN COMPASS
+              </p>
+
+              <span className="h-px w-12 bg-[#D4AF37]" />
+            </div>
+
+            {/* Main heading */}
+            <h1 className="font-serif text-5xl font-medium leading-[0.98] tracking-[-0.025em] sm:text-6xl md:text-7xl lg:text-[4.8rem]">
+              Experience the Himalayas
+              <span className="mt-2 block font-serif text-[#D4AF37] italic">
+                Beyond the Journey
               </span>
             </h1>
 
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-gray-200 md:text-xl">
-              The Himalayas are more than destinations on a map. They are
-              roads, villages, monasteries, flavours, adventures and quiet
-              moments that become part of the journey.
+            {/* Decorative divider */}
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <span className="h-px w-14 bg-[#D4AF37]" />
+              <span className="h-2 w-2 rotate-45 bg-[#D4AF37]" />
+              <span className="h-px w-14 bg-[#D4AF37]" />
+            </div>
+
+            {/* Description */}
+            <p className="mx-auto mt-7 max-w-3xl text-base font-medium leading-7 text-white/95 sm:text-lg sm:leading-8">
+              Adventure, culture, nature and quiet moments that turn a trip
+              through the mountains into a journey worth remembering.
+            </p>
+
+            {/* Experience categories */}
+            <p className="mt-7 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/90 sm:text-xs">
+              ADVENTURE
+              <span className="mx-3 text-[#D4AF37]">•</span>
+              CULTURE
+              <span className="mx-3 text-[#D4AF37]">•</span>
+              NATURE
+              <span className="mx-3 text-[#D4AF37]">•</span>
+              LOCAL LIFE
             </p>
           </div>
         </div>
       </section>
 
-      {/* INTRO */}
+      {/* =========================================================
+          INTRO
+      ========================================================= */}
       <section className="bg-[#F7F3E9] px-6 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-            What will you experience?
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D] sm:text-sm">
+            WHAT WILL YOU EXPERIENCE?
           </p>
 
-          <h2 className="mt-4 text-3xl font-extrabold text-[#10264A] md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-semibold text-[#10264A] sm:text-4xl md:text-5xl">
             Travel with a little more curiosity.
           </h2>
 
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-gray-600 md:text-lg">
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-[#40516B] md:text-lg">
             Our Experiences section is about the things you can see, do,
             taste and discover once you reach the mountains. Use it for
             inspiration when deciding where your next Himalayan journey
@@ -130,17 +162,24 @@ export default function ExperiencesPage() {
         </div>
       </section>
 
-      {/* EXPERIENCE GRID */}
+      {/* =========================================================
+          EXPERIENCE GRID
+      ========================================================= */}
       <section className="bg-white px-6 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-              Explore the possibilities
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D] sm:text-sm">
+              EXPLORE THE POSSIBILITIES
             </p>
 
-            <h2 className="mt-3 text-3xl font-extrabold text-[#10264A] md:text-4xl">
+            <h2 className="mt-3 font-serif text-3xl font-semibold text-[#10264A] md:text-4xl">
               Find your kind of Himalayan experience.
             </h2>
+
+            <p className="mt-4 text-base leading-7 text-[#40516B]">
+              From mountain adventures to quiet village moments, discover
+              different ways to experience Himachal.
+            </p>
           </div>
 
           <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-4">
@@ -150,13 +189,15 @@ export default function ExperiencesPage() {
               return (
                 <article
                   key={experience.title}
-                  className="group overflow-hidden rounded-2xl bg-white shadow-[0_10px_35px_rgba(16,38,74,0.08)] ring-1 ring-gray-100 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(16,38,74,0.15)]"
+                  className="group overflow-hidden rounded-2xl bg-white shadow-[0_10px_35px_rgba(16,38,74,0.08)] ring-1 ring-[#10264A]/8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(16,38,74,0.15)]"
                 >
+                  {/* Image */}
                   <div className="relative h-64 overflow-hidden">
                     <Image
                       src={experience.image}
                       alt={experience.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
@@ -167,17 +208,19 @@ export default function ExperiencesPage() {
                     </div>
                   </div>
 
+                  {/* Content */}
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-[#10264A]">
                       {experience.title}
                     </h3>
 
-                    <p className="mt-3 text-sm leading-7 text-gray-600">
+                    <p className="mt-3 text-sm leading-7 text-[#40516B]">
                       {experience.description}
                     </p>
 
-                    <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#C89A3D]">
+                    <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-[#B78622]">
                       Discover more
+
                       <ArrowRight
                         size={16}
                         className="transition-transform duration-300 group-hover:translate-x-1"
@@ -191,22 +234,26 @@ export default function ExperiencesPage() {
         </div>
       </section>
 
-      {/* FEATURED JOURNEY */}
+      {/* =========================================================
+          FEATURED JOURNEY
+      ========================================================= */}
       <section className="relative overflow-hidden bg-[#10264A] px-6 py-24 sm:px-8 lg:px-10">
         <div className="absolute -right-32 -top-32 h-80 w-80 rounded-full bg-[#C89A3D]/10 blur-3xl" />
+
         <div className="absolute -bottom-40 -left-32 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
+          {/* Text */}
           <div className="text-white">
-            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
-              One journey. Many experiences.
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37] sm:text-sm">
+              ONE JOURNEY. MANY EXPERIENCES.
             </p>
 
-            <h2 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
+            <h2 className="mt-5 font-serif text-3xl font-semibold leading-tight md:text-5xl">
               Spiti is not just a destination.
             </h2>
 
-            <p className="mt-6 max-w-xl text-base leading-8 text-gray-300 md:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/80 md:text-lg">
               A single Spiti journey can take you through ancient monasteries,
               remote villages, high-altitude landscapes, winding mountain
               roads, clear night skies and some of the most dramatic scenery
@@ -222,21 +269,24 @@ export default function ExperiencesPage() {
             </Link>
           </div>
 
+          {/* Image */}
           <div className="relative h-[380px] overflow-hidden rounded-3xl">
             <Image
-              src="/images/packages/spiti-package.jpg"
+              src="/images/packages/spiti.jpg"
               alt="Spiti Himalayan landscape"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/60 to-transparent" />
 
             <div className="absolute bottom-6 left-6 right-6">
               <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#D4AF37]">
-                Spiti Valley
+                SPITI VALLEY
               </p>
-              <p className="mt-2 text-2xl font-bold text-white">
+
+              <p className="mt-2 font-serif text-2xl font-semibold text-white">
                 Beyond the passes.
               </p>
             </div>
@@ -244,18 +294,20 @@ export default function ExperiencesPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* =========================================================
+          CTA
+      ========================================================= */}
       <section className="bg-[#F7F3E9] px-6 py-20 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-            Your journey starts with a question
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D] sm:text-sm">
+            YOUR JOURNEY STARTS WITH A QUESTION
           </p>
 
-          <h2 className="mt-4 text-3xl font-extrabold text-[#10264A] md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-semibold text-[#10264A] md:text-5xl">
             Where do you want the mountains to take you?
           </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-600 md:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-[#40516B] md:text-lg">
             Browse our destinations, explore the possibilities and then find
             a journey that fits the way you want to travel.
           </p>
@@ -271,7 +323,7 @@ export default function ExperiencesPage() {
 
             <Link
               href="/packages"
-              className="inline-flex items-center gap-2 rounded-full border border-[#10264A]/20 bg-white px-7 py-4 text-sm font-bold text-[#10264A] transition-all duration-300 hover:-translate-y-1 hover:border-[#C89A3D] hover:text-[#C89A3D] hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full border border-[#10264A]/20 bg-white px-7 py-4 text-sm font-bold text-[#10264A] transition-all duration-300 hover:-translate-y-1 hover:border-[#C89A3D] hover:text-[#B78622] hover:shadow-lg"
             >
               View Packages
               <ArrowRight size={17} />

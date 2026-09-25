@@ -51,7 +51,7 @@ export default function PackageSectionNav() {
        * Package section navbar = approximately 52px
        *
        * We use a point slightly below both navbars
-       * to decide which section is currently being viewed.
+       * to determine which section is currently visible.
        */
       const activationPoint = 175;
 
@@ -123,7 +123,7 @@ export default function PackageSectionNav() {
 
     /*
      * Leave enough space for:
-     * Main navbar + package navbar.
+     * Main navbar + package section navbar.
      */
     const offset = 155;
 
@@ -154,15 +154,15 @@ export default function PackageSectionNav() {
         z-40
         w-full
         border-y
-        border-[#10264A]/10
-        bg-white/97
+        border-[#C89A3D]/20
+        bg-[#F8F4EA]/98
         shadow-[0_4px_18px_rgba(16,38,74,0.08)]
         backdrop-blur-md
       "
     >
       <div className="w-full px-3 sm:px-5 lg:px-6">
         <div className="flex w-full items-stretch">
-          {sections.map((section) => {
+          {sections.map((section, index) => {
             const isActive =
               activeSection === section.id;
 
@@ -177,29 +177,66 @@ export default function PackageSectionNav() {
                   )
                 }
                 className={`
+                  relative
                   flex
                   flex-1
                   items-center
                   justify-center
                   whitespace-nowrap
+                  border-r
+                  border-[#10264A]/5
                   px-2
                   py-4
                   text-center
                   text-[13px]
                   font-semibold
                   tracking-[0.01em]
-                  transition-colors
+                  transition-all
                   duration-200
                   sm:px-2
                   sm:text-[14px]
+
+                  ${
+                    index === sections.length - 1
+                      ? "border-r-0"
+                      : ""
+                  }
+
                   ${
                     isActive
-                      ? "bg-[#DDBE73] text-[#10264A]"
-                      : "text-[#52627A] hover:bg-[#F7F3E9] hover:text-[#10264A]"
+                      ? `
+                        bg-[#E4D2A0]
+                        text-[#10264A]
+                      `
+                      : `
+                        text-[#263B59]
+                        hover:bg-[#F1E8D5]
+                        hover:text-[#10264A]
+                      `
                   }
+
+                  focus-visible:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-inset
+                  focus-visible:ring-[#C89A3D]
                 `}
               >
                 {section.label}
+
+                {isActive && (
+                  <span
+                    className="
+                      absolute
+                      bottom-0
+                      left-1/2
+                      h-[3px]
+                      w-10
+                      -translate-x-1/2
+                      rounded-t-full
+                      bg-[#C89A3D]
+                    "
+                  />
+                )}
               </a>
             );
           })}
