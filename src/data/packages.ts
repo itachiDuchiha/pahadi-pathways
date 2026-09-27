@@ -135,10 +135,6 @@ export const packages: Package[] = [
       "Road conditions in Kinnaur and Spiti depend on weather and local administration. Sightseeing and route plans may change due to landslides, snowfall or road closures.",
 
     itineraryDays: [
-      // ========================================================
-      // DAY 1
-      // ========================================================
-
       {
         day: 1,
         title: "Chandigarh → Shimla",
@@ -164,10 +160,6 @@ export const packages: Package[] = [
           },
         ],
       },
-
-      // ========================================================
-      // DAY 2
-      // ========================================================
 
       {
         day: 2,
@@ -204,10 +196,6 @@ export const packages: Package[] = [
           },
         ],
       },
-
-      // ========================================================
-      // DAY 3
-      // ========================================================
 
       {
         day: 3,
@@ -251,10 +239,6 @@ export const packages: Package[] = [
         ],
       },
 
-      // ========================================================
-      // DAY 4
-      // ========================================================
-
       {
         day: 4,
         title: "Sangla → Kalpa",
@@ -295,10 +279,6 @@ export const packages: Package[] = [
           },
         ],
       },
-
-      // ========================================================
-      // DAY 5
-      // ========================================================
 
       {
         day: 5,
@@ -353,10 +333,6 @@ export const packages: Package[] = [
         ],
       },
 
-      // ========================================================
-      // DAY 6
-      // ========================================================
-
       {
         day: 6,
         title: "Tabo → Dhankar → Kaza",
@@ -399,10 +375,6 @@ export const packages: Package[] = [
         ],
       },
 
-      // ========================================================
-      // DAY 7
-      // ========================================================
-
       {
         day: 7,
         title: "Kaza → Kaza",
@@ -433,10 +405,6 @@ export const packages: Package[] = [
           },
         ],
       },
-
-      // ========================================================
-      // DAY 8
-      // ========================================================
 
       {
         day: 8,
@@ -485,10 +453,6 @@ export const packages: Package[] = [
         ],
       },
 
-      // ========================================================
-      // DAY 9
-      // ========================================================
-
       {
         day: 9,
         title: "Chandratal → Manali",
@@ -530,10 +494,6 @@ export const packages: Package[] = [
         ],
       },
 
-      // ========================================================
-      // DAY 10
-      // ========================================================
-
       {
         day: 10,
         title: "Manali → Chandigarh",
@@ -563,7 +523,7 @@ export const packages: Package[] = [
   },
 
   // ============================================================
-  // 2. SHIMLA → MANALI
+  // 2. SHIMLA → MANALI → KASOL
   // ============================================================
 
   {
@@ -578,7 +538,8 @@ export const packages: Package[] = [
 
     itinerary: [
       "2N Shimla",
-      "4N Manali",
+      "3N Manali",
+      "1N Kasol",
     ],
 
     includes: [
@@ -588,85 +549,408 @@ export const packages: Package[] = [
       "Sightseeing",
     ],
 
+    overview:
+      "A balanced Himachal getaway combining the colonial charm of Shimla, the mountain landscapes and adventure experiences of Manali, and the relaxed atmosphere of Kasol in the Parvati Valley. Starting from Chandigarh, the journey covers Shimla's classic sights, Manali's local attractions and Solang Valley, followed by a scenic drive through Kullu to Kasol and Manikaran before returning to Chandigarh.",
+
+    stayPlan: [
+      "Shimla – 2 Nights",
+      "Manali – 3 Nights",
+      "Kasol – 1 Night",
+    ],
+
+    highlights: [
+      "Shimla",
+      "Kufri",
+      "Viceregal Lodge",
+      "Christ Church",
+      "Gaiety Theatre",
+      "The Ridge",
+      "Mall Road",
+      "Sundernagar",
+      "Pandoh Dam",
+      "Kullu Valley",
+      "Hadimba Temple",
+      "Manu Temple",
+      "Vashisht Hot Water Springs",
+      "Jogini Waterfall",
+      "Van Vihar",
+      "Manali Local Market",
+      "Solang Valley",
+      "North Portal of Atal Tunnel",
+      "Sissu",
+      "Rohtang Pass – Optional",
+      "Kullu",
+      "Vaishno Devi Temple",
+      "Kasol",
+      "Manikaran Sahib",
+      "Manikaran Hot Springs",
+    ],
+
+    exclusions: [
+      "Airfare / Train Tickets",
+      "Personal Expenses",
+      "Adventure Activities",
+      "Rohtang Pass excursion charges",
+      "Travel Insurance",
+      "Anything not mentioned under inclusions",
+    ],
+
+    bestTime: "March to June and September to November",
+    vehicle: "Private SUV / Innova Crysta",
+    tourType: "Private Tour",
+
+    idealFor: [
+      "Families",
+      "Couples",
+      "Friends",
+      "First-time Himachal Travelers",
+      "Adventure Travelers",
+    ],
+
+    travelNote:
+      "Mountain road conditions and sightseeing access depend on weather, local administration and road conditions. The Rohtang Pass excursion is optional and available at an additional cost during the permitted/open period. The route and sightseeing order may be adjusted when required for safety or operational reasons.",
+
     itineraryDays: [
+      // ========================================================
+      // DAY 1
+      // ========================================================
+
       {
         day: 1,
         title: "Chandigarh → Shimla",
+        start: "Chandigarh",
+        end: "Shimla",
         stay: "Shimla",
+
         description:
-          "Pickup from Chandigarh airport or railway station and drive to Shimla. Check in and relax at the hotel.",
+          "Arrive at Chandigarh railway station or airport and begin your scenic drive towards Shimla. As the road climbs into the hills, the landscape gradually changes from the plains to pine-covered mountain slopes. On arrival in Shimla, check in at your hotel and relax after the journey.",
+
+        places: ["Chandigarh", "Shimla"],
+
+        details: [
+          {
+            title: "Chandigarh",
+            description:
+              "Your journey begins at Chandigarh railway station or airport, where you will meet your driver and start the drive towards the Himalayan hills.",
+          },
+          {
+            title: "Shimla",
+            description:
+              "Once the summer capital of the British Raj and now the capital of Himachal Pradesh, Shimla is known for its colonial architecture, mountain setting, historic Ridge and lively Mall Road. Spend the evening relaxing and enjoying the atmosphere of the hill station.",
+          },
+        ],
       },
+
+      // ========================================================
+      // DAY 2
+      // ========================================================
+
       {
         day: 2,
         title: "Shimla Local Sightseeing",
+        start: "Shimla",
+        end: "Shimla",
         stay: "Shimla",
+
         description:
-          "Explore Shimla with visits to Kufri, Jakhu Temple, The Ridge, Mall Road and Christ Church.",
+          "After breakfast, spend the day exploring Shimla and its surrounding attractions. Visit Kufri and some of the city's historic landmarks before enjoying time around the Ridge and Mall Road.",
+
         places: [
           "Kufri",
-          "Jakhu Temple",
+          "Viceregal Lodge",
+          "Christ Church",
+          "Gaiety Theatre",
+          "Town Hall",
+          "Scandal Point",
           "The Ridge",
           "Mall Road",
-          "Christ Church",
+        ],
+
+        details: [
+          {
+            title: "Kufri",
+            description:
+              "Located around 16 km from Shimla, Kufri is surrounded by forested mountain slopes and offers scenic Himalayan views. Pony rides and other local activities are available separately.",
+          },
+          {
+            title: "Viceregal Lodge",
+            description:
+              "Also known as Rashtrapati Niwas, this historic colonial building was once the summer residence of the Viceroy of India. Its architecture and surrounding grounds offer a glimpse into Shimla's colonial past.",
+          },
+          {
+            title: "Christ Church",
+            description:
+              "Located prominently on the Ridge, Christ Church is one of Shimla's best-known landmarks and is recognized for its neo-Gothic architecture and stained-glass windows.",
+          },
+          {
+            title: "Gaiety Theatre",
+            description:
+              "A historic Victorian-era theatre located on Mall Road, Gaiety Theatre remains an important part of Shimla's cultural heritage.",
+          },
+          {
+            title: "Town Hall",
+            description:
+              "The historic Town Hall building is one of the prominent colonial-era structures around Shimla's central Mall Road area.",
+          },
+          {
+            title: "Scandal Point",
+            description:
+              "A popular viewpoint and meeting point on Mall Road offering views across the surrounding mountain landscape.",
+          },
+          {
+            title: "The Ridge & Mall Road",
+            description:
+              "The Ridge and Mall Road form the heart of Shimla's pedestrian centre, lined with historic buildings, shops, cafés and restaurants. Enjoy an evening stroll and explore the local atmosphere.",
+          },
         ],
       },
+
+      // ========================================================
+      // DAY 3
+      // ========================================================
+
       {
         day: 3,
         title: "Shimla → Manali",
+        start: "Shimla",
+        end: "Manali",
         stay: "Manali",
+
         description:
-          "Drive from Shimla to Manali through the scenic Himalayan valleys with en-route views around Sundernagar, Pandoh and Kullu.",
+          "After breakfast, check out from your hotel and begin the scenic drive from Shimla to Manali. The route passes through the mountain valleys around Sundernagar and Mandi before continuing alongside the Beas River through Kullu Valley. Arrive in Manali and check in at your hotel.",
+
         places: [
-          "Sundernagar Lake",
+          "Shimla",
+          "Sundernagar",
           "Pandoh Dam",
           "Mandi",
           "Kullu Valley",
+          "Manali",
+        ],
+
+        details: [
+          {
+            title: "Sundernagar",
+            description:
+              "A scenic valley town along the route from Shimla towards Manali. The surrounding hills and reservoir landscapes make this a pleasant en-route stop.",
+          },
+          {
+            title: "Pandoh Dam",
+            description:
+              "A major hydroelectric reservoir on the Beas River, surrounded by dramatic mountain scenery. Depending on the day's travel conditions, a short photo stop can be made here.",
+          },
+          {
+            title: "Kullu Valley",
+            description:
+              "Known for its green mountain slopes, apple orchards, pine forests and the Beas River, Kullu Valley provides a striking transition before reaching Manali.",
+          },
+          {
+            title: "Manali",
+            description:
+              "A popular Himalayan destination surrounded by mountains, forests and rivers. On arrival, check in and relax after the day's drive.",
+          },
         ],
       },
+
+      // ========================================================
+      // DAY 4
+      // ========================================================
+
       {
         day: 4,
         title: "Manali Local Sightseeing",
+        start: "Manali",
+        end: "Manali",
         stay: "Manali",
+
         description:
-          "Explore Manali with visits to Hadimba Temple, Club House, Tibetan Monastery and Vashisht Village.",
+          "After breakfast, explore the cultural and natural attractions around Manali. Visit Hadimba Temple, walk through Old Manali towards Manu Temple, experience the hot-water springs at Vashisht and enjoy the peaceful surroundings of Van Vihar. An optional walk towards Jogini Waterfall can also be included depending on time and weather. End the day with shopping at the local market.",
+
         places: [
           "Hadimba Temple",
-          "Club House",
-          "Tibetan Monastery",
-          "Vashisht Village",
+          "Manu Temple",
+          "Vashisht Hot Water Springs",
+          "Jogini Waterfall",
+          "Van Vihar",
+          "Manali Local Market",
+        ],
+
+        details: [
+          {
+            title: "Hadimba Devi Temple",
+            description:
+              "Set among tall deodar trees, this distinctive wooden temple is dedicated to Hadimba Devi and is one of Manali's best-known cultural landmarks.",
+          },
+          {
+            title: "Manu Temple",
+            description:
+              "Located in Old Manali, the temple is dedicated to Sage Manu. Reaching it involves a short walk through the lanes of Old Manali and provides a glimpse of the area's traditional character.",
+          },
+          {
+            title: "Vashisht Hot Water Springs",
+            description:
+              "Vashisht village is known for its natural hot-water springs and ancient temples. It is a popular stop for travellers exploring the Manali area.",
+          },
+          {
+            title: "Jogini Waterfall",
+            description:
+              "An optional walk from the Vashisht area leads towards Jogini Waterfall. The route passes through mountain scenery, forests and local surroundings and can be covered depending on available time and weather.",
+          },
+          {
+            title: "Van Vihar",
+            description:
+              "A peaceful green space near central Manali, suitable for a relaxed walk among tall trees.",
+          },
+          {
+            title: "Manali Local Market",
+            description:
+              "Spend some time exploring the local market for woollens, handicrafts, souvenirs, cafés and local products.",
+          },
         ],
       },
+
+      // ========================================================
+      // DAY 5
+      // ========================================================
+
       {
         day: 5,
-        title: "Manali → Solang Valley → Atal Tunnel → Sissu",
+        title: "Manali → Solang Valley → North Portal of Atal Tunnel → Sissu → Manali",
+        start: "Manali",
+        end: "Manali",
         stay: "Manali",
+
         description:
-          "Enjoy a full-day excursion to Solang Valley, Atal Tunnel and Sissu Valley. Adventure activities at Solang can be enjoyed at an additional cost.",
+          "After breakfast, set out for a full-day excursion towards Solang Valley and the North Portal of the Atal Tunnel. Enjoy the changing Himalayan landscapes as you travel beyond Manali towards Lahaul. Continue towards Sissu before returning to Manali in the evening. Adventure activities at Solang Valley are optional and payable directly by the traveller.",
+
         places: [
           "Solang Valley",
-          "Atal Tunnel",
-          "Sissu Valley",
+          "North Portal of Atal Tunnel",
+          "Sissu",
+          "Manali",
+          "Rohtang Pass – Optional",
+        ],
+
+        details: [
+          {
+            title: "Solang Valley",
+            description:
+              "A scenic valley close to Manali surrounded by high mountain slopes. It is popular for mountain views and adventure activities such as paragliding and other seasonal activities. Adventure activities are optional and available at an additional cost.",
+          },
+          {
+            title: "North Portal of Atal Tunnel",
+            description:
+              "Continue towards the North Portal of the Atal Tunnel, the gateway from the Manali side into the Lahaul region. The surrounding landscape changes noticeably as the route moves towards the high mountain terrain beyond the tunnel.",
+          },
+          {
+            title: "Sissu",
+            description:
+              "A picturesque village in Lahaul surrounded by high mountains and waterfalls. Enjoy the dramatic scenery around Sissu before beginning the return journey towards Manali.",
+          },
+          {
+            title: "Rohtang Pass – Optional Excursion",
+            description:
+              "An excursion to Rohtang Pass can be arranged at an additional cost during the permitted/open period, subject to government regulations, permits, weather and road conditions. Rohtang Pass is not included in the standard package cost.",
+          },
+          {
+            title: "Return to Manali",
+            description:
+              "After sightseeing around Solang, the Atal Tunnel and Sissu, return to Manali for your overnight stay.",
+          },
         ],
       },
+
+      // ========================================================
+      // DAY 6
+      // ========================================================
+
       {
         day: 6,
-        title: "Manali → Kasol → Manikaran → Manali",
-        stay: "Manali",
+        title: "Manali → Kullu → Vaishno Devi Temple → Kasol → Manikaran",
+        start: "Manali",
+        end: "Kasol",
+        stay: "Kasol",
+
         description:
-          "Visit the scenic Parvati Valley and Kasol before continuing to Manikaran Sahib Gurudwara and its famous hot springs.",
+          "After breakfast, check out from your Manali hotel and drive through the scenic Kullu Valley towards Kasol. En route, visit the Vaishno Devi Temple near Kullu before continuing through the Parvati Valley. Later, explore Manikaran Sahib and its natural hot springs before reaching Kasol. Check in and spend the evening exploring the relaxed atmosphere of Kasol.",
+
+        places: [
+          "Kullu",
+          "Vaishno Devi Temple",
+          "Parvati Valley",
+          "Manikaran Sahib",
+          "Manikaran Hot Springs",
+          "Kasol Market",
+          "Kasol",
+        ],
+
+        details: [
+          {
+            title: "Kullu",
+            description:
+              "Known as the Valley of Gods, Kullu is surrounded by mountain slopes, orchards and the Beas River. The route through Kullu provides beautiful views as the journey moves towards the Parvati Valley.",
+          },
+          {
+            title: "Vaishno Devi Temple",
+            description:
+              "Located near Kullu, this riverside temple complex is a popular pilgrimage stop for travellers passing through the Kullu Valley.",
+          },
+          {
+            title: "Parvati Valley",
+            description:
+              "As the route turns towards Kasol, the landscape follows the Parvati River through steep mountain valleys, forests and small settlements.",
+          },
+          {
+            title: "Manikaran Sahib",
+            description:
+              "A major pilgrimage destination in the Parvati Valley, Manikaran is known for Gurudwara Manikaran Sahib, its religious significance and natural hot springs.",
+          },
+          {
+            title: "Manikaran Hot Springs",
+            description:
+              "The natural hot springs around Manikaran are an important feature of the town and are closely associated with the local religious and cultural traditions.",
+          },
+          {
+            title: "Kasol",
+            description:
+              "A small settlement on the banks of the Parvati River known for its mountain scenery, cafés and relaxed atmosphere. After check-in, enjoy some free time exploring Kasol.",
+          },
+        ],
+      },
+
+      // ========================================================
+      // DAY 7
+      // ========================================================
+
+      {
+        day: 7,
+        title: "Kasol → Chandigarh",
+        start: "Kasol",
+        end: "Chandigarh",
+        stay: "-",
+
+        description:
+          "After breakfast, check out from your hotel in Kasol and begin the return journey towards Chandigarh. Enjoy the changing scenery as you travel down through the Parvati and Kullu valleys towards the plains. On arrival, you will be dropped at Chandigarh Airport or Railway Station for your onward journey.",
+
         places: [
           "Kasol",
           "Parvati Valley",
-          "Manikaran Sahib Gurudwara",
-          "Hot Springs",
+          "Kullu Valley",
+          "Chandigarh",
         ],
-      },
-      {
-        day: 7,
-        title: "Manali → Chandigarh",
-        stay: "-",
-        description:
-          "After breakfast, depart from Manali and travel to Chandigarh for your drop-off.",
+
+        details: [
+          {
+            title: "Kasol",
+            description:
+              "After breakfast, check out from your accommodation and begin the final road journey of the trip.",
+          },
+          {
+            title: "Chandigarh",
+            description:
+              "The journey concludes with your drop-off at Chandigarh Airport or Railway Station for your onward travel.",
+          },
+        ],
       },
     ],
   },
