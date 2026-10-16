@@ -150,7 +150,7 @@ export default function PackageSectionNav() {
       aria-label="Package sections"
       className="
         sticky
-        top-[96px]
+        top-[82px]
         z-40
         w-full
         border-y

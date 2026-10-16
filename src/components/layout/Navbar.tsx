@@ -19,8 +19,7 @@ export default function Navbar({
   onPlanTrip,
 }: NavbarProps) {
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] =
-    useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeTimer =
     useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -53,10 +52,7 @@ export default function Navbar({
   ========================================================= */
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(
-      (previous) => !previous
-    );
-
+    setIsMobileMenuOpen((previous) => !previous);
     setIsPhoneOpen(false);
   };
 
@@ -70,10 +66,7 @@ export default function Navbar({
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 w-full">
-
-      {/* =====================================================
-          PERMANENT NAVBAR BACKGROUND
-      ===================================================== */}
+      {/* PERMANENT NAVBAR BACKGROUND */}
 
       <div
         className="
@@ -87,9 +80,7 @@ export default function Navbar({
         "
       />
 
-      {/* =====================================================
-          NAVBAR CONTENT
-      ===================================================== */}
+      {/* NAVBAR CONTENT */}
 
       <div
         className="
@@ -104,32 +95,22 @@ export default function Navbar({
           lg:px-8
         "
       >
-
-        {/* ===================================================
-            LOGO
-        =================================================== */}
+        {/* LOGO */}
 
         <div className="flex shrink-0 items-center">
           <Logo />
         </div>
 
-        {/* ===================================================
-            DESKTOP NAVIGATION
-        =================================================== */}
+        {/* DESKTOP NAVIGATION */}
 
         <nav className="hidden flex-1 justify-center lg:flex">
           <NavLinks scrolled={true} />
         </nav>
 
-        {/* ===================================================
-            DESKTOP RIGHT SIDE
-        =================================================== */}
+        {/* DESKTOP RIGHT SIDE */}
 
         <div className="hidden shrink-0 items-center gap-5 lg:flex">
-
-          {/* ================================================
-              LOGIN
-          ================================================= */}
+          {/* LOGIN */}
 
           <a
             href="/login"
@@ -157,9 +138,7 @@ export default function Navbar({
               "
             />
 
-            <span>
-              Login
-            </span>
+            <span>Login</span>
 
             <span
               className="
@@ -177,9 +156,7 @@ export default function Navbar({
             />
           </a>
 
-          {/* ================================================
-              PHONE
-          ================================================= */}
+          {/* PHONE */}
 
           <div
             className="relative"
@@ -208,15 +185,10 @@ export default function Navbar({
                 hover:text-[#C89A3D]
               "
             >
-              <Phone
-                size={21}
-                strokeWidth={2}
-              />
+              <Phone size={21} strokeWidth={2} />
             </button>
 
-            {/* ==============================================
-                PHONE POPUP
-            ============================================== */}
+            {/* PHONE POPUP */}
 
             <div
               onMouseEnter={openPhonePopup}
@@ -233,7 +205,6 @@ export default function Navbar({
                 shadow-[0_15px_40px_rgba(0,0,0,0.18)]
                 transition-all
                 duration-200
-
                 ${
                   isPhoneOpen
                     ? "visible translate-y-0 opacity-100"
@@ -266,7 +237,7 @@ export default function Navbar({
               </p>
 
               <a
-                href="tel:+919876543210"
+                href="tel:+917559697919"
                 className="
                   mt-3
                   flex
@@ -294,10 +265,7 @@ export default function Navbar({
                     bg-[#C89A3D]
                   "
                 >
-                  <Phone
-                    size={17}
-                    className="text-[#10264A]"
-                  />
+                  <Phone size={17} className="text-[#10264A]" />
                 </div>
 
                 <div>
@@ -306,7 +274,7 @@ export default function Navbar({
                   </p>
 
                   <p className="whitespace-nowrap text-sm font-bold">
-                    +91 98765 43210
+                    +91 75596 97919
                   </p>
                 </div>
               </a>
@@ -314,18 +282,13 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* ===================================================
-            MOBILE RIGHT SIDE
-        =================================================== */}
+        {/* MOBILE RIGHT SIDE */}
 
         <div className="flex items-center gap-2 lg:hidden">
-
-          {/* ================================================
-              MOBILE PHONE
-          ================================================= */}
+          {/* MOBILE PHONE */}
 
           <a
-            href="tel:+919876543210"
+            href="tel:+917559697919"
             aria-label="Call The Himalayan Compass"
             className="
               flex
@@ -342,26 +305,17 @@ export default function Navbar({
               hover:text-[#C89A3D]
             "
           >
-            <Phone
-              size={20}
-              strokeWidth={2}
-            />
+            <Phone size={20} strokeWidth={2} />
           </a>
 
-          {/* ================================================
-              MOBILE MENU BUTTON
-          ================================================= */}
+          {/* MOBILE MENU BUTTON */}
 
           <button
             type="button"
             aria-label={
-              isMobileMenuOpen
-                ? "Close menu"
-                : "Open menu"
+              isMobileMenuOpen ? "Close menu" : "Open menu"
             }
-            aria-expanded={
-              isMobileMenuOpen
-            }
+            aria-expanded={isMobileMenuOpen}
             onClick={toggleMobileMenu}
             className="
               flex
@@ -378,18 +332,12 @@ export default function Navbar({
               hover:text-[#C89A3D]
             "
           >
-            {isMobileMenuOpen ? (
-              <X size={23} />
-            ) : (
-              <Menu size={23} />
-            )}
+            {isMobileMenuOpen ? <X size={23} /> : <Menu size={23} />}
           </button>
         </div>
       </div>
 
-      {/* =====================================================
-          MOBILE MENU
-      ===================================================== */}
+      {/* MOBILE MENU */}
 
       <div
         className={`
@@ -400,7 +348,6 @@ export default function Navbar({
           transition-all
           duration-300
           lg:hidden
-
           ${
             isMobileMenuOpen
               ? "max-h-[500px] opacity-100"
@@ -411,9 +358,6 @@ export default function Navbar({
         <div className="px-6 pb-6 pt-5">
           <nav>
             <ul className="space-y-1">
-
-              {/* HOME */}
-
               <li>
                 <a
                   href="/"
@@ -433,8 +377,6 @@ export default function Navbar({
                   Home
                 </a>
               </li>
-
-              {/* DESTINATIONS */}
 
               <li>
                 <a
@@ -456,8 +398,6 @@ export default function Navbar({
                 </a>
               </li>
 
-              {/* PACKAGES */}
-
               <li>
                 <a
                   href="/packages"
@@ -477,8 +417,6 @@ export default function Navbar({
                   Packages
                 </a>
               </li>
-
-              {/* EXPERIENCES */}
 
               <li>
                 <a
@@ -500,8 +438,6 @@ export default function Navbar({
                 </a>
               </li>
 
-              {/* GALLERY */}
-
               <li>
                 <a
                   href="/gallery"
@@ -522,8 +458,6 @@ export default function Navbar({
                 </a>
               </li>
 
-              {/* LOGIN */}
-
               <li>
                 <a
                   href="/login"
@@ -542,14 +476,10 @@ export default function Navbar({
                     hover:text-[#C89A3D]
                   "
                 >
-                  <CircleUserRound
-                    size={18}
-                    strokeWidth={1.8}
-                  />
+                  <CircleUserRound size={18} strokeWidth={1.8} />
                   Login
                 </a>
               </li>
-
             </ul>
           </nav>
         </div>

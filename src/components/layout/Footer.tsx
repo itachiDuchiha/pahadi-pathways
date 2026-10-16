@@ -16,7 +16,6 @@ import {
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
-
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#10264A] via-[#0D1F3A] to-[#081526]" />
 
@@ -25,16 +24,10 @@ export default function Footer() {
 
       {/* Main Content */}
       <div className="relative mx-auto max-w-7xl px-8 py-20">
-
-        {/* ================= TOP SECTION ================= */}
-
+        {/* TOP SECTION */}
         <div className="grid gap-14 lg:grid-cols-4">
-
-          {/* ================= BRAND ================= */}
-
+          {/* BRAND */}
           <div>
-
-            {/* Footer Logo */}
             <Link
               href="/"
               aria-label="The Himalayan Compass - Home"
@@ -54,22 +47,15 @@ export default function Footer() {
               Carefully curated journeys through Shimla,
               Manali and Spiti with trusted local experts.
             </p>
-
           </div>
 
-
-          {/* ================= EXPLORE ================= */}
-
+          {/* EXPLORE */}
           <div>
-
             <h3 className="mb-6 text-lg font-bold text-white">
               Explore
             </h3>
 
             <ul className="space-y-4 text-gray-300">
-
-              {/* Destinations */}
-
               <li>
                 <Link
                   href="/destinations"
@@ -78,9 +64,6 @@ export default function Footer() {
                   Destinations
                 </Link>
               </li>
-
-
-              {/* Packages */}
 
               <li>
                 <Link
@@ -91,111 +74,80 @@ export default function Footer() {
                 </Link>
               </li>
 
-
-              {/* Experiences */}
-
               <li>
                 <a
-                  href="#"
+                  href="/experiences"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Experiences
                 </a>
               </li>
 
-
-              {/* Gallery */}
-
               <li>
                 <a
-                  href="#"
+                  href="/gallery"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Gallery
                 </a>
               </li>
-
             </ul>
-
           </div>
 
-
-          {/* ================= PLAN YOUR TRIP ================= */}
-
+          {/* PLAN YOUR TRIP */}
           <div>
-
             <h3 className="mb-6 text-lg font-bold text-white">
               Plan Your Trip
             </h3>
 
             <ul className="space-y-4 text-gray-300">
-
-              {/* Honeymoon */}
-
               <li>
                 <a
-                  href="#"
+                  href="/packages"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Honeymoon
                 </a>
               </li>
 
-
-              {/* Family Trips */}
-
               <li>
                 <a
-                  href="#"
+                  href="/packages"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Family Trips
                 </a>
               </li>
 
-
-              {/* Adventure */}
-
               <li>
                 <a
-                  href="#"
+                  href="/experiences"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Adventure
                 </a>
               </li>
 
-
-              {/* Custom Journey */}
-
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/"
                   className="transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   Custom Journey
-                </a>
+                </Link>
               </li>
-
             </ul>
-
           </div>
 
-
-          {/* ================= CONTACT ================= */}
-
+          {/* CONTACT */}
           <div>
-
             <h3 className="mb-6 text-lg font-bold text-white">
               Contact
             </h3>
 
             <div className="space-y-5">
-
-              {/* Location */}
-
+              {/* LOCATION */}
               <div className="flex items-start gap-3">
-
                 <MapPin
                   size={18}
                   className="mt-1 shrink-0 text-[#C89A3D]"
@@ -208,56 +160,41 @@ export default function Footer() {
                   <br />
                   India
                 </p>
-
               </div>
 
-
-              {/* Phone */}
-
+              {/* PHONE */}
               <div className="flex items-center gap-3">
-
                 <Phone
                   size={18}
                   className="shrink-0 text-[#C89A3D]"
                 />
 
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+917559697919"
                   className="text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  +91 98765 43210
+                  +91 75596 97919
                 </a>
-
               </div>
 
-
-              {/* Email */}
-
+              {/* EMAIL */}
               <div className="flex items-start gap-3">
-
                 <Mail
                   size={18}
                   className="mt-1 shrink-0 text-[#C89A3D]"
                 />
 
                 <a
-                  href="mailto:hello@thehimalayancompass.com"
+                  href="mailto:thehimalayancompass@gmail.com"
                   className="break-all text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  hello@thehimalayancompass.com
+                  thehimalayancompass@gmail.com
                 </a>
-
               </div>
-
             </div>
 
-
-            {/* Social Icons */}
-
+            {/* SOCIAL ICONS */}
             <div className="mt-8 flex gap-4">
-
-              {/* Instagram */}
-
               <a
                 href="#"
                 aria-label="Instagram"
@@ -279,9 +216,6 @@ export default function Footer() {
               >
                 <FaInstagram size={18} />
               </a>
-
-
-              {/* Facebook */}
 
               <a
                 href="#"
@@ -305,9 +239,6 @@ export default function Footer() {
                 <FaFacebookF size={17} />
               </a>
 
-
-              {/* YouTube */}
-
               <a
                 href="#"
                 aria-label="YouTube"
@@ -329,23 +260,15 @@ export default function Footer() {
               >
                 <FaYoutube size={19} />
               </a>
-
             </div>
-
           </div>
-
         </div>
 
-
-        {/* ================= DIVIDER ================= */}
-
+        {/* DIVIDER */}
         <div className="my-16 h-px bg-white/10" />
 
-
-        {/* ================= OUR COMMITMENT ================= */}
-
+        {/* OUR COMMITMENT */}
         <div className="text-center">
-
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
             Our Commitment
           </p>
@@ -359,11 +282,8 @@ export default function Footer() {
             transport authorizations as The Himalayan Compass grows.
           </p>
 
-
-          {/* Authorization Badges */}
-
+          {/* AUTHORIZATION BADGES */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-
             <div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-gray-300">
               Himachal Tourism
               <span className="ml-2 text-[#C89A3D]">
@@ -384,37 +304,25 @@ export default function Footer() {
                 Coming Soon
               </span>
             </div>
-
           </div>
-
         </div>
 
-
-        {/* ================= BOTTOM DIVIDER ================= */}
-
+        {/* BOTTOM DIVIDER */}
         <div className="my-12 h-px bg-white/10" />
 
-
-        {/* ================= COPYRIGHT ================= */}
-
+        {/* COPYRIGHT */}
         <div className="flex flex-col items-center justify-between gap-4 text-center text-sm text-gray-400 md:flex-row md:text-left">
-
           <p>
             © 2026 The Himalayan Compass. All rights reserved.
           </p>
 
           <p>
             Crafted with{" "}
-            <span className="text-[#C89A3D]">
-              ♥
-            </span>{" "}
+            <span className="text-[#C89A3D]">♥</span>{" "}
             for mountain travelers.
           </p>
-
         </div>
-
       </div>
-
     </footer>
   );
 }

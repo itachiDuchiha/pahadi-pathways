@@ -33,8 +33,7 @@ export default function FloatingWhatsApp() {
 
   return (
     <div className="fixed bottom-6 right-6 z-[9999]">
-
-      {/* ================= WHATSAPP BUTTON ================= */}
+      {/* WHATSAPP BUTTON */}
       <button
         type="button"
         aria-label="WhatsApp"
@@ -42,6 +41,13 @@ export default function FloatingWhatsApp() {
         onMouseLeave={closePopup}
         onFocus={openPopup}
         onBlur={closePopup}
+        onClick={() => {
+          window.open(
+            "https://wa.me/917559697919",
+            "_blank",
+            "noopener,noreferrer"
+          );
+        }}
         className="
           flex
           h-16
@@ -63,8 +69,7 @@ export default function FloatingWhatsApp() {
         <FaWhatsapp size={32} />
       </button>
 
-
-      {/* ================= POPUP ================= */}
+      {/* POPUP */}
       <div
         onMouseEnter={openPopup}
         onMouseLeave={closePopup}
@@ -80,7 +85,6 @@ export default function FloatingWhatsApp() {
           shadow-[0_15px_45px_rgba(0,0,0,0.18)]
           transition-all
           duration-200
-
           ${
             isOpen
               ? "visible translate-y-0 opacity-100"
@@ -88,8 +92,7 @@ export default function FloatingWhatsApp() {
           }
         `}
       >
-
-        {/* Small Arrow */}
+        {/* SMALL ARROW */}
         <div
           className="
             absolute
@@ -102,7 +105,7 @@ export default function FloatingWhatsApp() {
           "
         />
 
-        {/* Popup Content */}
+        {/* POPUP CONTENT */}
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C89A3D]">
           Need Help?
         </p>
@@ -116,9 +119,9 @@ export default function FloatingWhatsApp() {
           hotels, transport or custom itineraries.
         </p>
 
-        {/* WhatsApp Link */}
+        {/* WHATSAPP LINK */}
         <a
-          href="https://wa.me/919876543210"
+          href="https://wa.me/917559697919"
           target="_blank"
           rel="noopener noreferrer"
           className="
@@ -142,9 +145,7 @@ export default function FloatingWhatsApp() {
           <FaWhatsapp size={18} />
           Open WhatsApp
         </a>
-
       </div>
-
     </div>
   );
 }
