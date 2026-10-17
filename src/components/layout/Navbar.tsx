@@ -1,12 +1,8 @@
+
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  Menu,
-  Phone,
-  CircleUserRound,
-  X,
-} from "lucide-react";
+import { Menu, Phone, X, ArrowUpRight } from "lucide-react";
 
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
@@ -15,14 +11,11 @@ type NavbarProps = {
   onPlanTrip: () => void;
 };
 
-export default function Navbar({
-  onPlanTrip,
-}: NavbarProps) {
+export default function Navbar({ onPlanTrip }: NavbarProps) {
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const closeTimer =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* =========================================================
      PHONE POPUP
@@ -44,7 +37,16 @@ export default function Navbar({
 
     closeTimer.current = setTimeout(() => {
       setIsPhoneOpen(false);
-    }, 250);
+    }, 180);
+  };
+
+  const togglePhonePopup = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+
+    setIsPhoneOpen((previous) => !previous);
   };
 
   /* =========================================================
@@ -66,7 +68,7 @@ export default function Navbar({
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 w-full">
-      {/* PERMANENT NAVBAR BACKGROUND */}
+      {/* NAVBAR BACKGROUND */}
 
       <div
         className="
@@ -107,57 +109,9 @@ export default function Navbar({
           <NavLinks scrolled={true} />
         </nav>
 
-        {/* DESKTOP RIGHT SIDE */}
+        {/* DESKTOP PHONE */}
 
-        <div className="hidden shrink-0 items-center gap-5 lg:flex">
-          {/* LOGIN */}
-
-          <a
-            href="/login"
-            className="
-              group/login
-              relative
-              flex
-              items-center
-              gap-2
-              py-2
-              font-semibold
-              text-[#10264A]
-              transition-colors
-              duration-300
-              hover:text-[#C89A3D]
-            "
-          >
-            <CircleUserRound
-              size={18}
-              strokeWidth={1.8}
-              className="
-                transition-colors
-                duration-300
-                group-hover/login:text-[#C89A3D]
-              "
-            />
-
-            <span>Login</span>
-
-            <span
-              className="
-                absolute
-                bottom-0
-                left-0
-                h-[2px]
-                w-0
-                rounded-full
-                bg-[#C89A3D]
-                transition-all
-                duration-300
-                group-hover/login:w-full
-              "
-            />
-          </a>
-
-          {/* PHONE */}
-
+        <div className="hidden shrink-0 items-center lg:flex">
           <div
             className="relative"
             onMouseEnter={openPhonePopup}
@@ -165,119 +119,226 @@ export default function Navbar({
           >
             <button
               type="button"
-              aria-label="Call The Himalayan Compass"
-              onClick={openPhonePopup}
+              aria-label="Contact The Himalayan Compass by phone"
+              aria-expanded={isPhoneOpen}
+              aria-haspopup="dialog"
+              onClick={togglePhonePopup}
               onFocus={openPhonePopup}
               onBlur={closePhonePopup}
-              className="
+              className={`
+                group
+                relative
                 flex
                 h-12
                 w-12
                 items-center
                 justify-center
                 rounded-full
-                bg-[#10264A]/5
-                text-[#10264A]
-                shadow-sm
+                border
                 transition-all
                 duration-300
-                hover:bg-[#C89A3D]/15
-                hover:text-[#C89A3D]
-              "
+                ease-out
+                ${
+                  isPhoneOpen
+                    ? "border-[#C89A3D]/40 bg-[#F7F3E9] text-[#C89A3D] shadow-[0_6px_20px_rgba(200,154,61,0.18)]"
+                    : "border-[#10264A]/5 bg-[#10264A]/[0.04] text-[#10264A] shadow-sm hover:-translate-y-0.5 hover:border-[#C89A3D]/40 hover:bg-[#F7F3E9] hover:text-[#C89A3D] hover:shadow-[0_6px_20px_rgba(200,154,61,0.16)]"
+                }
+              `}
             >
-              <Phone size={21} strokeWidth={2} />
+              <Phone
+                size={20}
+                strokeWidth={1.8}
+                className="transition-transform duration-300 group-hover:rotate-[-8deg]"
+              />
+
+              {/* SMALL GOLD ACCENT */}
+
+              <span
+                className={`
+                  absolute
+                  bottom-[7px]
+                  right-[7px]
+                  h-1.5
+                  w-1.5
+                  rounded-full
+                  bg-[#C89A3D]
+                  transition-transform
+                  duration-300
+                  ${
+                    isPhoneOpen
+                      ? "scale-100"
+                      : "scale-0 group-hover:scale-100"
+                  }
+                `}
+              />
             </button>
 
             {/* PHONE POPUP */}
 
             <div
+              id="navbar-phone-popup"
+              role="dialog"
+              aria-label="Call The Himalayan Compass"
               onMouseEnter={openPhonePopup}
               onMouseLeave={closePhonePopup}
               className={`
                 absolute
                 right-0
-                top-[62px]
-                w-[240px]
-                rounded-2xl
-                bg-white
-                p-4
-                text-left
-                shadow-[0_15px_40px_rgba(0,0,0,0.18)]
+                top-[calc(100%+14px)]
+                w-[270px]
+                origin-top-right
                 transition-all
                 duration-200
                 ${
                   isPhoneOpen
-                    ? "visible translate-y-0 opacity-100"
-                    : "invisible translate-y-2 opacity-0"
+                    ? "visible translate-y-0 scale-100 opacity-100"
+                    : "invisible translate-y-2 scale-[0.98] opacity-0"
                 }
               `}
             >
+              {/* CONNECTING POINTER */}
+
               <div
                 className="
                   absolute
-                  -top-2
-                  right-5
-                  h-4
-                  w-4
+                  -top-[7px]
+                  right-[18px]
+                  h-3.5
+                  w-3.5
                   rotate-45
+                  border-l
+                  border-t
+                  border-[#10264A]/[0.06]
                   bg-white
                 "
               />
 
-              <p
-                className="
-                  text-[11px]
-                  font-bold
-                  uppercase
-                  tracking-[0.2em]
-                  text-[#C89A3D]
-                "
-              >
-                Call Us
-              </p>
+              {/* POPUP CARD */}
 
-              <a
-                href="tel:+917559697919"
+              <div
                 className="
-                  mt-3
-                  flex
-                  items-center
-                  gap-3
-                  rounded-xl
-                  bg-[#F7F3E9]
-                  px-3
-                  py-3
-                  text-[#10264A]
-                  transition-all
-                  duration-300
-                  hover:bg-[#C89A3D]/20
+                  relative
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-[#10264A]/[0.06]
+                  bg-white
+                  p-5
+                  shadow-[0_18px_50px_rgba(16,38,74,0.16)]
                 "
               >
+                {/* GOLD TOP ACCENT */}
+
                 <div
                   className="
-                    flex
-                    h-9
-                    w-9
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    bg-[#C89A3D]
+                    absolute
+                    left-0
+                    right-0
+                    top-0
+                    h-[3px]
+                    bg-gradient-to-r
+                    from-[#C89A3D]/30
+                    via-[#D4AF37]
+                    to-[#C89A3D]/30
+                  "
+                />
+
+                <p
+                  className="
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-[0.24em]
+                    text-[#C89A3D]
                   "
                 >
-                  <Phone size={17} className="text-[#10264A]" />
-                </div>
+                  Let's Talk
+                </p>
 
-                <div>
-                  <p className="text-[10px] text-gray-500">
-                    Call directly
-                  </p>
+                <h3
+                  className="
+                    mt-1.5
+                    font-serif
+                    text-xl
+                    font-bold
+                    text-[#10264A]
+                  "
+                >
+                  Plan your next journey.
+                </h3>
 
-                  <p className="whitespace-nowrap text-sm font-bold">
-                    +91 75596 97919
-                  </p>
-                </div>
-              </a>
+                <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                  Have a question about your Himachal trip? We're here
+                  to help.
+                </p>
+
+                {/* CALL LINK */}
+
+                <a
+                  href="tel:+917559697919"
+                  className="
+                    group/call
+                    mt-4
+                    flex
+                    items-center
+                    gap-3
+                    rounded-xl
+                    border
+                    border-[#C89A3D]/20
+                    bg-[#F7F3E9]
+                    p-3
+                    transition-all
+                    duration-300
+                    hover:border-[#C89A3D]/50
+                    hover:bg-[#C89A3D]/15
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-[#C89A3D]
+                      text-[#10264A]
+                      transition-transform
+                      duration-300
+                      group-hover/call:scale-105
+                    "
+                  >
+                    <Phone size={17} strokeWidth={2} />
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[10px] text-slate-500">
+                      Call us directly
+                    </span>
+
+                    <span className="mt-0.5 block whitespace-nowrap text-sm font-bold tracking-wide text-[#10264A]">
+                      +91 75596 97919
+                    </span>
+                  </span>
+
+                  <ArrowUpRight
+                    size={17}
+                    className="
+                      shrink-0
+                      text-[#C89A3D]
+                      transition-transform
+                      duration-300
+                      group-hover/call:translate-x-0.5
+                      group-hover/call:-translate-y-0.5
+                    "
+                  />
+                </a>
+
+                <p className="mt-3 text-center text-[10px] text-slate-400">
+                  Your Himalayan journey starts here.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -291,30 +352,37 @@ export default function Navbar({
             href="tel:+917559697919"
             aria-label="Call The Himalayan Compass"
             className="
+              group
               flex
               h-11
               w-11
               items-center
               justify-center
               rounded-full
-              bg-[#10264A]/5
+              border
+              border-[#10264A]/5
+              bg-[#10264A]/[0.04]
               text-[#10264A]
               transition-all
               duration-300
-              hover:bg-[#C89A3D]/15
+              hover:border-[#C89A3D]/40
+              hover:bg-[#F7F3E9]
               hover:text-[#C89A3D]
+              active:scale-95
             "
           >
-            <Phone size={20} strokeWidth={2} />
+            <Phone
+              size={20}
+              strokeWidth={1.8}
+              className="transition-transform duration-300 group-hover:rotate-[-8deg]"
+            />
           </a>
 
           {/* MOBILE MENU BUTTON */}
 
           <button
             type="button"
-            aria-label={
-              isMobileMenuOpen ? "Close menu" : "Open menu"
-            }
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             onClick={toggleMobileMenu}
             className="
@@ -324,11 +392,14 @@ export default function Navbar({
               items-center
               justify-center
               rounded-full
-              bg-[#10264A]/5
+              border
+              border-[#10264A]/5
+              bg-[#10264A]/[0.04]
               text-[#10264A]
               transition-all
               duration-300
-              hover:bg-[#C89A3D]/15
+              hover:border-[#C89A3D]/40
+              hover:bg-[#F7F3E9]
               hover:text-[#C89A3D]
             "
           >
@@ -455,29 +526,6 @@ export default function Navbar({
                   "
                 >
                   Gallery
-                </a>
-              </li>
-
-              <li>
-                <a
-                  href="/login"
-                  onClick={closeMobileMenu}
-                  className="
-                    flex
-                    items-center
-                    gap-2
-                    rounded-xl
-                    px-4
-                    py-3
-                    font-semibold
-                    text-[#10264A]
-                    transition-colors
-                    hover:bg-[#F7F3E9]
-                    hover:text-[#C89A3D]
-                  "
-                >
-                  <CircleUserRound size={18} strokeWidth={1.8} />
-                  Login
                 </a>
               </li>
             </ul>

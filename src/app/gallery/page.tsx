@@ -1,263 +1,715 @@
+
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   Camera,
   Mountain,
   MapPin,
   ArrowRight,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Film,
+  Images,
 } from "lucide-react";
 
 import SiteLayout from "@/components/layout/SiteLayout";
+
+/*
+  TEMPORARY GALLERY IMAGES
+
+  All gallery cards currently use the same image for testing.
+  Later, replace each image path with your own image filename.
+
+  Example:
+  "/images/gallery/spiti-valley.jpg"
+*/
 
 const galleryItems = [
   {
     title: "Spiti Valley",
     category: "Landscapes",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/hero/hero.jpg",
+    location: "Spiti, Himachal Pradesh",
     size: "large",
   },
   {
     title: "The Himalayan Roads",
     category: "Road Journeys",
     image: "/images/hero/hero.jpg",
+    location: "Mountain roads",
     size: "normal",
   },
   {
     title: "Shimla",
     category: "Mountain Towns",
-    image: "/images/packages/shimla-package.jpg",
+    image: "/images/hero/hero.jpg",
+    location: "Shimla, Himachal Pradesh",
     size: "normal",
   },
   {
     title: "Manali",
     category: "Valleys",
-    image: "/images/packages/manali-package.jpg",
+    image: "/images/hero/hero.jpg",
+    location: "Manali, Himachal Pradesh",
     size: "large",
   },
   {
-    title: "Mountain Journeys",
-    category: "Travel",
+    title: "Life in the Mountains",
+    category: "Local Life",
     image: "/images/hero/hero.jpg",
+    location: "Himachal Pradesh",
     size: "normal",
   },
   {
-    title: "Himalayan Escapes",
+    title: "Beyond the Ordinary",
     category: "Landscapes",
-    image: "/images/packages/spiti-package.jpg",
+    image: "/images/hero/hero.jpg",
+    location: "The Himalayas",
+    size: "normal",
+  },
+  {
+    title: "Quiet Mountain Towns",
+    category: "Mountain Towns",
+    image: "/images/hero/hero.jpg",
+    location: "Himachal Pradesh",
+    size: "normal",
+  },
+  {
+    title: "The Journey Itself",
+    category: "Road Journeys",
+    image: "/images/hero/hero.jpg",
+    location: "Himalayan highways",
+    size: "large",
+  },
+  {
+    title: "Valleys of Himachal",
+    category: "Valleys",
+    image: "/images/hero/hero.jpg",
+    location: "Himachal Pradesh",
     size: "normal",
   },
 ];
 
+const categories = [
+  "All Moments",
+  "Landscapes",
+  "Mountain Towns",
+  "Road Journeys",
+  "Valleys",
+  "Local Life",
+];
+
+/*
+  VIDEO GALLERY
+
+  Add your videos to:
+  public/videos/
+
+  Then replace an empty src with a filename, for example:
+  src: "/videos/spiti-journey.mp4"
+
+  Keep the poster image as the video thumbnail.
+*/
+
+const videoItems = [
+  {
+    title: "A Journey Through Spiti",
+    category: "Road Stories",
+    src: "",
+    poster: "/images/hero/hero.jpg",
+    duration: "Travel film",
+  },
+  {
+    title: "The Quiet Side of Himachal",
+    category: "Local Life",
+    src: "",
+    poster: "/images/hero/hero.jpg",
+    duration: "Mountain moments",
+  },
+  {
+    title: "Roads Into the Himalayas",
+    category: "Scenic Journeys",
+    src: "",
+    poster: "/images/hero/hero.jpg",
+    duration: "On the road",
+  },
+];
+
 export default function GalleryPage() {
+  const [activeCategory, setActiveCategory] = useState("All Moments");
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
+
+  const filteredItems =
+    activeCategory === "All Moments"
+      ? galleryItems
+      : galleryItems.filter(
+          (item) => item.category === activeCategory
+        );
+
+  const closeOverlays = () => {
+    setSelectedImage(null);
+    setSelectedVideo(null);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeOverlays();
+      }
+
+      if (selectedImage !== null) {
+        if (event.key === "ArrowRight") {
+          setSelectedImage(
+            (current) =>
+              current === null
+                ? null
+                : (current + 1) % filteredItems.length
+          );
+        }
+
+        if (event.key === "ArrowLeft") {
+          setSelectedImage(
+            (current) =>
+              current === null
+                ? null
+                : (current - 1 + filteredItems.length) %
+                  filteredItems.length
+          );
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedImage, selectedVideo, filteredItems.length]);
+
   return (
     <SiteLayout>
+      {/* ================================================== */}
       {/* HERO */}
-      <section className="relative flex min-h-[65vh] items-center overflow-hidden">
+      {/* ================================================== */}
+
+      <section className="relative flex min-h-[460px] items-center justify-center overflow-hidden pt-20 sm:min-h-[480px] md:min-h-[500px]">
         <Image
-          src="/images/hero/hero.jpg"
-          alt="Himalayan mountain landscape"
+          src="/images/hero/gallery-hike-hero.png"
+          alt="Himalayan mountain peaks reflected in a peaceful alpine lake at sunset"
           fill
           priority
-          className="object-cover"
+          sizes="100vw"
+          className="object-cover object-center"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-[#081526]/90 via-[#081526]/65 to-[#081526]/35" />
+        {/* Match the balanced, centered hero treatment used across the site. */}
+        <div className="absolute inset-0 bg-[#081526]/28" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#081526]/35 via-[#081526]/15 to-[#081526]/45" />
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-16 pt-32 sm:px-8 lg:px-10">
-          <div className="max-w-3xl text-white">
-            <div className="mb-5 flex items-center gap-3">
-              <Camera
-                size={20}
-                className="text-[#D4AF37]"
-                strokeWidth={1.8}
-              />
-
-              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#D4AF37]">
-                The Himalayan Compass
-              </p>
-            </div>
-
-            <h1 className="text-5xl font-extrabold leading-[1.05] md:text-7xl">
-              The Gallery
-              <span className="block font-light text-white/90">
-                See the journey.
-              </span>
-            </h1>
-
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-gray-200 md:text-xl">
-              Mountains, roads, villages and quiet moments. A glimpse into
-              the landscapes and experiences that make a Himalayan journey
-              worth remembering.
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-5 py-10 text-center text-white sm:px-8 sm:py-12 lg:px-10">
+          <div className="mb-3 flex items-center justify-center gap-3">
+            <span className="h-px w-8 bg-[#C89A3D] sm:w-10" />
+            <Camera
+              size={18}
+              className="text-[#D4AF37]"
+              strokeWidth={1.8}
+            />
+            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#D4AF37] sm:text-xs sm:tracking-[0.35em]">
+              The Himalayan Compass
             </p>
+            <span className="h-px w-8 bg-[#C89A3D] sm:w-10" />
           </div>
+
+          <h1 className="font-serif text-4xl font-medium leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+            The Gallery
+            <span className="mt-2 block font-serif italic text-[#D4AF37]">
+              See the journey.
+            </span>
+          </h1>
+
+          <div className="mt-4 flex items-center justify-center gap-2 text-[#D4AF37] sm:mt-5">
+            <span className="h-px w-10 bg-[#C89A3D] sm:w-14" />
+            <span className="text-sm">◆</span>
+            <span className="h-px w-10 bg-[#C89A3D] sm:w-14" />
+          </div>
+
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/95 sm:mt-5 sm:text-base sm:leading-7">
+            Mountains, roads, villages and quiet moments. A glimpse into the
+            landscapes and experiences that make a Himalayan journey worth
+            remembering.
+          </p>
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white sm:gap-x-5 sm:text-xs sm:tracking-[0.2em]">
+            <span>Landscapes</span>
+            <span className="text-[#D4AF37]">✦</span>
+            <span>Local Life</span>
+            <span className="text-[#D4AF37]">✦</span>
+            <span>Journeys</span>
+          </div>
+
+          <a
+            href="#gallery-collection"
+            className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#C89A3D] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-[#10264A] transition-all duration-300 hover:-translate-y-1 hover:bg-[#D4AF37] hover:shadow-xl"
+          >
+            Explore the Gallery
+            <ArrowRight size={16} />
+          </a>
         </div>
       </section>
 
-      {/* INTRO */}
-      <section className="bg-[#F7F3E9] px-6 py-20 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-            A glimpse of the Himalayas
-          </p>
+      {/* ================================================== */}
+      {/* INTRODUCTION */}
+      {/* ================================================== */}
 
-          <h2 className="mt-4 text-3xl font-extrabold text-[#10264A] md:text-5xl">
+      <section className="bg-[#F7F3E9] px-6 py-16 sm:px-8 md:py-20 lg:px-10">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <span className="h-px w-9 bg-[#C89A3D]" />
+            <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+              A glimpse of the Himalayas
+            </p>
+            <span className="h-px w-9 bg-[#C89A3D]" />
+          </div>
+
+          <h2 className="font-serif text-3xl font-medium text-[#10264A] sm:text-4xl md:text-5xl">
             Every road has a story.
           </h2>
 
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-gray-600 md:text-lg">
-            This is where we share the atmosphere of the places we travel
-            through — dramatic landscapes, mountain roads, peaceful valleys,
-            villages and the little moments between destinations.
+          <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-gray-600 md:text-lg">
+            From dramatic landscapes to quiet village moments, discover
+            the places, people and experiences that give every Himalayan
+            journey its own character.
           </p>
+
+          <div className="mt-7 flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#10264A]/70">
+            <Mountain size={17} className="text-[#C89A3D]" />
+            <span>Collected along the way</span>
+          </div>
         </div>
       </section>
 
-      {/* GALLERY */}
-      <section className="bg-white px-6 py-20 sm:px-8 lg:px-10">
+      {/* ================================================== */}
+      {/* PHOTO GALLERY */}
+      {/* ================================================== */}
+
+      <section
+        id="gallery-collection"
+        className="scroll-mt-24 bg-white px-5 py-16 sm:px-8 md:py-20 lg:px-10"
+      >
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          {/* Section heading */}
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-                Explore the collection
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+                The photo collection
               </p>
 
-              <h2 className="mt-3 text-3xl font-extrabold text-[#10264A] md:text-4xl">
+              <h2 className="mt-3 font-serif text-3xl font-medium text-[#10264A] sm:text-4xl md:text-5xl">
                 Moments from the mountains.
               </h2>
+
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-500 sm:text-base">
+                A visual journal of mountain landscapes, scenic roads
+                and the little moments that make the journey.
+              </p>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Mountain size={17} className="text-[#C89A3D]" />
-              <span>Himalayan journeys</span>
+            <div className="flex shrink-0 items-center gap-2 text-sm text-gray-500">
+              <Images size={18} className="text-[#C89A3D]" />
+              <span>{filteredItems.length} photographs</span>
             </div>
           </div>
 
-          {/* MASONRY-STYLE GRID */}
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {galleryItems.map((item, index) => (
-              <div
-                key={`${item.title}-${index}`}
-                className={`group relative overflow-hidden rounded-2xl ${
+          {/* Category filters */}
+          <div className="mt-8 flex gap-2 overflow-x-auto pb-3">
+            {categories.map((category) => {
+              const isActive = activeCategory === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory(category);
+                    setSelectedImage(null);
+                  }}
+                  aria-pressed={isActive}
+                  className={`shrink-0 rounded-full border px-5 py-3 text-xs font-semibold transition-all duration-300 sm:text-sm ${
+                    isActive
+                      ? "border-[#10264A] bg-[#10264A] text-white shadow-md"
+                      : "border-[#10264A]/15 bg-white text-[#10264A] hover:border-[#C89A3D] hover:text-[#9A7020]"
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Editorial photo grid */}
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredItems.map((item, index) => (
+              <button
+                key={`${item.title}-${item.category}`}
+                type="button"
+                onClick={() => setSelectedImage(index)}
+                aria-label={`View photograph: ${item.title}`}
+                className={`group relative block w-full overflow-hidden rounded-sm bg-[#10264A] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C89A3D] focus-visible:ring-offset-4 ${
                   item.size === "large"
-                    ? "h-[430px] md:h-[500px]"
-                    : "h-[330px] md:h-[360px]"
+                    ? "h-[380px] sm:h-[440px] lg:h-[480px]"
+                    : "h-[320px] sm:h-[350px] lg:h-[360px]"
                 }`}
               >
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/85 via-[#081526]/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+                {/* Image overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/90 via-[#081526]/10 to-[#081526]/10 transition-colors duration-500 group-hover:from-[#081526]/95" />
 
-                {/* Location icon */}
-                <div className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#C89A3D] shadow-lg backdrop-blur-sm">
-                  <MapPin size={18} strokeWidth={1.8} />
+                {/* Gold top accent */}
+                <div className="absolute left-5 top-0 h-1 w-12 bg-[#C89A3D] transition-all duration-500 group-hover:w-20" />
+
+                {/* Location marker */}
+                <div className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-[#081526]/25 text-white backdrop-blur-sm transition-colors duration-300 group-hover:border-[#C89A3D] group-hover:bg-[#C89A3D] group-hover:text-[#10264A]">
+                  <MapPin size={17} strokeWidth={1.6} />
                 </div>
 
-                {/* Text */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#D4AF37]">
+                {/* Card text */}
+                <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-6">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#E5BD60] sm:text-xs">
                     {item.category}
                   </p>
 
-                  <h3 className="mt-2 text-2xl font-bold text-white">
+                  <h3 className="mt-2 font-serif text-2xl font-medium sm:text-3xl">
                     {item.title}
                   </h3>
 
-                  <div className="mt-3 h-[2px] w-0 bg-[#C89A3D] transition-all duration-500 group-hover:w-16" />
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <p className="text-xs text-white/70 sm:text-sm">
+                      {item.location}
+                    </p>
+
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 text-white transition-all duration-300 group-hover:border-[#C89A3D] group-hover:bg-[#C89A3D] group-hover:text-[#10264A]">
+                      <ArrowRight size={16} />
+                    </span>
+                  </div>
+
+                  <div className="mt-4 h-px w-full bg-white/20">
+                    <div className="h-px w-0 bg-[#C89A3D] transition-all duration-500 group-hover:w-full" />
+                  </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
+
+          {/* Empty state for future category changes */}
+          {filteredItems.length === 0 && (
+            <div className="py-20 text-center">
+              <Mountain
+                size={34}
+                className="mx-auto text-[#C89A3D]"
+              />
+              <p className="mt-4 text-lg text-[#10264A]">
+                More moments are on their way.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* VIDEO / FUTURE MEDIA SECTION */}
-      <section className="bg-[#10264A] px-6 py-24 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="text-white">
-              <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
-                More than photographs
-              </p>
+      {/* ================================================== */}
+      {/* VIDEO COLLECTION */}
+      {/* ================================================== */}
 
-              <h2 className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl">
-                See the mountains in motion.
+      <section className="bg-[#10264A] px-5 py-16 sm:px-8 md:py-20 lg:px-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
+            {/* Video introduction */}
+            <div className="text-white">
+              <div className="flex items-center gap-3">
+                <Film size={19} className="text-[#D4AF37]" />
+                <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
+                  Beyond photographs
+                </p>
+              </div>
+
+              <h2 className="mt-5 font-serif text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
+                See the mountains
+                <span className="block italic text-[#D4AF37]">
+                  in motion.
+                </span>
               </h2>
 
-              <p className="mt-6 max-w-xl text-base leading-8 text-gray-300 md:text-lg">
-                The gallery will eventually grow beyond photographs with
-                short cinematic clips from the road, village life, mountain
-                passes, stays and other moments from our journeys.
+              <p className="mt-5 max-w-lg text-sm leading-7 text-gray-300 sm:text-base sm:leading-8">
+                Some journeys deserve more than a photograph. Explore
+                cinematic travel films, scenic drives and the atmosphere
+                of life in the Himalayas.
               </p>
 
-              <div className="mt-8 flex items-center gap-3 text-sm font-semibold text-[#D4AF37]">
-                <Camera size={18} />
-                <span>Short travel films coming here</span>
+              <div className="mt-7 flex items-center gap-3 text-sm text-white/75">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#C89A3D]/50 text-[#D4AF37]">
+                  <Play size={15} fill="currentColor" />
+                </span>
+                <span>Travel stories, one moment at a time.</span>
               </div>
             </div>
 
-            <div className="relative flex h-[360px] items-center justify-center overflow-hidden rounded-3xl bg-[#081526]">
-              <Image
-                src="/images/hero/hero.jpg"
-                alt="Himalayan road journey"
-                fill
-                className="object-cover opacity-55"
-              />
+            {/* Video cards */}
+            <div className="grid gap-5 sm:grid-cols-2">
+              {videoItems.map((video, index) => (
+                <div
+                  key={video.title}
+                  className={`group relative overflow-hidden bg-[#081526] ${
+                    index === 0 ? "sm:col-span-2" : ""
+                  }`}
+                >
+                  <div
+                    className={`relative ${
+                      index === 0
+                        ? "aspect-[16/8] sm:aspect-[16/7]"
+                        : "aspect-[16/10]"
+                    }`}
+                  >
+                    <Image
+                      src={video.poster}
+                      alt={video.title}
+                      fill
+                      sizes={
+                        index === 0
+                          ? "(max-width: 640px) 100vw, 70vw"
+                          : "(max-width: 640px) 100vw, 35vw"
+                      }
+                      className="object-cover opacity-75 transition-transform duration-700 group-hover:scale-105"
+                    />
 
-              <div className="absolute inset-0 bg-[#081526]/45" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/95 via-[#081526]/15 to-[#081526]/10" />
 
-              <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-md">
-                <span className="ml-1 text-2xl">▶</span>
-              </div>
+                    {video.src ? (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedVideo(index)}
+                        aria-label={`Play ${video.title}`}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/60 bg-[#C89A3D] text-[#10264A] shadow-xl transition-transform duration-300 group-hover:scale-110">
+                          <Play size={21} fill="currentColor" />
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/50 bg-white/10 text-white backdrop-blur-sm transition-all duration-300 group-hover:border-[#C89A3D] group-hover:bg-[#C89A3D] group-hover:text-[#10264A]">
+                          <Play size={20} />
+                        </span>
+                      </div>
+                    )}
 
-              <p className="absolute bottom-6 left-6 text-sm font-medium text-white/80">
-                Himalayan Compass — Journey Stories
-              </p>
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+                        {video.category}
+                      </p>
+
+                      <h3 className="mt-2 font-serif text-xl font-medium text-white sm:text-2xl">
+                        {video.title}
+                      </h3>
+
+                      <p className="mt-2 text-xs text-white/65">
+                        {video.src ? video.duration : "Video coming soon"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
+
+          <p className="mt-8 border-t border-white/10 pt-5 text-xs leading-6 text-white/45">
+            Video placeholders are ready for your own travel footage.
+            Add your video files and update their paths in the gallery
+            configuration when they are available.
+          </p>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-[#F7F3E9] px-6 py-20 sm:px-8 lg:px-10">
+      {/* ================================================== */}
+      {/* CLOSING CTA */}
+      {/* ================================================== */}
+
+      <section className="bg-[#F7F3E9] px-6 py-16 sm:px-8 md:py-20 lg:px-10">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
             Ready to see it yourself?
           </p>
 
-          <h2 className="mt-4 text-3xl font-extrabold text-[#10264A] md:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-medium leading-tight text-[#10264A] sm:text-4xl md:text-5xl">
             The best view is the one you experience.
           </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-600 md:text-lg">
-            Explore the destinations behind these landscapes or browse our
-            journeys and start planning your own Himalayan escape.
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-gray-600 sm:text-base sm:leading-8">
+            Explore the destinations behind these landscapes or browse
+            our journeys and start planning your own Himalayan escape.
           </p>
 
-          <div className="mt-9 flex flex-wrap justify-center gap-4">
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
               href="/destinations"
-              className="inline-flex items-center gap-2 rounded-full bg-[#10264A] px-7 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#183966] hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full bg-[#10264A] px-7 py-4 text-xs font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#183966] hover:shadow-lg sm:text-sm"
             >
               Explore Destinations
-              <ArrowRight size={17} />
+              <ArrowRight size={16} />
             </Link>
 
             <Link
               href="/packages"
-              className="inline-flex items-center gap-2 rounded-full border border-[#10264A]/20 bg-white px-7 py-4 text-sm font-bold text-[#10264A] transition-all duration-300 hover:-translate-y-1 hover:border-[#C89A3D] hover:text-[#C89A3D] hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full border border-[#10264A]/20 bg-white px-7 py-4 text-xs font-bold uppercase tracking-[0.08em] text-[#10264A] transition-all duration-300 hover:-translate-y-1 hover:border-[#C89A3D] hover:text-[#9A7020] hover:shadow-lg sm:text-sm"
             >
               View Packages
-              <ArrowRight size={17} />
+              <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
+
+      {/* ================================================== */}
+      {/* PHOTO LIGHTBOX */}
+      {/* ================================================== */}
+
+      {selectedImage !== null && filteredItems[selectedImage] && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#050B14]/95 p-4 backdrop-blur-md sm:p-8"
+          onClick={closeOverlays}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Gallery photograph"
+        >
+          <button
+            type="button"
+            onClick={closeOverlays}
+            aria-label="Close photograph"
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#C89A3D] hover:text-[#10264A] sm:right-7 sm:top-7"
+          >
+            <X size={22} />
+          </button>
+
+          <button
+            type="button"
+            aria-label="Previous photograph"
+            onClick={(event) => {
+              event.stopPropagation();
+              setSelectedImage(
+                (selectedImage - 1 + filteredItems.length) %
+                  filteredItems.length
+              );
+            }}
+            className="absolute left-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#C89A3D] hover:text-[#10264A] sm:left-6 sm:h-12 sm:w-12"
+          >
+            <ChevronLeft size={24} />
+          </button>
+
+          <div
+            className="relative w-full max-w-6xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="relative mx-auto h-[65vh] max-h-[760px] w-full">
+              <Image
+                src={filteredItems[selectedImage].image}
+                alt={filteredItems[selectedImage].title}
+                fill
+                sizes="100vw"
+                className="object-contain"
+              />
+            </div>
+
+            <div className="mx-auto mt-5 max-w-3xl text-center text-white">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#D4AF37] sm:text-xs">
+                {filteredItems[selectedImage].category}
+              </p>
+
+              <h3 className="mt-2 font-serif text-2xl sm:text-3xl">
+                {filteredItems[selectedImage].title}
+              </h3>
+
+              <p className="mt-2 text-sm text-white/60">
+                {filteredItems[selectedImage].location}
+              </p>
+
+              <p className="mt-3 text-xs text-white/40">
+                {selectedImage + 1} of {filteredItems.length}
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            aria-label="Next photograph"
+            onClick={(event) => {
+              event.stopPropagation();
+              setSelectedImage(
+                (selectedImage + 1) % filteredItems.length
+              );
+            }}
+            className="absolute right-2 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#C89A3D] hover:text-[#10264A] sm:right-6 sm:h-12 sm:w-12"
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      )}
+
+      {/* ================================================== */}
+      {/* VIDEO PLAYER */}
+      {/* ================================================== */}
+
+      {selectedVideo !== null && videoItems[selectedVideo]?.src && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#050B14]/95 p-4 backdrop-blur-md sm:p-8"
+          onClick={closeOverlays}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Travel video player"
+        >
+          <button
+            type="button"
+            onClick={closeOverlays}
+            aria-label="Close video"
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#C89A3D] hover:text-[#10264A] sm:right-7 sm:top-7"
+          >
+            <X size={22} />
+          </button>
+
+          <div
+            className="w-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <video
+              key={videoItems[selectedVideo].src}
+              src={videoItems[selectedVideo].src}
+              poster={videoItems[selectedVideo].poster}
+              controls
+              autoPlay
+              playsInline
+              className="max-h-[75vh] w-full bg-black"
+            />
+
+            <h3 className="mt-4 font-serif text-xl text-white sm:text-2xl">
+              {videoItems[selectedVideo].title}
+            </h3>
+
+            <p className="mt-2 text-sm text-white/60">
+              {videoItems[selectedVideo].category}
+            </p>
+          </div>
+        </div>
+      )}
     </SiteLayout>
   );
 }

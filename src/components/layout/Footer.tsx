@@ -1,17 +1,10 @@
+
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  MapPin,
-  Phone,
-  Mail,
-} from "lucide-react";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaYoutube,
-} from "react-icons/fa";
+import { MapPin, Phone, Mail } from "lucide-react";
+import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -23,9 +16,9 @@ export default function Footer() {
       <div className="absolute -top-40 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#C89A3D]/10 blur-[140px]" />
 
       {/* Main Content */}
-      <div className="relative mx-auto max-w-7xl px-8 py-20">
+      <div className="relative mx-auto max-w-7xl px-6 py-10 md:px-8 md:py-12">
         {/* TOP SECTION */}
-        <div className="grid gap-14 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_0.8fr_0.9fr_1.25fr] lg:gap-6">
           {/* BRAND */}
           <div>
             <Link
@@ -42,97 +35,67 @@ export default function Footer() {
               />
             </Link>
 
-            <p className="mt-5 max-w-sm leading-8 text-gray-300">
-              Experience Himachal the local way.
-              Carefully curated journeys through Shimla,
-              Manali and Spiti with trusted local experts.
+            <p className="mt-4 max-w-sm leading-7 text-gray-300">
+              Experience Himachal the local way. Carefully curated
+              journeys through Shimla, Manali and Spiti with trusted
+              local experts.
             </p>
           </div>
 
           {/* EXPLORE */}
           <div>
-            <h3 className="mb-6 text-lg font-bold text-white">
+            <h3 className="mb-4 text-lg font-bold text-white">
               Explore
             </h3>
 
-            <ul className="space-y-4 text-gray-300">
+            <ul className="space-y-3 text-gray-300">
               <li>
-                <Link
-                  href="/destinations"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/destinations" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Destinations
                 </Link>
               </li>
-
               <li>
-                <Link
-                  href="/packages"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/packages" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Packages
                 </Link>
               </li>
-
               <li>
-                <a
-                  href="/experiences"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/experiences" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Experiences
-                </a>
+                </Link>
               </li>
-
               <li>
-                <a
-                  href="/gallery"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/gallery" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Gallery
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* PLAN YOUR TRIP */}
           <div>
-            <h3 className="mb-6 text-lg font-bold text-white">
+            <h3 className="mb-4 text-lg font-bold text-white">
               Plan Your Trip
             </h3>
 
-            <ul className="space-y-4 text-gray-300">
+            <ul className="space-y-3 text-gray-300">
               <li>
-                <a
-                  href="/packages"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/packages" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Honeymoon
-                </a>
+                </Link>
               </li>
-
               <li>
-                <a
-                  href="/packages"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/packages" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Family Trips
-                </a>
+                </Link>
               </li>
-
               <li>
-                <a
-                  href="/experiences"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/experiences" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Adventure
-                </a>
+                </Link>
               </li>
-
               <li>
-                <Link
-                  href="/"
-                  className="transition-colors duration-300 hover:text-[#C89A3D]"
-                >
+                <Link href="/" className="transition-colors duration-300 hover:text-[#C89A3D]">
                   Custom Journey
                 </Link>
               </li>
@@ -140,12 +103,12 @@ export default function Footer() {
           </div>
 
           {/* CONTACT */}
-          <div>
-            <h3 className="mb-6 text-lg font-bold text-white">
+          <div className="min-w-0">
+            <h3 className="mb-4 text-lg font-bold text-white">
               Contact
             </h3>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* LOCATION */}
               <div className="flex items-start gap-3">
                 <MapPin
@@ -171,22 +134,22 @@ export default function Footer() {
 
                 <a
                   href="tel:+917559697919"
-                  className="text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
+                  className="whitespace-nowrap text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   +91 75596 97919
                 </a>
               </div>
 
               {/* EMAIL */}
-              <div className="flex items-start gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <Mail
                   size={18}
-                  className="mt-1 shrink-0 text-[#C89A3D]"
+                  className="shrink-0 text-[#C89A3D]"
                 />
 
                 <a
                   href="mailto:thehimalayancompass@gmail.com"
-                  className="break-all text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
+                  className="whitespace-nowrap text-sm text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
                   thehimalayancompass@gmail.com
                 </a>
@@ -194,129 +157,61 @@ export default function Footer() {
             </div>
 
             {/* SOCIAL ICONS */}
-            <div className="mt-8 flex gap-4">
+            <div className="mt-5 flex gap-3">
               <a
-                href="#"
-                aria-label="Instagram"
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/10
-                  text-white
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1
-                  hover:bg-[#C89A3D]
-                  hover:text-[#10264A]
-                "
+                href="https://www.instagram.com/thehimalayancompass.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit The Himalayan Compass on Instagram"
+                title="Instagram"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#C89A3D] hover:text-[#10264A]"
               >
-                <FaInstagram size={18} />
+                <FaInstagram size={17} />
               </a>
 
               <a
-                href="#"
-                aria-label="Facebook"
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/10
-                  text-white
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1
-                  hover:bg-[#C89A3D]
-                  hover:text-[#10264A]
-                "
+                href="https://www.facebook.com/profile.php?id=61595698851399"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit The Himalayan Compass on Facebook"
+                title="Facebook"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#C89A3D] hover:text-[#10264A]"
               >
-                <FaFacebookF size={17} />
-              </a>
-
-              <a
-                href="#"
-                aria-label="YouTube"
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/10
-                  text-white
-                  transition-all
-                  duration-300
-                  hover:-translate-y-1
-                  hover:bg-[#C89A3D]
-                  hover:text-[#10264A]
-                "
-              >
-                <FaYoutube size={19} />
+                <FaFacebookF size={16} />
               </a>
             </div>
           </div>
         </div>
 
-        {/* DIVIDER */}
-        <div className="my-16 h-px bg-white/10" />
+        {/* DIVIDER BEFORE OUR PROMISE */}
+        <div className="my-6 h-px bg-white/10" />
 
-        {/* OUR COMMITMENT */}
-        <div className="text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#C89A3D]">
-            Our Commitment
+        {/* OUR PROMISE */}
+        <div className="py-1 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#C89A3D]">
+            Our Promise
           </p>
 
-          <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl">
-            Your Himalayan Journey, Our Responsibility
+          <h3 className="mt-2 text-xl font-bold text-white md:text-2xl">
+            Your Himalayan Journey, Thoughtfully Planned.
           </h3>
 
-          <p className="mx-auto mt-4 max-w-2xl leading-7 text-gray-400">
-            We are working toward the necessary tourism and
-            transport authorizations as The Himalayan Compass grows.
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-400 md:text-base">
+            Discover the beauty of Himachal Pradesh through carefully
+            curated journeys, local insights and personalised travel support.
           </p>
-
-          {/* AUTHORIZATION BADGES */}
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-gray-300">
-              Himachal Tourism
-              <span className="ml-2 text-[#C89A3D]">
-                Coming Soon
-              </span>
-            </div>
-
-            <div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-gray-300">
-              HRTC
-              <span className="ml-2 text-[#C89A3D]">
-                Coming Soon
-              </span>
-            </div>
-
-            <div className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-gray-300">
-              IRCTC
-              <span className="ml-2 text-[#C89A3D]">
-                Coming Soon
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* BOTTOM DIVIDER */}
-        <div className="my-12 h-px bg-white/10" />
+        <div className="my-6 h-px bg-white/10" />
 
         {/* COPYRIGHT */}
-        <div className="flex flex-col items-center justify-between gap-4 text-center text-sm text-gray-400 md:flex-row md:text-left">
-          <p>
+        <div className="flex flex-col items-center justify-center gap-3 pb-16 text-center text-sm text-gray-400 sm:pb-16 md:flex-row md:justify-between md:gap-6 md:pb-2 md:pl-16 md:pr-20 md:text-left">
+          <p className="whitespace-nowrap">
             © 2026 The Himalayan Compass. All rights reserved.
           </p>
 
-          <p>
+          <p className="whitespace-nowrap">
             Crafted with{" "}
             <span className="text-[#C89A3D]">♥</span>{" "}
             for mountain travelers.

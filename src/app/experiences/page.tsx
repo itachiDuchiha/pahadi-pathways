@@ -78,50 +78,54 @@ export default function ExperiencesPage() {
     <SiteLayout>
       <main className="bg-[#F7F3E9] text-[#10264A]">
         {/* Hero */}
-        <section className="relative isolate flex min-h-[410px] items-center overflow-hidden sm:min-h-[450px] lg:min-h-[480px]">
+        <section className="relative isolate flex min-h-[430px] items-center justify-center overflow-hidden pt-20 sm:min-h-[450px] lg:min-h-[480px]">
           <Image
-            src="/images/hero/experiences-paragliding.png"
-            alt="Paragliding above the Himalayan mountains"
+            src="/images/hero/experiences-hero-trekking.png"
+            alt="A trekker exploring a scenic Himalayan mountain trail"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[68%_center]"
+            className="object-cover object-[center_44%]"
           />
 
-          <div className="absolute inset-0 bg-gradient-to-r from-[#081526]/80 via-[#081526]/45 to-[#081526]/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/55 via-transparent to-[#081526]/10" />
+          {/* Balanced overlay keeps the photograph visible while making the centered text readable. */}
+          <div className="absolute inset-0 bg-[#081526]/28" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#081526]/35 via-[#081526]/15 to-[#081526]/45" />
 
-          <div className="relative mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 lg:px-12">
-            <div className="max-w-3xl">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37] sm:text-sm">
-                The Himalayan Compass
-              </p>
+          <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-5 py-10 text-center sm:px-8 sm:py-12">
+            <p className="mb-3 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#D4AF37] sm:text-xs sm:tracking-[0.35em]">
+              <span className="h-px w-8 bg-[#C89A3D] sm:w-10" />
+              The Himalayan Compass
+              <span className="h-px w-8 bg-[#C89A3D] sm:w-10" />
+            </p>
 
-              <h1 className="font-serif text-4xl font-semibold leading-[1.08] text-white sm:text-5xl lg:text-6xl">
-                Experience the Himalayas
-                <span className="mt-2 block font-serif italic text-[#D4AF37]">
-                  Beyond the Journey
-                </span>
-              </h1>
+            <h1 className="max-w-4xl font-serif text-3xl font-medium leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+              Experience the Himalayas
+              <span className="mt-2 block font-serif italic text-[#D4AF37]">
+                Beyond the Journey
+              </span>
+            </h1>
 
-              <div className="my-5 flex items-center gap-2 text-[#D4AF37]">
-                <span className="h-px w-10 bg-[#D4AF37]" />
-                <span className="text-sm">◆</span>
-                <span className="h-px w-10 bg-[#D4AF37]" />
-              </div>
-
-              <p className="max-w-xl text-sm leading-6 text-white/95 sm:text-base sm:leading-7">
-                Adventure, culture, nature and quiet moments that turn a trip
-                through the mountains into a journey worth remembering.
-              </p>
-
-              <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.22em] text-white sm:text-xs">
-                Adventure <span className="mx-2 text-[#D4AF37]">•</span>
-                Culture <span className="mx-2 text-[#D4AF37]">•</span>
-                Nature <span className="mx-2 text-[#D4AF37]">•</span>
-                Local Life
-              </p>
+            <div className="my-4 flex items-center justify-center gap-2 text-[#D4AF37] sm:my-5">
+              <span className="h-px w-10 bg-[#C89A3D] sm:w-14" />
+              <span className="text-sm">◆</span>
+              <span className="h-px w-10 bg-[#C89A3D] sm:w-14" />
             </div>
+
+            <p className="mx-auto max-w-2xl text-sm leading-6 text-white/95 sm:text-base sm:leading-7">
+              Adventure, culture, nature and quiet moments that turn a trip
+              through the mountains into a journey worth remembering.
+            </p>
+
+            <p className="mt-4 flex flex-wrap items-center justify-center text-[10px] font-bold uppercase tracking-[0.18em] text-white sm:text-xs sm:tracking-[0.22em]">
+              <span>Adventure</span>
+              <span className="mx-2 text-[#D4AF37]">•</span>
+              <span>Culture</span>
+              <span className="mx-2 text-[#D4AF37]">•</span>
+              <span>Nature</span>
+              <span className="mx-2 text-[#D4AF37]">•</span>
+              <span>Local Life</span>
+            </p>
           </div>
         </section>
 
