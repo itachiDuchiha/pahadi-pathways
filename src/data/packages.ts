@@ -53,7 +53,7 @@ export const packages: Package[] = [
     duration: "9N / 10D",
     rating: 5.0,
     pickup: "Chandigarh",
-    price: "₹31,999",
+    price: "₹32,249",
     popular: true,
 
     itinerary: [
@@ -534,7 +534,7 @@ export const packages: Package[] = [
     duration: "6N / 7D",
     rating: 4.9,
     pickup: "Chandigarh",
-    price: "₹24,999",
+    price: "₹18,999",
 
     itinerary: [
       "2N Shimla",
@@ -967,7 +967,7 @@ export const packages: Package[] = [
     duration: "9N / 10D",
     rating: 4.9,
     pickup: "Chandigarh",
-    price: "₹34,999",
+    price: "₹32,074",
 
     itinerary: [
       "2N Shimla",
@@ -1076,7 +1076,7 @@ export const packages: Package[] = [
     duration: "7N / 8D",
     rating: 4.9,
     pickup: "Chandigarh",
-    price: "₹27,999",
+    price: "₹18,999",
 
     itinerary: [
       "2N Shimla",
@@ -1176,7 +1176,7 @@ export const packages: Package[] = [
     duration: "8N / 9D",
     rating: 4.9,
     pickup: "Chandigarh",
-    price: "₹29,999",
+    price: "₹29,549",
 
     itinerary: [
       "1N Shimla",
@@ -1272,235 +1272,4 @@ export const packages: Package[] = [
   },
 
   // ============================================================
-  // 6. CHANDIGARH → MANALI → KEYLONG → KAZA → TABO → CHANDRATAL
-  // ============================================================
-
-  {
-    slug: "manali-keylong-spiti-chandratal",
-    title: "Manali, Lahaul & Spiti Expedition",
-    image: "/images/packages/keylong.jpg",
-    heroImage: "/images/packages/heroes/keylong.png",
-    duration: "9N / 10D",
-    rating: 4.9,
-    pickup: "Chandigarh",
-    price: "₹34,999",
-
-    itinerary: [
-      "2N Manali",
-      "2N Keylong",
-      "2N Kaza",
-      "1N Tabo",
-      "1N Chandratal",
-      "1N Manali",
-    ],
-
-    includes: [
-      "Private Transportation",
-      "Hotel / Camp Stay",
-      "Breakfast",
-      "Sightseeing",
-    ],
-
-    itineraryDays: [
-      {
-        day: 1,
-        title: "Chandigarh → Manali",
-        stay: "Manali",
-        description:
-          "Pickup from Chandigarh and scenic drive towards Manali through Mandi and Kullu Valley with an en-route stop at Pandoh Dam.",
-        places: ["Mandi", "Pandoh Dam", "Kullu Valley"],
-      },
-      {
-        day: 2,
-        title: "Manali Local Sightseeing",
-        stay: "Manali",
-        description:
-          "Explore Manali and its surrounding attractions before preparing for the high-altitude journey ahead.",
-        places: ["Hadimba Temple", "Vashisht", "Manali"],
-      },
-      {
-        day: 3,
-        title: "Manali → Keylong",
-        stay: "Keylong",
-        description:
-          "Morning drive to Keylong, visiting Solang Valley and crossing the Atal Tunnel before entering the spectacular Lahaul Valley. Rohtang Pass excursion is available at additional cost, subject to permits and road conditions.",
-        places: [
-          "Solang Valley",
-          "Atal Tunnel",
-          "Rohtang Pass",
-          "Keylong",
-        ],
-      },
-      {
-        day: 4,
-        title: "Keylong Local Sightseeing",
-        stay: "Keylong",
-        description:
-          "Explore Keylong with visits to Khardang Monastery, Trilokinath Temple and Shashur Monastery.",
-        places: [
-          "Khardang Monastery",
-          "Trilokinath Temple",
-          "Shashur Monastery",
-        ],
-      },
-      {
-        day: 5,
-        title: "Keylong → Kaza",
-        stay: "Kaza",
-        description:
-          "Morning drive from Keylong towards Kaza through the spectacular high-altitude Himalayan landscape and across Kunzum Pass.",
-        places: [
-          "Kunzum Pass",
-          "Spiti Valley",
-          "Kaza",
-        ],
-      },
-      {
-        day: 6,
-        title: "Kaza Local Sightseeing",
-        stay: "Kaza",
-        description:
-          "Explore the high-altitude villages around Kaza, including Langza, Hikkim and Komik.",
-        places: ["Langza", "Hikkim", "Komik"],
-      },
-      {
-        day: 7,
-        title: "Kaza → Dhankar → Tabo",
-        stay: "Tabo",
-        description:
-          "Travel from Kaza towards Tabo, visiting Dhankar Monastery and the ancient Buddhist heritage of Spiti.",
-        places: ["Dhankar Monastery", "Tabo"],
-      },
-      {
-        day: 8,
-        title: "Tabo → Chandratal",
-        stay: "Chandratal",
-        description:
-          "After breakfast, check out from the hotel and enjoy local sightseeing in Tabo, visiting Tabo Monastery, Tabo Cave, Key, Kibber and Chicham. Continue towards Chandratal for an overnight camp stay.",
-        places: [
-          "Tabo Monastery",
-          "Tabo Cave",
-          "Key Monastery",
-          "Kibber",
-          "Chicham",
-          "Chandratal",
-        ],
-      },
-      {
-        day: 9,
-        title: "Chandratal → Manali",
-        stay: "Manali",
-        description:
-          "Morning visit to Chandratal Lake, followed by the drive back to Manali through the Atal Tunnel.",
-        places: [
-          "Chandratal Lake",
-          "Atal Tunnel",
-          "Manali",
-        ],
-      },
-      {
-        day: 10,
-        title: "Manali → Chandigarh",
-        stay: "-",
-        description:
-          "After breakfast, drive from Manali to Chandigarh for your final drop-off.",
-      },
-    ],
-  },
-
-  // ============================================================
-  // 7. SHORT SPITI CIRCUIT
-  // ============================================================
-
-  {
-    slug: "manali-spiti-chandratal",
-    title: "Manali & Spiti: High Himalayan Escape",
-    image: "/images/packages/chandratal1.jpg",
-    heroImage: "/images/packages/heroes/chandratal.png",
-    duration: "5N / 6D",
-    rating: 4.9,
-    pickup: "Chandigarh",
-    price: "₹25,999",
-
-    itinerary: [
-      "1N Manali",
-      "1N Kaza",
-      "1N Tabo",
-      "1N Chandratal",
-      "1N Manali",
-    ],
-
-    includes: [
-      "Private Transportation",
-      "Hotel / Camp Stay",
-      "Breakfast",
-      "Sightseeing",
-    ],
-
-    itineraryDays: [
-      {
-        day: 1,
-        title: "Chandigarh → Manali",
-        stay: "Manali",
-        description:
-          "Pickup from Chandigarh and scenic drive to Manali through Mandi and Kullu Valley, with an en-route stop at Pandoh Dam.",
-        places: ["Pandoh Dam", "Kullu Valley", "Manali"],
-      },
-      {
-        day: 2,
-        title: "Manali → Kaza",
-        stay: "Kaza",
-        description:
-          "After breakfast, drive towards Kaza through the Atal Tunnel and across the spectacular Kunzum Pass.",
-        places: ["Atal Tunnel", "Kunzum Pass", "Kaza"],
-      },
-      {
-        day: 3,
-        title: "Kaza → Tabo",
-        stay: "Tabo",
-        description:
-          "Explore the high-altitude villages around Kaza, including Langza, Hikkim and Komik, before continuing towards Tabo.",
-        places: [
-          "Langza",
-          "Hikkim",
-          "Komik",
-          "Tabo",
-        ],
-      },
-      {
-        day: 4,
-        title: "Tabo → Chandratal",
-        stay: "Chandratal",
-        description:
-          "After breakfast, check out from the hotel and enjoy local sightseeing in Tabo, visiting Tabo Monastery, Tabo Cave, Key, Kibber and Chicham. Continue towards Chandratal for an overnight camp stay.",
-        places: [
-          "Tabo Monastery",
-          "Tabo Cave",
-          "Key Monastery",
-          "Kibber",
-          "Chicham",
-          "Chandratal",
-        ],
-      },
-      {
-        day: 5,
-        title: "Chandratal → Manali",
-        stay: "Manali",
-        description:
-          "Visit Chandratal Lake in the morning before driving back towards Manali through the Atal Tunnel.",
-        places: [
-          "Chandratal Lake",
-          "Atal Tunnel",
-          "Manali",
-        ],
-      },
-      {
-        day: 6,
-        title: "Manali → Chandigarh",
-        stay: "-",
-        description:
-          "After breakfast, depart from Manali and drive to Chandigarh for your final drop-off.",
-      },
-    ],
-  },
 ];

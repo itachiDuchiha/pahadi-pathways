@@ -134,7 +134,7 @@ export default async function PackageDetailsPage({
                 RIGHT — PACKAGE PLANNER
             ===================================================== */}
 
-            <aside className="hidden lg:block">
+            <aside className="order-first min-w-0 lg:order-none">
 
               <div
                 className="

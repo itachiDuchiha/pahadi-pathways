@@ -32,9 +32,11 @@ type MealOption = {
   price: number;
 };
 
+type VehicleKey = "sedan" | "ertiga" | "crysta";
+
 type VehicleOption = {
   label: string;
-  price: number;
+  key: VehicleKey;
 };
 
 /* =========================================================
@@ -67,24 +69,20 @@ const mealOptions: MealOption[] = [
     label: "Breakfast Only (CP)",
     price: -2500,
   },
-  {
-    label: "Breakfast + Lunch + Dinner (AP)",
-    price: 3500,
-  },
 ];
 
 const vehicleOptions: VehicleOption[] = [
   {
     label: "Sedan",
-    price: 0,
+    key: "sedan",
   },
   {
     label: "Ertiga / Rumion or similar",
-    price: 1000,
+    key: "ertiga",
   },
   {
     label: "Innova Crysta or similar",
-    price: 2000,
+    key: "crysta",
   },
 ];
 
@@ -106,14 +104,11 @@ export default function PackageBookingPanel({
   /* =======================================================
      BASIC PACKAGE PRICE
 
-     Package price is treated as the price for 2 adults.
+     Package price is treated as the price per adult.
   ======================================================= */
 
-  const basePackagePrice = Number(pkg.price) || 0;
+  const basePackagePrice = Number(String(pkg.price).replace(/[^\d.]/g, "")) || 0;
 
-  const adultRate = Math.round(
-    basePackagePrice / 2
-  );
 
   /* =======================================================
      STATE
@@ -126,7 +121,7 @@ export default function PackageBookingPanel({
   );
 
   const [vehicle, setVehicle] = useState(
-    "Ertiga / Rumion or similar"
+    "Sedan"
   );
 
   const [adults, setAdults] = useState(2);
@@ -202,6 +197,43 @@ export default function PackageBookingPanel({
     [vehicle]
   );
 
+  const isSpitiRoute = /spiti|kaza|tabo|kunzum|chandratal/i.test(
+    pkg.title + " " + pkg.slug
+  );
+
+  const tourDays =
+    Number(pkg.duration.match(/(\d+)\s*D/i)?.[1]) ||
+    pkg.itineraryDays?.length ||
+    1;
+
+  // Published base prices are the lowest Sedan rates. These per-adult
+  // amounts keep the agreed vehicle tiers consistent across the five packages.
+  const packageVehicleRates: Record<string, Record<VehicleKey, number>> = {
+    "shimla-kinnaur-spiti-chandratal": { sedan: 32249, ertiga: 38749, crysta: 54999 },
+    "shimla-manali-getaway": { sedan: 18999, ertiga: 21624, crysta: 32999 },
+    "himachal-grand-circuit": { sedan: 32074, ertiga: 36624, crysta: 47999 },
+    "shimla-manali-jibhi": { sedan: 18999, ertiga: 19999, crysta: 32999 },
+    "shimla-kinnaur-spiti-kalpa": { sedan: 29549, ertiga: 34799, crysta: 49499 },
+  };
+
+  const packageRates = packageVehicleRates[pkg.slug];
+  const selectedAdultRate = packageRates?.[selectedVehicle.key] ?? basePackagePrice;
+
+  const dailyVehicleRates: Record<VehicleKey, number> =
+    isSpitiRoute
+      ? { sedan: 4500, ertiga: 5500, crysta: 8000 }
+      : { sedan: 3500, ertiga: 4500, crysta: 6000 };
+
+  const vehicleUpgradePerDay =
+    dailyVehicleRates[selectedVehicle.key] - dailyVehicleRates.sedan;
+
+  const vehicleUpgradeTotal = packageRates
+    ? 0
+    : vehicleUpgradePerDay * tourDays;
+
+  const adultRate = packageRates
+    ? selectedAdultRate
+    : basePackagePrice;
   /* =======================================================
      CHILD PRICING
 
@@ -228,15 +260,15 @@ export default function PackageBookingPanel({
   /* =======================================================
      EXTRA ADULT PRICING
 
-     Base package already covers 2 adults.
+     The first adult is included as the base package price.
 
-     Every adult above 2 is charged at the
+     Each additional adult is charged at the
      calculated adult rate.
   ======================================================= */
 
   const extraAdults = Math.max(
     0,
-    adults - 2
+    adults - 1
   );
 
   const extraAdultPrice =
@@ -253,12 +285,12 @@ export default function PackageBookingPanel({
     selectedMeal.price;
 
   const packageCostBeforeVehicle =
-    basePackagePrice +
+    (packageRates ? adultRate : basePackagePrice) +
     packageAdjustment;
 
   const packageCost =
     packageCostBeforeVehicle +
-    selectedVehicle.price;
+    vehicleUpgradeTotal;
 
   /* =======================================================
      GST
@@ -407,7 +439,7 @@ export default function PackageBookingPanel({
       if (whatsappWindow) {
         whatsappWindow.location.href = whatsappUrl;
       } else {
-        window.location.href = whatsappUrl;
+        window.open(whatsappUrl, "_self");
       }
 
       setIsEnquiryOpen(false);
@@ -700,7 +732,11 @@ export default function PackageBookingPanel({
               Vehicle
             </label>
 
-            {selectedVehicle.price > 0 && (
+            {packageRates ? (
+              <span className="rounded-full bg-[#F4E5C3] px-2 py-[2px] text-[8px] font-bold text-[#8B6412]">
+                {formatCurrency(selectedAdultRate)}/adult
+              </span>
+            ) : vehicleUpgradeTotal > 0 && (
               <span
                 className="
                   rounded-full
@@ -712,9 +748,7 @@ export default function PackageBookingPanel({
                   text-[#8B6412]
                 "
               >
-                +{formatCurrency(
-                  selectedVehicle.price
-                )}
+                +{formatCurrency(vehicleUpgradePerDay)}/day
               </span>
             )}
           </div>
@@ -803,7 +837,7 @@ export default function PackageBookingPanel({
             <div>
               <p
                 className="
-                  text-[9px]
+                  text-[10px]
                   font-bold
                   uppercase
                   tracking-[0.18em]
@@ -816,7 +850,7 @@ export default function PackageBookingPanel({
               <p
                 className="
                   mt-0.5
-                  text-[10px]
+                  text-[11px]
                   font-medium
                   text-[#526078]
                 "
@@ -833,7 +867,7 @@ export default function PackageBookingPanel({
                 bg-[#F8F3E8]
                 px-2
                 py-1
-                text-[9px]
+                text-[10px]
                 font-semibold
                 text-[#34445E]
               "
@@ -913,7 +947,7 @@ export default function PackageBookingPanel({
                 className="
                   min-w-[26px]
                   text-center
-                  text-[11px]
+                  text-[12px]
                   font-bold
                   text-[#10264A]
                 "
@@ -1019,7 +1053,7 @@ export default function PackageBookingPanel({
                 className="
                   min-w-[26px]
                   text-center
-                  text-[11px]
+                  text-[12px]
                   font-bold
                   text-[#10264A]
                 "
@@ -1083,7 +1117,7 @@ export default function PackageBookingPanel({
               >
                 <p
                   className="
-                    text-[9px]
+                    text-[10px]
                     font-bold
                     uppercase
                     tracking-[0.16em]
@@ -1101,7 +1135,7 @@ export default function PackageBookingPanel({
                     )
                   }
                   className="
-                    text-[9px]
+                    text-[10px]
                     font-semibold
                     text-[#8B6412]
                     hover:underline
@@ -1134,7 +1168,7 @@ export default function PackageBookingPanel({
                       border-[#D3C9B9]
                       bg-white
                       py-1.5
-                      text-[10px]
+                      text-[11px]
                       font-semibold
                       text-[#10264A]
                       transition
@@ -1150,7 +1184,7 @@ export default function PackageBookingPanel({
               <p
                 className="
                   mt-2
-                  text-[9px]
+                  text-[10px]
                   leading-4
                   text-[#526078]
                 "
@@ -1205,7 +1239,7 @@ export default function PackageBookingPanel({
                       <div>
                         <p
                           className="
-                            text-[10px]
+                            text-[11px]
                             font-semibold
                             text-[#10264A]
                           "
@@ -1218,7 +1252,7 @@ export default function PackageBookingPanel({
                         <p
                           className="
                             mt-0.5
-                            text-[8.5px]
+                            text-[9.5px]
                             font-medium
                             text-[#526078]
                           "
@@ -1297,10 +1331,10 @@ export default function PackageBookingPanel({
             <div>
               <p
                 className="
-                  text-[9px]
+                  text-[10px]
                   font-bold
                   uppercase
-                  tracking-[0.17em]
+                  tracking-[0.12em]
                   text-[#34445E]
                 "
               >
@@ -1310,7 +1344,7 @@ export default function PackageBookingPanel({
               <p
                 className="
                   mt-0.5
-                  text-[9px]
+                  text-[10px]
                   font-medium
                   text-[#526078]
                 "
@@ -1325,7 +1359,7 @@ export default function PackageBookingPanel({
                 bg-white
                 px-2
                 py-1
-                text-[8px]
+                text-[9px]
                 font-bold
                 text-[#34445E]
                 shadow-sm
@@ -1343,7 +1377,7 @@ export default function PackageBookingPanel({
 
           <div
             className="
-              space-y-2
+              space-y-2.5
               px-3.5
               py-3
             "
@@ -1361,7 +1395,7 @@ export default function PackageBookingPanel({
             >
               <span
                 className="
-                  text-[10px]
+                  text-[12px]
                   font-medium
                   text-[#46536A]
                 "
@@ -1374,13 +1408,13 @@ export default function PackageBookingPanel({
               <span
                 className="
                   whitespace-nowrap
-                  text-[10px]
+                  text-[12px]
                   font-bold
                   text-[#10264A]
                 "
               >
                 {formatCurrency(
-                  basePackagePrice +
+                  (packageRates ? adultRate : basePackagePrice) +
                     extraAdultPrice
                 )}
               </span>
@@ -1399,7 +1433,7 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#46536A]
                   "
@@ -1410,7 +1444,7 @@ export default function PackageBookingPanel({
                 <span
                   className="
                     whitespace-nowrap
-                    text-[10px]
+                    text-[12px]
                     font-bold
                     text-[#10264A]
                   "
@@ -1437,7 +1471,7 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#46536A]
                   "
@@ -1447,7 +1481,7 @@ export default function PackageBookingPanel({
 
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-bold
                     text-[#7A5B19]
                   "
@@ -1459,7 +1493,7 @@ export default function PackageBookingPanel({
 
             {/* Vehicle */}
 
-            {selectedVehicle.price > 0 && (
+            {!packageRates && vehicleUpgradeTotal > 0 && (
               <div
                 className="
                   flex
@@ -1470,26 +1504,24 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#46536A]
                   "
                 >
-                  Vehicle upgrade
+                  Vehicle upgrade · {tourDays} days
                 </span>
 
                 <span
                   className="
                     whitespace-nowrap
-                    text-[10px]
+                    text-[12px]
                     font-bold
                     text-[#8B6412]
                   "
                 >
                   +
-                  {formatCurrency(
-                    selectedVehicle.price
-                  )}
+                  {formatCurrency(vehicleUpgradeTotal)}
                 </span>
               </div>
             )}
@@ -1507,7 +1539,7 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#46536A]
                   "
@@ -1518,7 +1550,7 @@ export default function PackageBookingPanel({
                 <span
                   className="
                     whitespace-nowrap
-                    text-[10px]
+                    text-[12px]
                     font-bold
                     text-[#8B6412]
                   "
@@ -1547,7 +1579,7 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#46536A]
                   "
@@ -1558,7 +1590,7 @@ export default function PackageBookingPanel({
                 <span
                   className="
                     whitespace-nowrap
-                    text-[10px]
+                    text-[12px]
                     font-bold
                     text-[#8B6412]
                   "
@@ -1596,7 +1628,7 @@ export default function PackageBookingPanel({
             >
               <span
                 className="
-                  text-[10px]
+                  text-[12px]
                   font-bold
                   text-[#34445E]
                 "
@@ -1607,7 +1639,7 @@ export default function PackageBookingPanel({
               <span
                 className="
                   whitespace-nowrap
-                  text-[11px]
+                  text-[13px]
                   font-extrabold
                   text-[#10264A]
                 "
@@ -1638,7 +1670,7 @@ export default function PackageBookingPanel({
               >
                 <span
                   className="
-                    text-[10px]
+                    text-[12px]
                     font-medium
                     text-[#526078]
                   "
@@ -1652,7 +1684,7 @@ export default function PackageBookingPanel({
                     bg-white
                     px-1.5
                     py-0.5
-                    text-[7px]
+                    text-[9px]
                     font-bold
                     text-[#526078]
                   "
@@ -1663,7 +1695,7 @@ export default function PackageBookingPanel({
 
               <span
                 className="
-                  text-[10px]
+                  text-[12px]
                   font-semibold
                   text-[#46536A]
                 "
@@ -1705,10 +1737,10 @@ export default function PackageBookingPanel({
               <div>
                 <p
                   className="
-                    text-[8px]
+                    text-[9px]
                     font-bold
                     uppercase
-                    tracking-[0.16em]
+                    tracking-[0.12em]
                     text-[#7A5B19]
                   "
                 >
@@ -1718,7 +1750,7 @@ export default function PackageBookingPanel({
                 <p
                   className="
                     mt-0.5
-                    text-[7.5px]
+                    text-[9px]
                     font-medium
                     text-[#526078]
                   "
@@ -1730,7 +1762,7 @@ export default function PackageBookingPanel({
               <p
                 className="
                   whitespace-nowrap
-                  text-[20px]
+                  text-[24px]
                   font-extrabold
                   tracking-tight
                   text-[#10264A]

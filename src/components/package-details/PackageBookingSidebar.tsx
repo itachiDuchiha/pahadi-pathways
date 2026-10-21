@@ -54,14 +54,7 @@ export default function PackageBookingSidebar({ pkg }: Props) {
         ? 0
         : 2500;
 
-  const mealExtra =
-    mealPlan === "Room Only"
-      ? -1200
-      : mealPlan === "CP"
-        ? 0
-        : mealPlan === "MAP"
-          ? 1200
-          : 2200;
+  const mealExtra = mealPlan === "MAP" ? 1200 : 0;
 
   const vehicleExtra =
     vehicle === "Sedan"
@@ -190,9 +183,6 @@ export default function PackageBookingSidebar({ pkg }: Props) {
                 }
                 className="w-full appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2.5 pr-9 text-sm font-medium text-[#10264A] outline-none transition focus:border-[#C89A3D] focus:ring-1 focus:ring-[#C89A3D]/30"
               >
-                <option value="Room Only">
-                  Room Only
-                </option>
 
                 <option value="CP">
                   CP — Breakfast
@@ -200,10 +190,6 @@ export default function PackageBookingSidebar({ pkg }: Props) {
 
                 <option value="MAP">
                   MAP — Breakfast + Dinner
-                </option>
-
-                <option value="AP">
-                  AP — Breakfast + Lunch + Dinner
                 </option>
               </select>
 
