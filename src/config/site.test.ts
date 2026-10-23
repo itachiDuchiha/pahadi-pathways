@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { site, whatsappUrl } from "./site";
 
@@ -19,5 +19,30 @@ describe("site config", () => {
 
   it("has the correct business email", () => {
     expect(site.email).toBe("thehimalayancompass@gmail.com");
+  });
+
+  describe("NEXT_PUBLIC_SITE_URL", () => {
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+    });
+
+    it("falls back to the default URL when the variable is empty", async () => {
+      vi.stubEnv("NEXT_PUBLIC_SITE_URL", "");
+      vi.resetModules();
+
+      const fresh = await import("./site");
+
+      expect(fresh.site.url).toBe("https://thehimalayancompass.in");
+    });
+
+    it("falls back to the default URL when the variable is only spaces", async () => {
+      vi.stubEnv("NEXT_PUBLIC_SITE_URL", "   ");
+      vi.resetModules();
+
+      const fresh = await import("./site");
+
+      expect(fresh.site.url).toBe("https://thehimalayancompass.in");
+    });
   });
 });

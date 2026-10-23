@@ -3,7 +3,7 @@ function stripTrailingSlash(value: string): string {
 }
 
 const siteUrl = stripTrailingSlash(
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://thehimalayancompass.in"
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://thehimalayancompass.in"
 );
 
 export const site = {

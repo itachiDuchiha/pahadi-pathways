@@ -13,8 +13,8 @@ vi.mock("./mail", async (importOriginal) => {
   };
 });
 
-import { POST as packagePOST } from "@/app/api/package-enquiry/route";
-import { POST as tripPOST } from "@/app/api/trip-enquiry/route";
+import { POST as packagePOST } from "@/app/(frontend)/api/package-enquiry/route";
+import { POST as tripPOST } from "@/app/(frontend)/api/trip-enquiry/route";
 
 import { MAX_BODY_BYTES } from "./guards";
 import { sendEnquiryEmail } from "./mail";
