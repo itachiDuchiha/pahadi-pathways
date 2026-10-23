@@ -489,7 +489,7 @@ export default function Navbar() {
               </li>
 
               <li>
-                <a
+                <Link
                   href="/experiences"
                   onClick={closeMobileMenu}
                   className="
@@ -505,11 +505,11 @@ export default function Navbar() {
                   "
                 >
                   Experiences
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
+                <Link
                   href="/gallery"
                   onClick={closeMobileMenu}
                   className="
@@ -525,7 +525,7 @@ export default function Navbar() {
                   "
                 >
                   Gallery
-                </a>
+                </Link>
               </li>
             </ul>
           </nav>

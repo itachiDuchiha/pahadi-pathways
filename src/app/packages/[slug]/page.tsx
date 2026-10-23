@@ -106,7 +106,7 @@ export default async function PackageDetailsPage({
                 id="things-to-know"
                 className="scroll-mt-32"
               >
-                <TravelNote pkg={pkg} />
+                <TravelNote />
               </section>
 
               {/* TERMS & CONDITIONS */}

@@ -12,19 +12,13 @@ import {
   Ticket,
 } from "lucide-react";
 
-import type { Package } from "@/data/packages";
-
-type Props = {
-  pkg: Package;
-};
-
 type InfoItem = {
   title: string;
   icon: React.ElementType;
   content: string;
 };
 
-export default function TravelNote({}: Props) {
+export default function TravelNote() {
   const [openItem, setOpenItem] = useState<number | null>(0);
 
   const items: InfoItem[] = [
