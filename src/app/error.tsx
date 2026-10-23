@@ -7,20 +7,21 @@ type ErrorPageProps = {
 
 export default function Error({ reset }: ErrorPageProps) {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center bg-[#F8F6F1] px-6 py-20">
-      <div className="text-center">
-        <h1 className="font-serif text-4xl font-medium tracking-tight text-[#10264A] md:text-5xl">
-          Something went wrong
-        </h1>
+    <div className="bg-[#F8F6F1] pt-[82px]">
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#F8F6F1] px-6 py-20">
+        <div className="text-center">
+          <h1 className="font-serif text-4xl font-medium tracking-tight text-[#10264A] md:text-5xl">
+            Something went wrong
+          </h1>
 
-        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-gray-500 md:text-base">
-          An unexpected error occurred while loading this page.
-        </p>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-gray-500 md:text-base">
+            An unexpected error occurred while loading this page.
+          </p>
 
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="
             mt-8
             inline-flex
             items-center
@@ -45,9 +46,10 @@ export default function Error({ reset }: ErrorPageProps) {
             sm:py-4
             sm:text-sm
           "
-        >
-          Try again
-        </button>
+          >
+            Try again
+          </button>
+        </div>
       </div>
     </div>
   );

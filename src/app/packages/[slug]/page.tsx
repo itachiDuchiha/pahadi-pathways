@@ -62,106 +62,104 @@ export default async function PackageDetailsPage({
 
   return (
     <>
-      <div>
+      {/* =========================================================
+          PACKAGE HERO
+      ========================================================= */}
 
-        {/* =========================================================
-            PACKAGE HERO
-        ========================================================= */}
+      <Hero pkg={pkg} />
 
-        <Hero pkg={pkg} />
+      {/* =========================================================
+          PACKAGE SECTION NAVIGATION
+      ========================================================= */}
 
-        {/* =========================================================
-            PACKAGE SECTION NAVIGATION
-        ========================================================= */}
+      <PackageSectionNav />
 
-        <PackageSectionNav />
+      {/* =========================================================
+          MAIN PACKAGE CONTENT
+      ========================================================= */}
 
-        {/* =========================================================
-            MAIN PACKAGE CONTENT
-        ========================================================= */}
+      <div className="mx-auto max-w-7xl px-5 sm:px-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
 
-        <div className="mx-auto max-w-7xl px-5 sm:px-6">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+          {/* =====================================================
+              LEFT — PACKAGE DETAILS
+          ===================================================== */}
 
-            {/* =====================================================
-                LEFT — PACKAGE DETAILS
-            ===================================================== */}
+          <div className="min-w-0">
 
-            <div className="min-w-0">
+            {/* OVERVIEW */}
 
-              {/* OVERVIEW */}
+            <section
+              id="overview"
+              className="scroll-mt-32"
+            >
+              <Overview pkg={pkg} />
+            </section>
 
-              <section
-                id="overview"
-                className="scroll-mt-32"
-              >
-                <Overview pkg={pkg} />
-              </section>
+            {/* DETAILED ITINERARY */}
 
-              {/* DETAILED ITINERARY */}
+            <section
+              id="itinerary"
+              className="scroll-mt-32"
+            >
+              <DayTimeline pkg={pkg} />
+            </section>
 
-              <section
-                id="itinerary"
-                className="scroll-mt-32"
-              >
-                <DayTimeline pkg={pkg} />
-              </section>
+            {/* STAYS */}
 
-              {/* STAYS */}
+            <section
+              id="stays"
+              className="scroll-mt-32"
+            >
+              <StayPlan pkg={pkg} />
+            </section>
 
-              <section
-                id="stays"
-                className="scroll-mt-32"
-              >
-                <StayPlan pkg={pkg} />
-              </section>
+            {/* INCLUSIONS */}
 
-              {/* INCLUSIONS */}
+            <section
+              id="inclusions"
+              className="scroll-mt-32"
+            >
+              <IncludedExcluded pkg={pkg} />
+            </section>
 
-              <section
-                id="inclusions"
-                className="scroll-mt-32"
-              >
-                <IncludedExcluded pkg={pkg} />
-              </section>
+            {/* THINGS TO KNOW */}
 
-              {/* THINGS TO KNOW */}
+            <section
+              id="things-to-know"
+              className="scroll-mt-32"
+            >
+              <TravelNote />
+            </section>
 
-              <section
-                id="things-to-know"
-                className="scroll-mt-32"
-              >
-                <TravelNote />
-              </section>
+            {/* TERMS & CONDITIONS */}
 
-              {/* TERMS & CONDITIONS */}
+            <section
+              id="terms"
+              className="scroll-mt-32"
+            >
+              <TermsConditions />
+            </section>
 
-              <section
-                id="terms"
-                className="scroll-mt-32"
-              >
-                <TermsConditions />
-              </section>
+            {/* CANCELLATION POLICY */}
 
-              {/* CANCELLATION POLICY */}
+            <section
+              id="cancellation"
+              className="scroll-mt-32"
+            >
+              <CancellationPolicy />
+            </section>
 
-              <section
-                id="cancellation"
-                className="scroll-mt-32"
-              >
-                <CancellationPolicy />
-              </section>
+          </div>
 
-            </div>
+          {/* =====================================================
+              RIGHT — PACKAGE PLANNER
+          ===================================================== */}
 
-            {/* =====================================================
-                RIGHT — PACKAGE PLANNER
-            ===================================================== */}
+          <aside className="order-first min-w-0 lg:order-none">
 
-            <aside className="order-first min-w-0 lg:order-none">
-
-              <div
-                className="
+            <div
+              className="
                   sticky
                   top-[145px]
                   max-h-[calc(100vh-165px)]
@@ -171,15 +169,13 @@ export default async function PackageDetailsPage({
                   scrollbar-thumb-[#C89A3D]/40
                   scrollbar-track-transparent
                 "
-              >
-                <PackageBookingPanel pkg={pkg} />
-              </div>
+            >
+              <PackageBookingPanel pkg={pkg} />
+            </div>
 
-            </aside>
+          </aside>
 
-          </div>
         </div>
-
       </div>
     </>
   );

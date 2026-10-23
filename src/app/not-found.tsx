@@ -2,24 +2,25 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center bg-[#F8F6F1] px-6 py-20">
-      <div className="text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#C89A3D]">
-          404
-        </p>
+    <div className="bg-[#F8F6F1] pt-[82px]">
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#F8F6F1] px-6 py-20">
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#C89A3D]">
+            404
+          </p>
 
-        <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight text-[#10264A] md:text-5xl">
-          Page not found
-        </h1>
+          <h1 className="mt-3 font-serif text-4xl font-medium tracking-tight text-[#10264A] md:text-5xl">
+            Page not found
+          </h1>
 
-        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-gray-500 md:text-base">
-          The page you are looking for does not exist or has moved.
-        </p>
+          <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-gray-500 md:text-base">
+            The page you are looking for does not exist or has moved.
+          </p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/packages"
-            className="
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/packages"
+              className="
               inline-flex
               items-center
               justify-center
@@ -43,13 +44,13 @@ export default function NotFound() {
               sm:py-4
               sm:text-sm
             "
-          >
-            Browse packages
-          </Link>
+            >
+              Browse packages
+            </Link>
 
-          <Link
-            href="/destinations"
-            className="
+            <Link
+              href="/destinations"
+              className="
               inline-flex
               items-center
               justify-center
@@ -74,9 +75,10 @@ export default function NotFound() {
               sm:py-4
               sm:text-sm
             "
-          >
-            Explore destinations
-          </Link>
+            >
+              Explore destinations
+            </Link>
+          </div>
         </div>
       </div>
     </div>

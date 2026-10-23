@@ -8,6 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 
 import Modal from "@/components/ui/Modal";
 import TripPlannerForm from "@/components/forms/TripPlannerForm";
@@ -28,6 +29,19 @@ export default function PlannerProvider({ children }: PlannerProviderProps) {
 
   const openPlanner = useCallback(() => setIsOpen(true), []);
   const closePlanner = useCallback(() => setIsOpen(false), []);
+
+  const pathname = usePathname();
+
+  const [lastPathname, setLastPathname] = useState(pathname);
+
+  // The provider lives in the root layout and survives client navigation,
+  // so close the planner whenever the route changes. This adjusts state
+  // during render (no effect) and only ever closes; on mount the pathnames
+  // match, so nothing happens.
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setIsOpen(false);
+  }
 
   const value = useMemo(
     () => ({ openPlanner, closePlanner }),
