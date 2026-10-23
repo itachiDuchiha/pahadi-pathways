@@ -2,17 +2,15 @@
 
 import { ArrowRight } from "lucide-react";
 
-type FloatingPlannerProps = {
-  onOpen: () => void;
-};
+import { usePlanner } from "./PlannerProvider";
 
-export default function FloatingPlanner({
-  onOpen,
-}: FloatingPlannerProps) {
+export default function FloatingPlanner() {
+  const { openPlanner } = usePlanner();
+
   return (
     <button
       type="button"
-      onClick={onOpen}
+      onClick={openPlanner}
       aria-label="Plan my trip"
       className="
         group

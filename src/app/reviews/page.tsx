@@ -7,9 +7,18 @@ import {
   Mountain,
 } from "lucide-react";
 
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Traveller Reviews",
+  description:
+    "What travellers say about their Himachal trips with The Himalayan Compass.",
+  path: "/reviews",
+});
+
 export default function ReviewsPage() {
   return (
-    <main className="min-h-screen bg-[#F8F7F3] text-[#10264A]">
+    <div className="min-h-screen bg-[#F8F7F3] pt-[82px] text-[#10264A]">
 
       {/* =====================================================
           HERO
@@ -514,6 +523,6 @@ export default function ReviewsPage() {
 
       </section>
 
-    </main>
+    </div>
   );
 }

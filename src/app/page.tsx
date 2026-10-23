@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 import Hero from "@/components/home/Hero";
 import PopularPackages from "@/components/home/PopularPackages";
 import FeaturedDestinations from "@/components/home/FeaturedDestinations";
@@ -9,22 +5,15 @@ import WhyChooseUs from "@/components/home/WhyChooseUs";
 import Testimonials from "@/components/home/Testimonials";
 import CallToAction from "@/components/home/CallToAction";
 
-import Footer from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 
-import Modal from "@/components/ui/Modal";
-import TripPlannerForm from "@/components/forms/TripPlannerForm";
+export const metadata = pageMetadata({
+  description:
+    "Handcrafted Himachal Pradesh tours, custom itineraries and trusted local hosts for Shimla, Manali, Spiti and beyond.",
+  path: "/",
+});
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openPlanner = () => {
-    setIsModalOpen(true);
-  };
-
-  const closePlanner = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <>
       <Hero />
@@ -37,17 +26,7 @@ export default function Home() {
 
       <WhyChooseUs />
 
-      <CallToAction onOpen={openPlanner} />
-
-      <Footer />
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closePlanner}
-        title="Plan Your Himalayan Journey"
-      >
-        <TripPlannerForm />
-      </Modal>
+      <CallToAction />
     </>
   );
 }

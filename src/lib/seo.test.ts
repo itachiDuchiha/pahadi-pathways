@@ -92,4 +92,15 @@ describe("pageMetadata", () => {
       title: "Title",
     });
   });
+
+  it("omits the page title and uses the site default for social titles when no title is given", () => {
+    const metadata = pageMetadata({
+      description: "Description",
+      path: "/",
+    });
+
+    expect(metadata.title).toBeUndefined();
+    expect(metadata.openGraph?.title).toBe(`${site.name} | ${site.tagline}`);
+    expect(metadata.twitter?.title).toBe(`${site.name} | ${site.tagline}`);
+  });
 });

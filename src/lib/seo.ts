@@ -21,7 +21,8 @@ export function truncate(text: string, max: number): string {
 }
 
 type PageMetadataInput = {
-  title: string;
+  // Omit to inherit the root layout's default title.
+  title?: string;
   description: string;
   path: string;
   image?: string;
@@ -34,9 +35,10 @@ export function pageMetadata({
   image,
 }: PageMetadataInput): Metadata {
   const url = absoluteUrl(path);
+  const socialTitle = title ?? `${site.name} | ${site.tagline}`;
 
   return {
-    title,
+    ...(title ? { title } : {}),
     description,
     alternates: {
       canonical: url,
@@ -44,14 +46,15 @@ export function pageMetadata({
     openGraph: {
       type: "website",
       siteName: site.name,
+      locale: "en_IN",
       url,
-      title,
+      title: socialTitle,
       description,
       ...(image ? { images: [{ url: absoluteUrl(image) }] } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
     },
   };

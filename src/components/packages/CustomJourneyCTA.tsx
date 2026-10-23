@@ -1,14 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 
-import Modal from "@/components/ui/Modal";
-import TripPlannerForm from "@/components/forms/TripPlannerForm";
+import { usePlanner } from "@/components/layout/PlannerProvider";
 
 export default function CustomJourneyCTA() {
-  const [isModalOpen, setIsModalOpen] =
-    useState(false);
+  const { openPlanner } = usePlanner();
 
   return (
     <>
@@ -178,7 +175,7 @@ export default function CustomJourneyCTA() {
 
             <button
               type="button"
-              onClick={() => setIsModalOpen(true)}
+              onClick={openPlanner}
               className="
                 mt-7
                 rounded-full
@@ -206,17 +203,6 @@ export default function CustomJourneyCTA() {
 
       </section>
 
-      {/* =====================================================
-          EXISTING TRIP PLANNER
-      ===================================================== */}
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Plan Your Himalayan Journey"
-      >
-        <TripPlannerForm />
-      </Modal>
     </>
   );
 }

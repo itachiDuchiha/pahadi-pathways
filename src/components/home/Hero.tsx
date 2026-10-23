@@ -1,4 +1,3 @@
-import Navbar from "../layout/Navbar";
 import HeroPlanner from "./HeroPlanner";
 
 import {
@@ -53,12 +52,6 @@ export default function Hero() {
             bg-[radial-gradient(circle_at_50%_42%,rgba(255,255,255,0.08),transparent_45%)]
           "
         />
-
-        {/* =======================================================
-            NAVBAR
-        ======================================================= */}
-
-        <Navbar />
 
         {/* =======================================================
             HERO CONTENT

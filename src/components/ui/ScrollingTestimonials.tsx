@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import { testimonials } from "@/data/testimonials";
 import ReviewCard from "@/components/ui/ReviewCard";

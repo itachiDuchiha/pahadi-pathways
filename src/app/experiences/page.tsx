@@ -12,7 +12,15 @@ import {
   ArrowRight,
   Info,
 } from "lucide-react";
-import SiteLayout from "@/components/layout/SiteLayout";
+
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Experiences",
+  description:
+    "Trekking, camping, river rafting, monastery visits and local culture across Himachal Pradesh.",
+  path: "/experiences",
+});
 
 const experiences = [
   {
@@ -75,8 +83,7 @@ const experiences = [
 
 export default function ExperiencesPage() {
   return (
-    <SiteLayout>
-      <main className="bg-[#F7F3E9] text-[#10264A]">
+    <div className="bg-[#F7F3E9] text-[#10264A]">
         {/* Hero */}
         <section className="relative isolate flex min-h-[430px] items-center justify-center overflow-hidden pt-20 sm:min-h-[450px] lg:min-h-[480px]">
           <Image
@@ -321,7 +328,6 @@ export default function ExperiencesPage() {
             </Link>
           </div>
         </section>
-      </main>
-    </SiteLayout>
+    </div>
   );
 }

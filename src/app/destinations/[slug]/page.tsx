@@ -6,8 +6,6 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import SiteLayout from "@/components/layout/SiteLayout";
-
 import { allDestinations } from "@/data/destinations";
 
 import { packages } from "@/data/packages";
@@ -18,7 +16,6 @@ import SpitiPackages from "@/components/destination-page/SpitiPackages";
 
 import PackageCard from "@/components/packages/PackageCard";
 
-import { site } from "@/config/site";
 import { pageMetadata, truncate } from "@/lib/seo";
 
 type Props = {
@@ -47,7 +44,7 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `${destination.name} | ${site.name}`,
+    title: destination.name,
     description: truncate(destination.description, 155),
     path: `/destinations/${destination.slug}`,
     image: destination.image,
@@ -80,9 +77,9 @@ export default async function DestinationPage({
         : [];
 
     return (
-      <SiteLayout>
+      <>
 
-        <main className="bg-[#F8F6F1] pt-[82px]">
+        <div className="bg-[#F8F6F1] pt-[82px]">
 
           {/* =====================================================
               MANALI HEADER + PHOTO GRID
@@ -523,9 +520,9 @@ export default async function DestinationPage({
 
           </section>
 
-        </main>
+        </div>
 
-      </SiteLayout>
+      </>
     );
 
   }
@@ -544,9 +541,9 @@ export default async function DestinationPage({
         : [];
 
     return (
-      <SiteLayout>
+      <>
 
-        <main className="bg-[#F8F6F1] pt-[82px]">
+        <div className="bg-[#F8F6F1] pt-[82px]">
 
           {/* =====================================================
               SHIMLA HEADER + PHOTO GRID
@@ -868,9 +865,9 @@ export default async function DestinationPage({
 
           </section>
 
-        </main>
+        </div>
 
-      </SiteLayout>
+      </>
     );
 
   }
@@ -896,9 +893,9 @@ export default async function DestinationPage({
 
 
     return (
-      <SiteLayout>
+      <>
 
-        <main className="bg-[#F8F6F1] pt-[82px]">
+        <div className="bg-[#F8F6F1] pt-[82px]">
 
           {/* =====================================================
               SPITI HEADER + PHOTO GRID
@@ -1171,9 +1168,9 @@ export default async function DestinationPage({
 
           </section>
 
-        </main>
+        </div>
 
-      </SiteLayout>
+      </>
     );
 
   }
@@ -1278,9 +1275,9 @@ export default async function DestinationPage({
 
     return (
 
-      <SiteLayout>
+      <>
 
-        <main className="bg-[#F8F6F1] pt-[82px]">
+        <div className="bg-[#F8F6F1] pt-[82px]">
 
 
           {/* =====================================================
@@ -1519,9 +1516,9 @@ export default async function DestinationPage({
 
           </section>
 
-        </main>
+        </div>
 
-      </SiteLayout>
+      </>
 
     );
 
@@ -1536,9 +1533,9 @@ export default async function DestinationPage({
 
   return (
 
-    <SiteLayout>
+    <>
 
-      <main className="bg-[#F8F6F1]">
+      <div className="bg-[#F8F6F1]">
 
         <section className="relative flex min-h-[55vh] items-center justify-center overflow-hidden">
 
@@ -1571,9 +1568,9 @@ export default async function DestinationPage({
 
         </section>
 
-      </main>
+      </div>
 
-    </SiteLayout>
+    </>
 
   );
 

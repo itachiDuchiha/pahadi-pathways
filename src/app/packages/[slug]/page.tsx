@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
 
-import SiteLayout from "@/components/layout/SiteLayout";
-
 import Hero from "@/components/package-details/Hero";
 import PackageSectionNav from "@/components/package-details/PackageSectionNav";
 
@@ -20,7 +18,6 @@ import PackageBookingPanel from "@/components/package-details/PackageBookingPane
 
 import { packages } from "@/data/packages";
 
-import { site } from "@/config/site";
 import { pageMetadata, truncate } from "@/lib/seo";
 
 type Props = {
@@ -45,7 +42,7 @@ export async function generateMetadata({
   }
 
   return pageMetadata({
-    title: `${pkg.title} | ${site.name}`,
+    title: pkg.title,
     description: truncate(pkg.overview ?? pkg.summary ?? pkg.title, 155),
     path: `/packages/${pkg.slug}`,
     image: pkg.heroImage ?? pkg.image,
@@ -64,8 +61,8 @@ export default async function PackageDetailsPage({
   }
 
   return (
-    <SiteLayout>
-      <main>
+    <>
+      <div>
 
         {/* =========================================================
             PACKAGE HERO
@@ -183,7 +180,7 @@ export default async function PackageDetailsPage({
           </div>
         </div>
 
-      </main>
-    </SiteLayout>
+      </div>
+    </>
   );
 }

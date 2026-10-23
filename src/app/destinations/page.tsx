@@ -1,13 +1,6 @@
-"use client";
-
-import { useState } from "react";
-
-import SiteLayout from "@/components/layout/SiteLayout";
+import PlannerButton from "@/components/layout/PlannerButton";
 import DestinationsHero from "@/components/destinations/DestinationsHero";
 import DestinationSection from "@/components/destinations/DestinationSection";
-
-import Modal from "@/components/ui/Modal";
-import TripPlannerForm from "@/components/forms/TripPlannerForm";
 
 import {
   featuredJourneys,
@@ -16,19 +9,18 @@ import {
   cultureAndSoul,
 } from "@/data/destinations";
 
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Destinations",
+  description:
+    "Explore Shimla, Manali, Spiti Valley, Kinnaur and hidden Himachal villages with The Himalayan Compass.",
+  path: "/destinations",
+});
+
 export default function DestinationsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openPlanner = () => {
-    setIsModalOpen(true);
-  };
-
-  const closePlanner = () => {
-    setIsModalOpen(false);
-  };
-
   return (
-    <SiteLayout>
+    <>
       {/* ================= HERO ================= */}
 
       <DestinationsHero />
@@ -208,9 +200,7 @@ export default function DestinationsPage() {
 
             {/* ================= PLAN BUTTON ================= */}
 
-            <button
-              type="button"
-              onClick={openPlanner}
+            <PlannerButton
               className="
                 mt-8
                 inline-flex
@@ -247,7 +237,7 @@ export default function DestinationsPage() {
               >
                 →
               </span>
-            </button>
+            </PlannerButton>
 
             {/* Supporting text */}
 
@@ -267,16 +257,6 @@ export default function DestinationsPage() {
 
       </section>
 
-      {/* ================= TRIP PLANNER MODAL ================= */}
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closePlanner}
-        title="Plan Your Himalayan Journey"
-      >
-        <TripPlannerForm />
-      </Modal>
-
-    </SiteLayout>
+    </>
   );
 }

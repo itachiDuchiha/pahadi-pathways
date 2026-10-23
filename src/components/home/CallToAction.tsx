@@ -1,12 +1,8 @@
 import Link from "next/link";
 
-type CallToActionProps = {
-  onOpen: () => void;
-};
+import PlannerButton from "@/components/layout/PlannerButton";
 
-export default function CallToAction({
-  onOpen,
-}: CallToActionProps) {
+export default function CallToAction() {
   return (
     <section
       className="relative my-20 overflow-hidden rounded-3xl"
@@ -55,9 +51,7 @@ export default function CallToAction({
 
           {/* Primary — Opens the same Trip Planner Modal */}
 
-          <button
-            type="button"
-            onClick={onOpen}
+          <PlannerButton
             className="
               rounded-full
               bg-[#C89A3D]
@@ -75,7 +69,7 @@ export default function CallToAction({
             "
           >
             Plan My Journey
-          </button>
+          </PlannerButton>
 
           {/* Secondary — Opens Contact Page */}
 

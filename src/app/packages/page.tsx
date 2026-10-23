@@ -1,12 +1,19 @@
 import Image from "next/image";
 
-import SiteLayout from "@/components/layout/SiteLayout";
-
 import PackageCard from "@/components/packages/PackageCard";
 
 import CustomJourneyCTA from "@/components/packages/CustomJourneyCTA";
 
 import { packages } from "@/data/packages";
+
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Tour Packages",
+  description:
+    "Curated Himachal tour packages with transport, stays and sightseeing included. Compare routes, durations and prices.",
+  path: "/packages",
+});
 
 type PackagesPageProps = {
   searchParams: Promise<{
@@ -214,7 +221,7 @@ export default async function PackagesPage({
   ======================================================= */
 
   return (
-    <SiteLayout>
+    <>
 
       {/* =====================================================
           SEARCH RESULTS PAGE
@@ -944,6 +951,6 @@ export default async function PackagesPage({
         </>
       )}
 
-    </SiteLayout>
+    </>
   );
 }

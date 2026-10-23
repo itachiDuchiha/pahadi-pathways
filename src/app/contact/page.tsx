@@ -9,10 +9,18 @@ import {
 
 import { site, telUrl, mailtoUrl } from "@/config/site";
 import ContactForm from "@/components/forms/ContactForm";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata = pageMetadata({
+  title: "Contact Us",
+  description:
+    "Call, WhatsApp or email The Himalayan Compass to plan your Himachal trip.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-[#F8F7F3]">
+    <div className="min-h-screen bg-[#F8F7F3] pt-[82px]">
 
       {/* =====================================================
           HERO
@@ -674,6 +682,6 @@ export default function ContactPage() {
 
       </section>
 
-    </main>
+    </div>
   );
 }

@@ -1,16 +1,19 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { site, mailtoUrl } from "@/config/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Privacy Policy",
-};
+  description:
+    "How The Himalayan Compass collects, uses and protects the personal data you share when you enquire.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-[#F8F7F3]">
+    <div className="min-h-screen bg-[#F8F7F3] pt-[82px]">
 
       {/* =====================================================
           HERO
@@ -398,6 +401,6 @@ export default function PrivacyPage() {
 
       </section>
 
-    </main>
+    </div>
   );
 }
