@@ -42,6 +42,7 @@ export default function TripPlannerForm() {
     const travelDate = String(formData.get("travel-date") ?? "");
     const destination = String(formData.get("destination") ?? "");
     const message = String(formData.get("message") ?? "").trim();
+    const website = String(formData.get("website") ?? "");
 
     const destinationLabels: Record<string, string> = {
       shimla: "Shimla",
@@ -56,6 +57,7 @@ export default function TripPlannerForm() {
     };
 
     const enquiry = {
+      source: "trip",
       name,
       phone,
       email,
@@ -66,6 +68,7 @@ export default function TripPlannerForm() {
       children,
       budgetPerPerson: budget,
       message,
+      website,
     };
 
     const formattedMessage = [
@@ -99,7 +102,7 @@ export default function TripPlannerForm() {
 
       if (!response.ok) {
         throw new Error(
-          result?.error ||
+          result?.message ||
             "We couldn't submit your request. Please try again."
         );
       }
@@ -254,6 +257,8 @@ export default function TripPlannerForm() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-2.5">
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+
           {/* NAME + PHONE */}
 
           <div className="grid gap-3 sm:grid-cols-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import {
   ChevronDown,
@@ -14,86 +14,19 @@ import {
 
 import type { Package } from "@/data/packages";
 import { telUrl, whatsappUrl } from "@/config/site";
+import {
+  COMPLIMENTARY_CHILD_MAX_AGE,
+  computePackagePrice,
+  formatCurrency,
+  mealOptions,
+  packagePricingContext,
+  stayOptions,
+  vehicleOptions,
+} from "@/lib/pricing";
 
 type Props = {
   pkg: Package;
 };
-
-/* =========================================================
-   TYPES
-========================================================= */
-
-type StayOption = {
-  label: string;
-  price: number;
-};
-
-type MealOption = {
-  label: string;
-  price: number;
-};
-
-type VehicleKey = "sedan" | "ertiga" | "crysta";
-
-type VehicleOption = {
-  label: string;
-  key: VehicleKey;
-};
-
-/* =========================================================
-   OPTIONS
-
-   Keep these simple and easy to modify later.
-========================================================= */
-
-const stayOptions: StayOption[] = [
-  {
-    label: "Deluxe",
-    price: 0,
-  },
-  {
-    label: "Premium",
-    price: 2500,
-  },
-  {
-    label: "Luxury",
-    price: 5000,
-  },
-];
-
-const mealOptions: MealOption[] = [
-  {
-    label: "Breakfast + Dinner (MAP)",
-    price: 0,
-  },
-  {
-    label: "Breakfast Only (CP)",
-    price: -2500,
-  },
-];
-
-const vehicleOptions: VehicleOption[] = [
-  {
-    label: "Sedan",
-    key: "sedan",
-  },
-  {
-    label: "Ertiga / Rumion or similar",
-    key: "ertiga",
-  },
-  {
-    label: "Innova Crysta or similar",
-    key: "crysta",
-  },
-];
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function formatCurrency(value: number) {
-  return `₹${Math.round(value).toLocaleString("en-IN")}`;
-}
 
 /* =========================================================
    COMPONENT
@@ -102,15 +35,6 @@ function formatCurrency(value: number) {
 export default function PackageBookingPanel({
   pkg,
 }: Props) {
-  /* =======================================================
-     BASIC PACKAGE PRICE
-
-     Package price is treated as the price per adult.
-  ======================================================= */
-
-  const basePackagePrice = Number(String(pkg.price).replace(/[^\d.]/g, "")) || 0;
-
-
   /* =======================================================
      STATE
   ======================================================= */
@@ -171,140 +95,40 @@ export default function PackageBookingPanel({
   }, [isEnquiryOpen]);
 
   /* =======================================================
-     SELECTED OPTIONS
+     PRICING
+
+     Shared with the package enquiry API so the server
+     recomputes exactly what the visitor sees.
   ======================================================= */
 
-  const selectedStay = useMemo(
-    () =>
-      stayOptions.find(
-        (option) => option.label === stay
-      ) ?? stayOptions[0],
-    [stay]
-  );
+  const pricingContext = packagePricingContext(pkg);
+  const tourDays = pricingContext.tourDays;
 
-  const selectedMeal = useMemo(
-    () =>
-      mealOptions.find(
-        (option) => option.label === meals
-      ) ?? mealOptions[0],
-    [meals]
-  );
+  const {
+    packageCost,
+    gst,
+    estimatedTotal,
+    hasVehicleRates: packageRates,
+    adultRate,
+    extraAdultPrice,
+    childRate,
+    childPrice,
+    paidChildren,
+    complimentaryChildren,
+    stayPrice,
+    mealPrice,
+    vehicleUpgradePerDay,
+    vehicleUpgradeTotal,
+  } = computePackagePrice({
+    ...pricingContext,
+    stay,
+    meals,
+    vehicle,
+    adults,
+    childAges: children,
+  });
 
-  const selectedVehicle = useMemo(
-    () =>
-      vehicleOptions.find(
-        (option) => option.label === vehicle
-      ) ?? vehicleOptions[0],
-    [vehicle]
-  );
-
-  const isSpitiRoute = /spiti|kaza|tabo|kunzum|chandratal/i.test(
-    pkg.title + " " + pkg.slug
-  );
-
-  const tourDays =
-    Number(pkg.duration.match(/(\d+)\s*D/i)?.[1]) ||
-    pkg.itineraryDays?.length ||
-    1;
-
-  // Published base prices are the lowest Sedan rates. These per-adult
-  // amounts keep the agreed vehicle tiers consistent across the five packages.
-  const packageVehicleRates: Record<string, Record<VehicleKey, number>> = {
-    "shimla-kinnaur-spiti-chandratal": { sedan: 32249, ertiga: 38749, crysta: 54999 },
-    "shimla-manali-getaway": { sedan: 18999, ertiga: 21624, crysta: 32999 },
-    "himachal-grand-circuit": { sedan: 32074, ertiga: 36624, crysta: 47999 },
-    "shimla-manali-jibhi": { sedan: 18999, ertiga: 19999, crysta: 32999 },
-    "shimla-kinnaur-spiti-kalpa": { sedan: 29549, ertiga: 34799, crysta: 49499 },
-  };
-
-  const packageRates = packageVehicleRates[pkg.slug];
-  const selectedAdultRate = packageRates?.[selectedVehicle.key] ?? basePackagePrice;
-
-  const dailyVehicleRates: Record<VehicleKey, number> =
-    isSpitiRoute
-      ? { sedan: 4500, ertiga: 5500, crysta: 8000 }
-      : { sedan: 3500, ertiga: 4500, crysta: 6000 };
-
-  const vehicleUpgradePerDay =
-    dailyVehicleRates[selectedVehicle.key] - dailyVehicleRates.sedan;
-
-  const vehicleUpgradeTotal = packageRates
-    ? 0
-    : vehicleUpgradePerDay * tourDays;
-
-  const adultRate = packageRates
-    ? selectedAdultRate
-    : basePackagePrice;
-  /* =======================================================
-     CHILD PRICING
-
-     Under 5:
-       Complimentary
-       No extra bed
-
-     5–10:
-       25% of adult rate
-  ======================================================= */
-
-  const complimentaryChildren = children.filter(
-    (age) => age < 5
-  );
-
-  const paidChildren = children.filter(
-    (age) => age >= 5
-  );
-
-  const childPrice = paidChildren.length * Math.round(
-    adultRate * 0.25
-  );
-
-  /* =======================================================
-     EXTRA ADULT PRICING
-
-     The first adult is included as the base package price.
-
-     Each additional adult is charged at the
-     calculated adult rate.
-  ======================================================= */
-
-  const extraAdults = Math.max(
-    0,
-    adults - 1
-  );
-
-  const extraAdultPrice =
-    extraAdults * adultRate;
-
-  /* =======================================================
-     PACKAGE CALCULATION
-  ======================================================= */
-
-  const packageAdjustment =
-    extraAdultPrice +
-    childPrice +
-    selectedStay.price +
-    selectedMeal.price;
-
-  const packageCostBeforeVehicle =
-    (packageRates ? adultRate : basePackagePrice) +
-    packageAdjustment;
-
-  const packageCost =
-    packageCostBeforeVehicle +
-    vehicleUpgradeTotal;
-
-  /* =======================================================
-     GST
-
-     Current package uses 5% GST.
-  ======================================================= */
-
-  const gst = Math.round(
-    packageCost * 0.05
-  );
-
-  const estimatedTotal =
-    packageCost + gst;
+  const selectedAdultRate = adultRate;
 
   /* =======================================================
      TRAVELLER COUNT
@@ -362,13 +186,11 @@ export default function PackageBookingPanel({
   const getChildPricingLabel = (
     age: number
   ) => {
-    if (age < 5) {
+    if (age < COMPLIMENTARY_CHILD_MAX_AGE) {
       return "Complimentary · No extra bed";
     }
 
-    return `25% adult rate · ${formatCurrency(
-      Math.round(adultRate * 0.25)
-    )}`;
+    return `25% adult rate · ${formatCurrency(childRate)}`;
   };
 
   const packageName =
@@ -401,6 +223,10 @@ export default function PackageBookingPanel({
     setEnquiryError("");
     setIsSubmitting(true);
 
+    const website = String(
+      new FormData(event.currentTarget).get("website") ?? ""
+    );
+
     // Open a blank tab during the direct user action so the browser does not
     // block the WhatsApp tab after the email request finishes.
     const whatsappWindow = window.open("about:blank", "_blank");
@@ -412,27 +238,25 @@ export default function PackageBookingPanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          source: "package",
+          slug: pkg.slug,
           name: customerName.trim(),
           phone: customerPhone.trim(),
           email: customerEmail.trim(),
           travelDate,
-          packageName,
           adults,
-          children,
+          childAges: children,
           stay,
           meals,
           vehicle,
-          packageCost,
-          gst,
-          estimatedTotal,
-          whatsappMessage: message,
+          website,
         }),
       });
 
       const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(result.error || "We could not send your enquiry. Please try again.");
+        throw new Error(result.message || "We could not send your enquiry. Please try again.");
       }
 
       const whatsappLink = whatsappUrl(message);
@@ -1415,7 +1239,7 @@ export default function PackageBookingPanel({
                 "
               >
                 {formatCurrency(
-                  (packageRates ? adultRate : basePackagePrice) +
+                  adultRate +
                     extraAdultPrice
                 )}
               </span>
@@ -1529,7 +1353,7 @@ export default function PackageBookingPanel({
 
             {/* Stay adjustment */}
 
-            {selectedStay.price !== 0 && (
+            {stayPrice !== 0 && (
               <div
                 className="
                   flex
@@ -1556,12 +1380,12 @@ export default function PackageBookingPanel({
                     text-[#8B6412]
                   "
                 >
-                  {selectedStay.price >
+                  {stayPrice >
                   0
                     ? "+"
                     : ""}
                   {formatCurrency(
-                    selectedStay.price
+                    stayPrice
                   )}
                 </span>
               </div>
@@ -1569,7 +1393,7 @@ export default function PackageBookingPanel({
 
             {/* Meal adjustment */}
 
-            {selectedMeal.price !== 0 && (
+            {mealPrice !== 0 && (
               <div
                 className="
                   flex
@@ -1596,12 +1420,12 @@ export default function PackageBookingPanel({
                     text-[#8B6412]
                   "
                 >
-                  {selectedMeal.price >
+                  {mealPrice >
                   0
                     ? "+"
                     : ""}
                   {formatCurrency(
-                    selectedMeal.price
+                    mealPrice
                   )}
                 </span>
               </div>
@@ -1956,6 +1780,7 @@ export default function PackageBookingPanel({
             </div>
 
             <form onSubmit={handleEnquirySubmit} className="min-h-0 space-y-3.5 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
               <div>
                 <label htmlFor="package-customer-name" className="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-[#10264A]">Your name *</label>
                 <input id="package-customer-name" type="text" autoComplete="name" required maxLength={100} value={customerName} onChange={(event) => setCustomerName(event.target.value)} placeholder="Enter your name" className="w-full rounded-lg border border-[#D9D1C3] bg-white px-3.5 py-2.5 text-sm text-[#10264A] outline-none placeholder:text-gray-400 focus:border-[#C89A3D] focus:ring-2 focus:ring-[#C89A3D]/10" />

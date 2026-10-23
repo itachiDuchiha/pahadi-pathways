@@ -23,6 +23,7 @@ export default function ContactForm() {
     const email = String(formData.get("email") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
     const message = String(formData.get("message") ?? "").trim();
+    const website = String(formData.get("website") ?? "");
 
     try {
       const response = await fetch("/api/trip-enquiry", {
@@ -36,7 +37,7 @@ export default function ContactForm() {
           phone,
           email,
           message,
-          website: "",
+          website,
         }),
       });
 
@@ -45,7 +46,6 @@ export default function ContactForm() {
       if (!response.ok) {
         throw new Error(
           result?.message ??
-            result?.error ??
             "We couldn't send your message. Please try again."
         );
       }
@@ -108,6 +108,8 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="mt-7 space-y-5">
 
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+
       {/* Name */}
 
       <div>
@@ -131,6 +133,7 @@ export default function ContactForm() {
           id="name"
           name="name"
           type="text"
+          required
           placeholder="Enter your name"
           className="
             w-full
@@ -225,6 +228,7 @@ export default function ContactForm() {
           id="phone"
           name="phone"
           type="tel"
+          required
           placeholder="+91"
           className="
             w-full
