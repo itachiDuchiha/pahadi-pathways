@@ -15,6 +15,7 @@ import {
 
 import type { Package } from "@/data/packages";
 import { telUrl, whatsappUrl } from "@/config/site";
+import { useTodayIso } from "@/lib/hooks/useTodayIso";
 import {
   COMPLIMENTARY_CHILD_MAX_AGE,
   computePackagePrice,
@@ -81,22 +82,10 @@ export default function PackageBookingPanel({
   const [enquiryError, setEnquiryError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Rendered undefined on the server and filled in after mount so the
-  // server and client markup match (today's date depends on the client's
-  // clock/timezone).
-  const [minTravelDate, setMinTravelDate] = useState<string | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    // Deferred via setTimeout (rather than set synchronously in the effect
-    // body) to avoid cascading renders during the commit phase.
-    const timer = window.setTimeout(() => {
-      setMinTravelDate(new Date().toISOString().split("T")[0]);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
+  // `undefined` on the server and on the initial client render, then
+  // today's date once the client's external clock is read, so server and
+  // client markup match (no hydration mismatch).
+  const minTravelDate = useTodayIso();
 
   // Prevent the page behind the enquiry modal from scrolling.
   useEffect(() => {

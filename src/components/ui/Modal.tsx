@@ -97,13 +97,18 @@ export default function Modal({
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
+      // Right after open, focus sits on the dialog container itself (not
+      // on `first`), and `dialog.contains(active)` is true for the dialog
+      // itself too — so that case must be checked explicitly, or neither
+      // branch below fires and native Tab/Shift+Tab escapes the trap.
+      const atDialog = active === dialog;
 
       if (event.shiftKey) {
-        if (active === first || !dialog.contains(active)) {
+        if (active === first || atDialog || !dialog.contains(active)) {
           event.preventDefault();
           last.focus();
         }
-      } else if (active === last || !dialog.contains(active)) {
+      } else if (active === last || atDialog || !dialog.contains(active)) {
         event.preventDefault();
         first.focus();
       }

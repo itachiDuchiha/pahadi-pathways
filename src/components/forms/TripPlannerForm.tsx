@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { whatsappUrl } from "@/config/site";
+import { useTodayIso } from "@/lib/hooks/useTodayIso";
 
 export default function TripPlannerForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -25,22 +26,10 @@ export default function TripPlannerForm() {
   const [budget, setBudget] = useState(40000);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
-  // Rendered undefined on the server and filled in after mount so the
-  // server and client markup match (today's date depends on the client's
-  // clock/timezone).
-  const [minTravelDate, setMinTravelDate] = useState<string | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    // Deferred via setTimeout (rather than set synchronously in the effect
-    // body) to avoid cascading renders during the commit phase.
-    const timer = window.setTimeout(() => {
-      setMinTravelDate(new Date().toISOString().split("T")[0]);
-    }, 0);
-
-    return () => window.clearTimeout(timer);
-  }, []);
+  // `undefined` on the server and on the initial client render, then
+  // today's date once the client's external clock is read, so server and
+  // client markup match (no hydration mismatch).
+  const minTravelDate = useTodayIso();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
