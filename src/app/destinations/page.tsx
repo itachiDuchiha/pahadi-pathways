@@ -9,12 +9,13 @@ import {
   cultureAndSoul,
 } from "@/data/destinations";
 
+import { site } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Destinations",
   description:
-    "Explore Shimla, Manali, Spiti Valley, Kinnaur and hidden Himachal villages with The Himalayan Compass.",
+    `Explore Shimla, Manali, Spiti Valley, Kinnaur and hidden Himachal villages with ${site.name}.`,
   path: "/destinations",
 });
 

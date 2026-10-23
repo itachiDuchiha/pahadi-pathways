@@ -36,6 +36,10 @@ const sections: Section[] = [
     id: "cancellation",
     label: "Cancellation Policy",
   },
+  {
+    id: "faq",
+    label: "FAQ",
+  },
 ];
 
 export default function PackageSectionNav() {

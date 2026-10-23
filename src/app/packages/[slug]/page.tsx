@@ -15,10 +15,18 @@ import CancellationPolicy from "@/components/package-details/CancellationPolicy"
 import TermsConditions from "@/components/package-details/TermsConditions";
 
 import PackageBookingPanel from "@/components/package-details/PackageBookingPanel";
+import PackageFaq from "@/components/package-details/PackageFaq";
+
+import JsonLd from "@/components/seo/JsonLd";
 
 import { packages } from "@/data/packages";
 
 import { pageMetadata, truncate } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  faqJsonLd,
+  packageJsonLd,
+} from "@/lib/structured-data";
 
 type Props = {
   params: Promise<{
@@ -62,6 +70,18 @@ export default async function PackageDetailsPage({
 
   return (
     <>
+      <JsonLd data={packageJsonLd(pkg)} />
+
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Packages", path: "/packages" },
+          { name: pkg.title, path: `/packages/${pkg.slug}` },
+        ])}
+      />
+
+      {pkg.faqs?.length ? <JsonLd data={faqJsonLd(pkg.faqs)} /> : null}
+
       {/* =========================================================
           PACKAGE HERO
       ========================================================= */}
@@ -149,6 +169,17 @@ export default async function PackageDetailsPage({
             >
               <CancellationPolicy />
             </section>
+
+            {/* FREQUENTLY ASKED QUESTIONS */}
+
+            {pkg.faqs?.length ? (
+              <section
+                id="faq"
+                className="scroll-mt-32"
+              >
+                <PackageFaq faqs={pkg.faqs} />
+              </section>
+            ) : null}
 
           </div>
 

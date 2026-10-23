@@ -6,7 +6,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
 import type { Package } from "@/data/packages";
-import { whatsappUrl } from "@/config/site";
+import { site, whatsappUrl } from "@/config/site";
 import { useTodayIso } from "@/lib/hooks/useTodayIso";
 import { formatCurrency } from "@/lib/pricing";
 import type { BookingPrice } from "@/components/package-details/booking/useBookingState";
@@ -79,7 +79,7 @@ export default function EnquiryModal({
       : "Himachal Tour Package";
 
   const buildEnquiryMessage = () => [
-    "Hello The Himalayan Compass, I would like to enquire about this package:",
+    `Hello ${site.name}, I would like to enquire about this package:`,
     "",
     `Package: ${packageName}`,
     `Name: ${customerName.trim()}`,
@@ -182,7 +182,7 @@ export default function EnquiryModal({
           >
             <div className="flex shrink-0 items-start justify-between gap-4 border-b border-[#C89A3D]/25 bg-[#F7F0E0] px-5 py-4 sm:px-6">
               <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8B6412]">The Himalayan Compass</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8B6412]">{site.name}</p>
                 <h2 id="package-enquiry-title" className="mt-1 font-serif text-xl font-semibold text-[#10264A]">Request to Book</h2>
                 <p className="mt-1 text-xs leading-5 text-[#526078]">Add your contact details. We’ll email your enquiry and open WhatsApp with the same details.</p>
               </div>

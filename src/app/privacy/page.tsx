@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Privacy Policy",
   description:
-    "How The Himalayan Compass collects, uses and protects the personal data you share when you enquire.",
+    `How ${site.name} collects, uses and protects the personal data you share when you enquire.`,
   path: "/privacy",
 });
 

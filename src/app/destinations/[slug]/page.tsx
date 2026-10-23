@@ -3,9 +3,11 @@ import { notFound } from "next/navigation";
 import { createElement } from "react";
 
 import { getDestinationPage } from "@/components/destination-page/registry";
+import JsonLd from "@/components/seo/JsonLd";
 import { allDestinations } from "@/data/destinations";
 import { packages } from "@/data/packages";
 import { pageMetadata, truncate } from "@/lib/seo";
+import { breadcrumbJsonLd, destinationJsonLd } from "@/lib/structured-data";
 
 type Props = {
   params: Promise<{
@@ -51,8 +53,22 @@ export default async function DestinationPage({ params }: Props) {
 
   // The registry returns stable, module-level components, so creating the
   // element from the looked-up type does not remount anything per render.
-  return createElement(getDestinationPage(destination.slug), {
-    destination,
-    packages,
-  });
+  return (
+    <>
+      <JsonLd data={destinationJsonLd(destination)} />
+
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Destinations", path: "/destinations" },
+          { name: destination.name, path: `/destinations/${destination.slug}` },
+        ])}
+      />
+
+      {createElement(getDestinationPage(destination.slug), {
+        destination,
+        packages,
+      })}
+    </>
+  );
 }

@@ -3,6 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { site } from "@/config/site";
+import { defaultDescription, defaultTitle } from "@/lib/seo";
+import { organizationJsonLd } from "@/lib/structured-data";
+
+import JsonLd from "@/components/seo/JsonLd";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -22,15 +26,25 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | ${site.tagline}`,
+    default: defaultTitle,
     template: `%s | ${site.name}`,
   },
-  description:
-    "Handcrafted Himachal Pradesh tours, custom itineraries and trusted local hosts for Shimla, Manali, Spiti and beyond.",
+  description: defaultDescription,
   openGraph: {
+    title: {
+      default: defaultTitle,
+      template: `%s | ${site.name}`,
+    },
     siteName: site.name,
     type: "website",
     locale: "en_IN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: {
+      default: defaultTitle,
+      template: `%s | ${site.name}`,
+    },
   },
   icons: {
     icon: "/favicon.ico",
@@ -48,6 +62,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <JsonLd data={organizationJsonLd()} />
         <PlannerProvider>
           <Navbar />
           <main className="flex-1">{children}</main>

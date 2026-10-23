@@ -7,12 +7,13 @@ import {
   Mountain,
 } from "lucide-react";
 
+import { site } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
   title: "Traveller Reviews",
   description:
-    "What travellers say about their Himachal trips with The Himalayan Compass.",
+    `What travellers say about their Himachal trips with ${site.name}.`,
   path: "/reviews",
 });
 
