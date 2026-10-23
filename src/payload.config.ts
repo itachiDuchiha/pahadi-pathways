@@ -35,11 +35,6 @@ export default buildConfig({
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, "cms/payload-types.ts"),
-    // Drop the blanket lint-disable banner; eslint.config.mjs ignores this generated file instead.
-    postProcess: [
-      ({ compiledTypes }) =>
-        compiledTypes.replace(/^\/\* (tslint:|eslint-)disable \*\/\n/gm, ""),
-    ],
   },
   onInit: async (payload) => {
     await ensureAdmin(payload, process.env);

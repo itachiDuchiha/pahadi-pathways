@@ -22,6 +22,7 @@ export const Users: CollectionConfig = {
     read: isEditorOrAdmin,
     update: isAdmin,
     delete: isAdmin,
+    unlock: isAdmin,
   },
   hooks: {
     beforeOperation: [blockAnonymousCreate],

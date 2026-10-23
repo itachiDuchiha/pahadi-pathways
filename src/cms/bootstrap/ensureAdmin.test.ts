@@ -29,12 +29,12 @@ describe("ensureAdmin", () => {
 
     expect(result).toBe("created");
     expect(create).toHaveBeenCalledTimes(1);
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        collection: "users",
-        data: expect.objectContaining({ email, password, role: "admin" }),
-      })
-    );
+    expect(create).toHaveBeenCalledWith({
+      collection: "users",
+      context: { internal: true },
+      data: { email, password, role: "admin" },
+      overrideAccess: true,
+    });
   });
 
   it("does nothing when a user already exists", async () => {

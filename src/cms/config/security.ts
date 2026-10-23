@@ -2,7 +2,7 @@ import { site } from "@/config/site";
 
 export const MIN_SECRET_LENGTH = 32;
 
-export function securityConfig(env: NodeJS.ProcessEnv) {
+export function securityConfig(env: Readonly<Record<string, string | undefined>>) {
   const secret = env.PAYLOAD_SECRET ?? "";
 
   if (secret.length < MIN_SECRET_LENGTH) {
