@@ -67,8 +67,13 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    packages: Package;
+    destinations: Destination;
+    testimonials: Testimonial;
+    'gallery-items': GalleryItem;
+    experiences: Experience;
     media: Media;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,8 +81,13 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    packages: PackagesSelect<false> | PackagesSelect<true>;
+    destinations: DestinationsSelect<false> | DestinationsSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    'gallery-items': GalleryItemsSelect<false> | GalleryItemsSelect<true>;
+    experiences: ExperiencesSelect<false> | ExperiencesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,8 +97,14 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'pricing-settings': PricingSetting;
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -119,30 +135,121 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
+ * via the `definition` "packages".
  */
-export interface User {
+export interface Package {
   id: number;
-  role: 'admin' | 'editor';
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
+  /**
+   * Used in the page URL. Lower-case words separated by hyphens.
+   */
+  slug: string;
+  title: string;
+  image: number | Media;
+  heroImage?: (number | null) | Media;
+  /**
+   * For example 9N / 10D
+   */
+  duration: string;
+  rating: number;
+  pickup: string;
+  /**
+   * Starting price per adult in rupees, shown on cards.
+   */
+  price: number;
+  popular?: boolean | null;
+  pricing?: {
+    /**
+     * Rupees per adult before upgrades and GST.
+     */
+    basePricePerAdult?: number | null;
+    /**
+     * Per-adult rate in rupees for each vehicle, if it differs.
+     */
+    vehicleRates?: {
+      sedan?: number | null;
+      ertiga?: number | null;
+      crysta?: number | null;
+    };
+  };
+  summary?: string | null;
+  overview?: string | null;
+  itinerary: {
+    item: string;
+    id?: string | null;
+  }[];
+  hiddenItinerary?:
     | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
+        item: string;
+        id?: string | null;
       }[]
     | null;
-  password?: string | null;
-  collection: 'users';
+  includes: {
+    item: string;
+    id?: string | null;
+  }[];
+  exclusions?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  stayPlan?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  highlights?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  idealFor?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  travelNote?: string | null;
+  bestTime?: string | null;
+  vehicle?: string | null;
+  tourType?: string | null;
+  maxAltitude?: string | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  itineraryDays?:
+    | {
+        day: number;
+        title: string;
+        start?: string | null;
+        end?: string | null;
+        stay: string;
+        description: string;
+        places?:
+          | {
+              item: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              description: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -191,6 +298,108 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations".
+ */
+export interface Destination {
+  id: number;
+  /**
+   * Used in the page URL. Lower-case words separated by hyphens.
+   */
+  slug: string;
+  name: string;
+  subtitle: string;
+  description: string;
+  fullDescription: string;
+  image: number | Media;
+  gallery?: (number | Media)[] | null;
+  category: 'Featured Journeys' | 'Along the Way' | 'Hidden Himachal' | 'Culture & Soul';
+  /**
+   * Dedicated uses a hand-built page in code for this slug.
+   */
+  layout?: ('dedicated' | 'shared') | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: number;
+  name: string;
+  city: string;
+  tour: string;
+  review: string;
+  rating: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-items".
+ */
+export interface GalleryItem {
+  id: number;
+  title: string;
+  category: string;
+  location: string;
+  size: 'normal' | 'large';
+  image: number | Media;
+  caption: string;
+  /**
+   * Lower numbers appear first.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experiences".
+ */
+export interface Experience {
+  id: number;
+  title: string;
+  description: string;
+  image: number | Media;
+  icon: 'Camera' | 'Compass' | 'Footprints' | 'Home' | 'Landmark' | 'Mountain' | 'Star' | 'Utensils';
+  /**
+   * Lower numbers appear first.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  role: 'admin' | 'editor';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -214,12 +423,32 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'packages';
+        value: number | Package;
+      } | null)
+    | ({
+        relationTo: 'destinations';
+        value: number | Destination;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'gallery-items';
+        value: number | GalleryItem;
+      } | null)
+    | ({
+        relationTo: 'experiences';
+        value: number | Experience;
       } | null)
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -265,27 +494,172 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "packages_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface PackagesSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  image?: T;
+  heroImage?: T;
+  duration?: T;
+  rating?: T;
+  pickup?: T;
+  price?: T;
+  popular?: T;
+  pricing?:
     | T
     | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
+        basePricePerAdult?: T;
+        vehicleRates?:
+          | T
+          | {
+              sedan?: T;
+              ertiga?: T;
+              crysta?: T;
+            };
       };
+  summary?: T;
+  overview?: T;
+  itinerary?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  hiddenItinerary?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  includes?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  exclusions?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  stayPlan?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  highlights?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  idealFor?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  travelNote?: T;
+  bestTime?: T;
+  vehicle?: T;
+  tourType?: T;
+  maxAltitude?: T;
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  itineraryDays?:
+    | T
+    | {
+        day?: T;
+        title?: T;
+        start?: T;
+        end?: T;
+        stay?: T;
+        description?: T;
+        places?:
+          | T
+          | {
+              item?: T;
+              id?: T;
+            };
+        details?:
+          | T
+          | {
+              title?: T;
+              description?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "destinations_select".
+ */
+export interface DestinationsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  subtitle?: T;
+  description?: T;
+  fullDescription?: T;
+  image?: T;
+  gallery?: T;
+  category?: T;
+  layout?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  name?: T;
+  city?: T;
+  tour?: T;
+  review?: T;
+  rating?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-items_select".
+ */
+export interface GalleryItemsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  location?: T;
+  size?: T;
+  image?: T;
+  caption?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "experiences_select".
+ */
+export interface ExperiencesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  image?: T;
+  icon?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -341,6 +715,30 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -378,6 +776,127 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-settings".
+ */
+export interface PricingSetting {
+  id: number;
+  /**
+   * Hotel tiers. Delta is rupees per adult added to the base rate.
+   */
+  stayOptions?:
+    | {
+        label: string;
+        delta: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Meal plans. Delta is rupees per adult; negative lowers the price.
+   */
+  mealOptions?:
+    | {
+        label: string;
+        delta: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Vehicles offered. Per-day upgrade applies when a package has no vehicle rate.
+   */
+  vehicleOptions?:
+    | {
+        label: string;
+        key: 'sedan' | 'ertiga' | 'crysta';
+        perDayUpgrade: number;
+        id?: string | null;
+      }[]
+    | null;
+  gstPercent: number;
+  /**
+   * Children younger than this travel free.
+   */
+  childFreeUnderAge: number;
+  /**
+   * Paying children are charged this percentage of the adult rate.
+   */
+  childPercentOfAdult: number;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * For example +91 75596 97919
+   */
+  phoneDisplay?: string | null;
+  phoneE164?: string | null;
+  /**
+   * Digits only with country code, for example 917559697919
+   */
+  whatsapp?: string | null;
+  email?: string | null;
+  instagram?: string | null;
+  facebook?: string | null;
+  tagline?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-settings_select".
+ */
+export interface PricingSettingsSelect<T extends boolean = true> {
+  stayOptions?:
+    | T
+    | {
+        label?: T;
+        delta?: T;
+        id?: T;
+      };
+  mealOptions?:
+    | T
+    | {
+        label?: T;
+        delta?: T;
+        id?: T;
+      };
+  vehicleOptions?:
+    | T
+    | {
+        label?: T;
+        key?: T;
+        perDayUpgrade?: T;
+        id?: T;
+      };
+  gstPercent?: T;
+  childFreeUnderAge?: T;
+  childPercentOfAdult?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  phoneDisplay?: T;
+  phoneE164?: T;
+  whatsapp?: T;
+  email?: T;
+  instagram?: T;
+  facebook?: T;
+  tagline?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
