@@ -39,7 +39,7 @@ export const GalleryItems: CollectionConfig = {
       ],
     },
     imageField("image", true),
-    { name: "caption", type: "textarea", required: true },
+    { name: "caption", type: "textarea" },
     {
       name: "order",
       type: "number",

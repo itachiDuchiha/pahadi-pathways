@@ -41,6 +41,11 @@ export function tagFor(kind: RevalidateKind): string {
   return TAGS[kind];
 }
 
+/** Package cards also render on destination pages, so both caches go. */
+export function tagsFor(kind: RevalidateKind): string[] {
+  return kind === "package" ? [TAGS.package, TAGS.destination] : [TAGS[kind]];
+}
+
 function slugOf(doc: unknown): string | null {
   if (typeof doc !== "object" || doc === null || !("slug" in doc)) return null;
 
@@ -73,6 +78,9 @@ export function pathsFor(
 
   const targets: RevalidateTarget[] = [...paths].map((path) => ({ path }));
 
+  if (kind === "package") {
+    targets.push({ path: "/destinations" }, { path: "/destinations/[slug]", type: "page" });
+  }
   if (kind === "pricing") targets.push({ path: "/packages/[slug]", type: "page" });
   if (kind === "site") targets.push({ path: "/", type: "layout" });
 
@@ -97,7 +105,7 @@ function run(kind: RevalidateKind, req: HookReq, doc: unknown, previousDoc?: unk
       revalidatePath(target.path, target.type);
     }
     // Editors expect the next visit to show their change, so expire now.
-    revalidateTag(tagFor(kind), { expire: 0 });
+    for (const tag of tagsFor(kind)) revalidateTag(tag, { expire: 0 });
   } catch (error) {
     // Outside a Next request (scripts, tests) there is no cache to clear.
     const message = error instanceof Error ? error.message : String(error);

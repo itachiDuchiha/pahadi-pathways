@@ -27,6 +27,7 @@ export const Destinations: CollectionConfig = {
     create: isEditorOrAdmin,
     update: isEditorOrAdmin,
     delete: isEditorOrAdmin,
+    readVersions: isEditorOrAdmin,
   },
   hooks: {
     afterChange: [revalidate.afterChange],

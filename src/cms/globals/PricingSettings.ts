@@ -5,6 +5,21 @@ import { revalidateHooks } from "../hooks/revalidate";
 
 const revalidate = revalidateHooks("pricing");
 
+/** Each vehicle key may be configured once; pricing looks options up by key. */
+export function validateUniqueVehicleKeys(value: unknown): true | string {
+  if (!Array.isArray(value)) return true;
+
+  const seen = new Set<unknown>();
+  for (const row of value) {
+    const key: unknown = typeof row === "object" && row !== null ? Reflect.get(row, "key") : undefined;
+    if (key === undefined || key === null) continue;
+    if (seen.has(key)) return `Each vehicle can be listed once; "${String(key)}" appears more than once.`;
+    seen.add(key);
+  }
+
+  return true;
+}
+
 export const PricingSettings: GlobalConfig = {
   slug: "pricing-settings",
   label: "Pricing settings",
@@ -37,6 +52,7 @@ export const PricingSettings: GlobalConfig = {
     {
       name: "vehicleOptions",
       type: "array",
+      validate: (value: unknown) => validateUniqueVehicleKeys(value),
       admin: { description: "Vehicles offered. Per-day upgrade applies when a package has no vehicle rate." },
       fields: [
         { name: "label", type: "text", required: true },
@@ -51,6 +67,12 @@ export const PricingSettings: GlobalConfig = {
           ],
         },
         { name: "perDayUpgrade", type: "number", required: true, defaultValue: 0, min: 0 },
+        {
+          name: "perDayUpgradeSpiti",
+          type: "number",
+          min: 0,
+          admin: { description: "Per-day upgrade on Spiti routes, if it differs." },
+        },
       ],
     },
     { name: "gstPercent", type: "number", required: true, defaultValue: 5, min: 0, max: 100 },

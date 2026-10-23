@@ -346,7 +346,7 @@ export interface GalleryItem {
   location: string;
   size: 'normal' | 'large';
   image: number | Media;
-  caption: string;
+  caption?: string | null;
   /**
    * Lower numbers appear first.
    */
@@ -811,6 +811,10 @@ export interface PricingSetting {
         label: string;
         key: 'sedan' | 'ertiga' | 'crysta';
         perDayUpgrade: number;
+        /**
+         * Per-day upgrade on Spiti routes, if it differs.
+         */
+        perDayUpgradeSpiti?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -873,6 +877,7 @@ export interface PricingSettingsSelect<T extends boolean = true> {
         label?: T;
         key?: T;
         perDayUpgrade?: T;
+        perDayUpgradeSpiti?: T;
         id?: T;
       };
   gstPercent?: T;

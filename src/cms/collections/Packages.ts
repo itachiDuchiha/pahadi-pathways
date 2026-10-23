@@ -20,6 +20,7 @@ export const Packages: CollectionConfig = {
     create: isEditorOrAdmin,
     update: isEditorOrAdmin,
     delete: isEditorOrAdmin,
+    readVersions: isEditorOrAdmin,
   },
   hooks: {
     afterChange: [revalidate.afterChange],

@@ -7,7 +7,13 @@ const nextCache = vi.hoisted(() => ({
 
 vi.mock("next/cache", () => nextCache);
 
-import { pathsFor, revalidateHooks, tagFor, type RevalidateKind } from "./revalidate";
+import {
+  pathsFor,
+  revalidateHooks,
+  tagFor,
+  tagsFor,
+  type RevalidateKind,
+} from "./revalidate";
 
 const COMMON = ["/", "/sitemap.xml", "/llms.txt", "/llms-full.txt"];
 
@@ -22,6 +28,13 @@ describe("pathsFor", () => {
     expect(result).toEqual(
       expect.arrayContaining(["/packages/x", "/packages/y", "/packages", ...COMMON])
     );
+  });
+
+  it("revalidates destination pages that list packages", () => {
+    const targets = pathsFor("package", { slug: "x" }, { slug: "x" });
+
+    expect(targets.map((target) => target.path)).toContain("/destinations");
+    expect(targets).toContainEqual({ path: "/destinations/[slug]", type: "page" });
   });
 
   it("lists a package path once when the slug is unchanged", () => {
@@ -76,6 +89,11 @@ describe("pathsFor", () => {
 });
 
 describe("tagFor", () => {
+  it("adds the destinations tag for package changes", () => {
+    expect(tagsFor("package")).toEqual(["packages", "destinations"]);
+    expect(tagsFor("testimonial")).toEqual(["testimonials"]);
+  });
+
   it("maps each kind to a collection tag", () => {
     expect(tagFor("package")).toBe("packages");
     expect(tagFor("destination")).toBe("destinations");
@@ -121,6 +139,7 @@ describe("revalidateHooks", () => {
     expect(nextCache.revalidatePath).toHaveBeenCalledWith("/packages/x", undefined);
     expect(nextCache.revalidatePath).toHaveBeenCalledWith("/packages/y", undefined);
     expect(nextCache.revalidateTag).toHaveBeenCalledWith("packages", { expire: 0 });
+    expect(nextCache.revalidateTag).toHaveBeenCalledWith("destinations", { expire: 0 });
   });
 
   it("logs instead of failing the write when Next has no cache store", async () => {

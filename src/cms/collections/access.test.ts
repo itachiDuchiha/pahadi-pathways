@@ -1,7 +1,13 @@
+import { NotFound } from "payload";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
+import { isEditorOrAdmin } from "../access";
+import { validateUniqueVehicleKeys } from "../globals/PricingSettings";
 import { withTempPayload } from "../test/withTempPayload";
+
+import { Destinations } from "./Destinations";
+import { Packages } from "./Packages";
 
 const temp = withTempPayload();
 
@@ -82,6 +88,58 @@ describe("content access (Local API, overrideAccess: false)", () => {
     expect(result.docs.map((doc) => doc.slug)).toEqual(["live-one"]);
   });
 
+  it("hides a draft-only package from anonymous reads that ask for drafts", async () => {
+    await makePackage("draft-only", "draft");
+
+    const result = await temp.payload.find({
+      collection: "packages",
+      draft: true,
+      overrideAccess: false,
+    });
+
+    expect(result.totalDocs).toBe(0);
+  });
+
+  it("never shows a newer draft of a published package to anonymous reads", async () => {
+    const published = await makePackage("live-one", "published");
+    await temp.payload.update({
+      collection: "packages",
+      id: published.id,
+      data: { title: "SECRET DRAFT" },
+      draft: true,
+      overrideAccess: true,
+      context,
+    });
+
+    const found = await temp.payload.find({
+      collection: "packages",
+      draft: true,
+      overrideAccess: false,
+    });
+    expect(found.docs.map((doc) => doc.title)).not.toContain("SECRET DRAFT");
+
+    const byId = await temp.payload
+      .findByID({ collection: "packages", id: published.id, draft: true, overrideAccess: false })
+      .then(
+        (doc) => doc.title,
+        (error: unknown) => (error instanceof NotFound ? "not-found" : Promise.reject(error))
+      );
+    expect(["Package live-one", "not-found"]).toContain(byId);
+  });
+
+  it("keeps package versions unreadable without a user", async () => {
+    await makePackage("live-one", "published");
+
+    await expect(
+      temp.payload.findVersions({ collection: "packages", overrideAccess: false })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("limits version reads to editors and admins on drafted collections", () => {
+    expect(Packages.access?.readVersions).toBe(isEditorOrAdmin);
+    expect(Destinations.access?.readVersions).toBe(isEditorOrAdmin);
+  });
+
   it("shows a draft package to a signed-in editor reading drafts", async () => {
     await makePackage("draft-only", "draft");
     const editor = await makeUser("editor");
@@ -142,6 +200,26 @@ describe("content access (Local API, overrideAccess: false)", () => {
     });
 
     expect(result.totalDocs).toBe(1);
+  });
+
+  it("accepts a gallery item without a caption", async () => {
+    const image = await makeImage();
+
+    const item = await temp.payload.create({
+      collection: "gallery-items",
+      data: {
+        title: "Spiti Valley",
+        category: "Landscapes",
+        location: "Spiti",
+        size: "large",
+        order: 1,
+        image: image.id,
+      },
+      overrideAccess: true,
+      context,
+    });
+
+    expect(item.caption ?? null).toBeNull();
   });
 
   it("defaults a destination layout to shared", async () => {
@@ -233,6 +311,52 @@ describe("global access", () => {
     ).rejects.toThrow(/not allowed/i);
   });
 
+  it("starts every test from the default global values", async () => {
+    const pricing = await temp.payload.findGlobal({ slug: "pricing-settings" });
+    const siteSettings = await temp.payload.findGlobal({ slug: "site-settings" });
+
+    expect(pricing.gstPercent).toBe(5);
+    expect(pricing.vehicleOptions ?? []).toHaveLength(0);
+    expect(siteSettings.tagline ?? null).toBeNull();
+  });
+
+  it("stores an optional Spiti per-day upgrade on a vehicle option", async () => {
+    const pricing = await temp.payload.updateGlobal({
+      slug: "pricing-settings",
+      data: {
+        vehicleOptions: [
+          { label: "Sedan", key: "sedan", perDayUpgrade: 0, perDayUpgradeSpiti: 0 },
+          { label: "Innova Crysta or similar", key: "crysta", perDayUpgrade: 2500, perDayUpgradeSpiti: 3500 },
+          { label: "Ertiga / Rumion or similar", key: "ertiga", perDayUpgrade: 1000 },
+        ],
+      },
+      overrideAccess: true,
+      context,
+    });
+
+    expect(pricing.vehicleOptions?.map((option) => option.perDayUpgradeSpiti ?? null)).toEqual([
+      0,
+      3500,
+      null,
+    ]);
+  });
+
+  it("rejects pricing settings that repeat a vehicle key", async () => {
+    await expect(
+      temp.payload.updateGlobal({
+        slug: "pricing-settings",
+        data: {
+          vehicleOptions: [
+            { label: "Sedan", key: "sedan", perDayUpgrade: 0 },
+            { label: "Another sedan", key: "sedan", perDayUpgrade: 0 },
+          ],
+        },
+        overrideAccess: true,
+        context,
+      })
+    ).rejects.toThrow(/vehicle/i);
+  });
+
   it("lets an admin update site settings", async () => {
     const admin = await makeUser("admin");
 
@@ -245,5 +369,17 @@ describe("global access", () => {
     });
 
     expect(siteSettings.tagline).toBe("Handcrafted Himalayan Journeys");
+  });
+});
+
+describe("validateUniqueVehicleKeys", () => {
+  it("accepts distinct keys and an empty list", () => {
+    expect(validateUniqueVehicleKeys([{ key: "sedan" }, { key: "crysta" }])).toBe(true);
+    expect(validateUniqueVehicleKeys(undefined)).toBe(true);
+    expect(validateUniqueVehicleKeys([])).toBe(true);
+  });
+
+  it("names the repeated key", () => {
+    expect(validateUniqueVehicleKeys([{ key: "ertiga" }, { key: "ertiga" }])).toMatch(/ertiga/);
   });
 });

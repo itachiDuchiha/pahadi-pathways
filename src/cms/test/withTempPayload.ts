@@ -7,6 +7,7 @@ import {
   getPayload,
   type CollectionSlug,
   type Config,
+  type GlobalSlug,
   type Payload,
   type SanitizedConfig,
 } from "payload";
@@ -31,8 +32,8 @@ export type TempPayload = {
 /**
  * Boots one Payload instance per test file against a throwaway SQLite
  * file (schema created by `push`) and removes it afterwards. Every
- * collection is emptied before each test so tests stay independent
- * without paying for a re-boot.
+ * collection is emptied and every global reset before each test, so
+ * tests stay independent without paying for a re-boot.
  *
  * Call it at the top level of a test file, never inside a test.
  */
@@ -80,6 +81,27 @@ export function withTempPayload(): TempPayload {
       if (payload.collections[slug].config.versions) {
         await payload.db.deleteVersions({ collection: slug, where: {} });
       }
+    }
+
+    // Globals are single rows, so put every top-level field back to its
+    // default (or empty) value instead of deleting.
+    for (const global of payload.globals.config) {
+      const data: Record<string, unknown> = {};
+      for (const field of global.fields) {
+        if (!("name" in field) || field.name === "createdAt" || field.name === "updatedAt") continue;
+        data[field.name] =
+          "defaultValue" in field && field.defaultValue !== undefined
+            ? field.defaultValue
+            : field.type === "array"
+              ? []
+              : null;
+      }
+      await payload.updateGlobal({
+        slug: global.slug as GlobalSlug,
+        data,
+        overrideAccess: true,
+        context: { skipRevalidate: true },
+      });
     }
   });
 
