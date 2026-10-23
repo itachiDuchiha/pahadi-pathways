@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { notFound } from "next/navigation";
 
 import Image from "next/image";
@@ -16,11 +18,41 @@ import SpitiPackages from "@/components/destination-page/SpitiPackages";
 
 import PackageCard from "@/components/packages/PackageCard";
 
+import { site } from "@/config/site";
+import { pageMetadata, truncate } from "@/lib/seo";
+
 type Props = {
   params: Promise<{
     slug: string;
   }>;
 };
+
+export function generateStaticParams() {
+  return allDestinations.map((destination) => ({
+    slug: destination.slug,
+  }));
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const destination = allDestinations.find(
+    (item) => item.slug === slug
+  );
+
+  if (!destination) {
+    return { title: "Not found" };
+  }
+
+  return pageMetadata({
+    title: `${destination.name} | ${site.name}`,
+    description: truncate(destination.description, 155),
+    path: `/destinations/${destination.slug}`,
+    image: destination.image,
+  });
+}
 
 export default async function DestinationPage({
   params,

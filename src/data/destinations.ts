@@ -197,6 +197,8 @@ export const allDestinations = [
   },
 ];
 
+export type Destination = (typeof allDestinations)[number];
+
 // ================= FILTERED GROUPS =================
 
 export const featuredJourneys = allDestinations.filter(

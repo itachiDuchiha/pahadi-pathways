@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { notFound } from "next/navigation";
 
 import SiteLayout from "@/components/layout/SiteLayout";
@@ -18,11 +20,37 @@ import PackageBookingPanel from "@/components/package-details/PackageBookingPane
 
 import { packages } from "@/data/packages";
 
+import { site } from "@/config/site";
+import { pageMetadata, truncate } from "@/lib/seo";
+
 type Props = {
   params: Promise<{
     slug: string;
   }>;
 };
+
+export function generateStaticParams() {
+  return packages.map((pkg) => ({ slug: pkg.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const pkg = packages.find((item) => item.slug === slug);
+
+  if (!pkg) {
+    return { title: "Not found" };
+  }
+
+  return pageMetadata({
+    title: `${pkg.title} | ${site.name}`,
+    description: truncate(pkg.overview ?? pkg.summary ?? pkg.title, 155),
+    path: `/packages/${pkg.slug}`,
+    image: pkg.heroImage ?? pkg.image,
+  });
+}
 
 export default async function PackageDetailsPage({
   params,

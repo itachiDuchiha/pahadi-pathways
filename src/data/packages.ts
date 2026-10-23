@@ -13,6 +13,12 @@ export type Package = {
   hiddenItinerary?: string[];
   includes: string[];
 
+  summary?: string;
+  faqs?: {
+    question: string;
+    answer: string;
+  }[];
+
   // Package Details
   overview?: string;
   stayPlan?: string[];
@@ -71,6 +77,36 @@ export const packages: Package[] = [
       "Hotel / Camp Stay",
       "Breakfast",
       "Sightseeing",
+    ],
+
+    summary:
+      "Kinnaur & Spiti: The Himalayan Circuit is a 9N / 10D journey from Chandigarh covering 1N Shimla, 2N Sangla, 1N Kalpa, 1N Tabo, 2N Kaza, 1N Chandratal, 1N Manali, priced from ₹32,249 per adult.",
+
+    faqs: [
+      {
+        question:
+          "How long is the Kinnaur & Spiti: The Himalayan Circuit tour?",
+        answer:
+          "The Kinnaur & Spiti: The Himalayan Circuit tour runs for 9N / 10D, with overnight stays covering 1N Shimla, 2N Sangla, 1N Kalpa, 1N Tabo, 2N Kaza, 1N Chandratal and 1N Manali.",
+      },
+      {
+        question:
+          "Where does the Kinnaur & Spiti: The Himalayan Circuit tour start?",
+        answer:
+          "The tour starts with pickup from Chandigarh, from where the journey into the Himalayan hills begins.",
+      },
+      {
+        question:
+          "How much does the Kinnaur & Spiti: The Himalayan Circuit tour cost and what is included?",
+        answer:
+          "The tour is priced from ₹32,249 per adult and includes Private Transportation, Hotel / Camp Stay, Breakfast and Sightseeing.",
+      },
+      {
+        question:
+          "When is the best time to take the Kinnaur & Spiti: The Himalayan Circuit tour?",
+        answer:
+          "The best time to take this tour is May to October, when the high-altitude roads through Kinnaur and Spiti are most accessible.",
+      },
     ],
 
     overview:
@@ -549,6 +585,33 @@ export const packages: Package[] = [
       "Sightseeing",
     ],
 
+    summary:
+      "Shimla & Manali Getaway is a 6N / 7D journey from Chandigarh covering 2N Shimla, 3N Manali, 1N Kasol, priced from ₹18,999 per adult.",
+
+    faqs: [
+      {
+        question: "How long is the Shimla & Manali Getaway tour?",
+        answer:
+          "The Shimla & Manali Getaway tour runs for 6N / 7D, with overnight stays covering 2N Shimla, 3N Manali and 1N Kasol.",
+      },
+      {
+        question: "Where does the Shimla & Manali Getaway tour start?",
+        answer: "The tour starts with pickup from Chandigarh.",
+      },
+      {
+        question:
+          "How much does the Shimla & Manali Getaway tour cost and what is included?",
+        answer:
+          "The tour is priced from ₹18,999 per adult and includes Private Transportation, Hotel Stay, Breakfast and Sightseeing.",
+      },
+      {
+        question:
+          "When is the best time to take the Shimla & Manali Getaway tour?",
+        answer:
+          "The best time to take this tour is March to June and September to November, when the weather across Shimla, Manali and Kasol is at its most pleasant.",
+      },
+    ],
+
     overview:
       "A balanced Himachal getaway combining the colonial charm of Shimla, the mountain landscapes and adventure experiences of Manali, and the relaxed atmosphere of Kasol in the Parvati Valley. Starting from Chandigarh, the journey covers Shimla's classic sights, Manali's local attractions and Solang Valley, followed by a scenic drive through Kullu to Kasol and Manikaran before returning to Chandigarh.",
 
@@ -984,6 +1047,33 @@ export const packages: Package[] = [
       "Sightseeing",
     ],
 
+    summary:
+      "Himachal Grand Circuit is a 9N / 10D journey from Chandigarh covering 2N Shimla, 3N Manali, 1N Dharamshala, 2N Dalhousie, 1N Amritsar, priced from ₹32,074 per adult.",
+
+    faqs: [
+      {
+        question: "How long is the Himachal Grand Circuit tour?",
+        answer:
+          "The Himachal Grand Circuit tour runs for 9N / 10D, with overnight stays covering 2N Shimla, 3N Manali, 1N Dharamshala, 2N Dalhousie and 1N Amritsar.",
+      },
+      {
+        question: "Where does the Himachal Grand Circuit tour start?",
+        answer: "The tour starts with pickup from Chandigarh.",
+      },
+      {
+        question:
+          "How much does the Himachal Grand Circuit tour cost and what is included?",
+        answer:
+          "The tour is priced from ₹32,074 per adult and includes Private Transportation, Hotel Stay, Breakfast and Sightseeing.",
+      },
+      {
+        question:
+          "When is the best time to take the Himachal Grand Circuit tour?",
+        answer:
+          "The best time to take this tour is March to June and September to November, when the hill stations and plains along the Himachal Grand Circuit have comfortable, clear weather for sightseeing.",
+      },
+    ],
+
     itineraryDays: [
       {
         day: 1,
@@ -1091,6 +1181,33 @@ export const packages: Package[] = [
       "Sightseeing",
     ],
 
+    summary:
+      "Shimla, Manali & Jibhi Escape is a 7N / 8D journey from Chandigarh covering 2N Shimla, 3N Manali, 2N Jibhi, priced from ₹18,999 per adult.",
+
+    faqs: [
+      {
+        question: "How long is the Shimla, Manali & Jibhi Escape tour?",
+        answer:
+          "The Shimla, Manali & Jibhi Escape tour runs for 7N / 8D, with overnight stays covering 2N Shimla, 3N Manali and 2N Jibhi.",
+      },
+      {
+        question: "Where does the Shimla, Manali & Jibhi Escape tour start?",
+        answer: "The tour starts with pickup from Chandigarh.",
+      },
+      {
+        question:
+          "How much does the Shimla, Manali & Jibhi Escape tour cost and what is included?",
+        answer:
+          "The tour is priced from ₹18,999 per adult and includes Private Transportation, Hotel Stay, Breakfast and Sightseeing.",
+      },
+      {
+        question:
+          "When is the best time to take the Shimla, Manali & Jibhi Escape tour?",
+        answer:
+          "The best time to take this tour is March to June and September to November, when Shimla, Manali and the quiet village of Jibhi all enjoy comfortable, clear weather.",
+      },
+    ],
+
     itineraryDays: [
       {
         day: 1,
@@ -1192,6 +1309,34 @@ export const packages: Package[] = [
       "Hotel Stay",
       "Breakfast",
       "Sightseeing",
+    ],
+
+    summary:
+      "Shimla, Kinnaur & Spiti Explorer is a 8N / 9D journey from Chandigarh covering 1N Shimla, 2N Sangla, 1N Tabo, 2N Kaza, 1N Kalpa, 1N Shimla, priced from ₹29,549 per adult.",
+
+    faqs: [
+      {
+        question: "How long is the Shimla, Kinnaur & Spiti Explorer tour?",
+        answer:
+          "The Shimla, Kinnaur & Spiti Explorer tour runs for 8N / 9D, with overnight stays covering 1N Shimla, 2N Sangla, 1N Tabo, 2N Kaza, 1N Kalpa and 1N Shimla.",
+      },
+      {
+        question:
+          "Where does the Shimla, Kinnaur & Spiti Explorer tour start?",
+        answer: "The tour starts with pickup from Chandigarh.",
+      },
+      {
+        question:
+          "How much does the Shimla, Kinnaur & Spiti Explorer tour cost and what is included?",
+        answer:
+          "The tour is priced from ₹29,549 per adult and includes Private Transportation, Hotel Stay, Breakfast and Sightseeing.",
+      },
+      {
+        question:
+          "When is the best time to take the Shimla, Kinnaur & Spiti Explorer tour?",
+        answer:
+          "The best time to take this tour is May to October, when the high-altitude roads through Kinnaur and Spiti are most accessible.",
+      },
     ],
 
     itineraryDays: [
