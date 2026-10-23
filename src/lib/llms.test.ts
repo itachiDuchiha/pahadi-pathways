@@ -43,6 +43,8 @@ describe("buildLlmsFullTxt", () => {
       expect(text).toContain(pkg.title);
       expect(text).toContain(absoluteUrl(`/packages/${pkg.slug}`));
 
+      expect(pkg.faqs?.length).toBeGreaterThan(0);
+
       for (const faq of pkg.faqs ?? []) {
         expect(text).toContain(faq.question);
       }

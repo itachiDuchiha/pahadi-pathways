@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Section = {
   id: string;
   label: string;
 };
 
-const sections: Section[] = [
+const baseSections: Section[] = [
   {
     id: "overview",
     label: "Overview",
@@ -36,13 +36,23 @@ const sections: Section[] = [
     id: "cancellation",
     label: "Cancellation Policy",
   },
-  {
-    id: "faq",
-    label: "FAQ",
-  },
 ];
 
-export default function PackageSectionNav() {
+const faqSection: Section = {
+  id: "faq",
+  label: "FAQ",
+};
+
+type Props = {
+  hasFaqs?: boolean;
+};
+
+export default function PackageSectionNav({ hasFaqs = false }: Props) {
+  const sections = useMemo(
+    () => (hasFaqs ? [...baseSections, faqSection] : baseSections),
+    [hasFaqs]
+  );
+
   const [activeSection, setActiveSection] =
     useState("overview");
 
@@ -96,7 +106,7 @@ export default function PackageSectionNav() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", updateActiveSection);
     };
-  }, []);
+  }, [sections]);
 
   const handleClick = (
     event: React.MouseEvent<HTMLAnchorElement>,

@@ -14,6 +14,7 @@ type Crumb = { name: string; path: string };
 function organization(): JsonLdObject {
   return {
     "@type": "TravelAgency",
+    "@id": absoluteUrl("/#organization"),
     name: site.name,
     url: site.url,
     logo: absoluteUrl("/images/logo/full-logo.png"),

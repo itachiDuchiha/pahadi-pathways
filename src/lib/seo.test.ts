@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import { site } from "@/config/site";
 
-import { absoluteUrl, pageMetadata, truncate } from "./seo";
+import {
+  absoluteUrl,
+  ogImageAlt,
+  ogImageSize,
+  pageMetadata,
+  truncate,
+} from "./seo";
 
 describe("absoluteUrl", () => {
   it("joins a path that starts with a slash", () => {
@@ -50,14 +56,23 @@ describe("pageMetadata", () => {
     );
   });
 
-  it("leaves openGraph.images undefined when no image is given", () => {
+  it("falls back to the default generated image when no image is given", () => {
     const metadata = pageMetadata({
       title: "Title",
       description: "Description",
       path: "/packages/some-slug",
     });
 
-    expect(metadata.openGraph?.images).toBeUndefined();
+    expect(metadata.openGraph?.images).toEqual([
+      {
+        url: absoluteUrl("/opengraph-image"),
+        width: 1200,
+        height: 630,
+        alt: ogImageAlt,
+      },
+    ]);
+    expect(ogImageSize).toEqual({ width: 1200, height: 630 });
+    expect(metadata.twitter?.images).toBeUndefined();
   });
 
   it("sets an absolute openGraph image when given", () => {

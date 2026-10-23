@@ -7,6 +7,10 @@ export const defaultTitle = `${site.name} | ${site.tagline}`;
 export const defaultDescription =
   "Handcrafted Himachal Pradesh tours, custom itineraries and trusted local hosts for Shimla, Manali, Spiti and beyond.";
 
+export const ogImageSize = { width: 1200, height: 630 };
+
+export const ogImageAlt = defaultTitle;
+
 export function absoluteUrl(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
@@ -55,7 +59,17 @@ export function pageMetadata({
       url,
       title: socialTitle,
       description,
-      ...(image ? { images: [{ url: absoluteUrl(image) }] } : {}),
+      // A page-level openGraph replaces the root one, so pages without their
+      // own image would otherwise lose the default generated image.
+      images: image
+        ? [{ url: absoluteUrl(image) }]
+        : [
+            {
+              url: absoluteUrl("/opengraph-image"),
+              ...ogImageSize,
+              alt: ogImageAlt,
+            },
+          ],
     },
     twitter: {
       card: "summary_large_image",

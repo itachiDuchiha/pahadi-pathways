@@ -57,6 +57,7 @@ describe("packageJsonLd", () => {
     const provider = data.provider as Record<string, unknown>;
 
     expect(provider["@type"]).toBe("TravelAgency");
+    expect(provider["@id"]).toBe(organizationJsonLd()["@id"]);
     expect(provider["@context"]).toBeUndefined();
   });
 });
@@ -90,6 +91,7 @@ describe("organizationJsonLd", () => {
     const data = organizationJsonLd();
 
     expect(data.telephone).toBe("+917559697919");
+    expect(data["@id"]).toBe(absoluteUrl("/#organization"));
     expect(data.name).toBe(site.name);
     expect(data["@context"]).toBe("https://schema.org");
   });

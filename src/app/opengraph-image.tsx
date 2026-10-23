@@ -1,10 +1,11 @@
 import { ImageResponse } from "next/og";
 
 import { site } from "@/config/site";
+import { ogImageAlt, ogImageSize } from "@/lib/seo";
 
-export const alt = `${site.name} | ${site.tagline}`;
+export const alt = ogImageAlt;
 
-export const size = { width: 1200, height: 630 };
+export const size = ogImageSize;
 
 export const contentType = "image/png";
 

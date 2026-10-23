@@ -92,7 +92,7 @@ export default async function PackageDetailsPage({
           PACKAGE SECTION NAVIGATION
       ========================================================= */}
 
-      <PackageSectionNav />
+      <PackageSectionNav hasFaqs={Boolean(pkg.faqs?.length)} />
 
       {/* =========================================================
           MAIN PACKAGE CONTENT
