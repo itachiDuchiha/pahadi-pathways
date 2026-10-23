@@ -26,4 +26,23 @@ describe("rateLimit", () => {
     expect(rateLimit("test:b", opts).allowed).toBe(true);
     expect(rateLimit("test:a", opts).allowed).toBe(false);
   });
+
+  it("re-opens an expired window even when the sweep is throttled", () => {
+    let clock = 50_000_000;
+    const opts = { limit: 1, windowMs: 1000, now: () => clock };
+
+    // Sweep runs here; "test:x" window ends at +1000.
+    expect(rateLimit("test:x", opts).allowed).toBe(true);
+    expect(rateLimit("test:x", opts).allowed).toBe(false);
+
+    // A sweep runs at +999, before "test:x" has expired.
+    clock += 999;
+    expect(rateLimit("test:y", opts).allowed).toBe(true);
+
+    // At +1000 the next sweep is not due (1 ms < windowMs / 10), yet the
+    // expired window must not keep blocking.
+    clock += 1;
+    expect(rateLimit("test:x", opts).allowed).toBe(true);
+    expect(rateLimit("test:x", opts).allowed).toBe(false);
+  });
 });

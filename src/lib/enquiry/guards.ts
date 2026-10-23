@@ -28,6 +28,15 @@ export function checkOrigin(request: Request, siteUrl: string): boolean {
   return expected !== null && actual !== null && actual === expected;
 }
 
+/**
+ * Best-effort client IP for rate limiting.
+ *
+ * Trust assumption: the hosting edge overwrites `x-forwarded-for` with the
+ * real client address (Vercel does). Behind a proxy that appends to a
+ * client-supplied header instead, the first entry is attacker-controlled and
+ * the limit can be bypassed. Requests with neither header all share one
+ * global "unknown" bucket.
+ */
 export function clientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   if (forwarded) return forwarded;

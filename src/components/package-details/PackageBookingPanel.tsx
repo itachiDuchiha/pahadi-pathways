@@ -108,7 +108,7 @@ export default function PackageBookingPanel({
     packageCost,
     gst,
     estimatedTotal,
-    hasVehicleRates: packageRates,
+    hasVehicleRates,
     adultRate,
     extraAdultPrice,
     childRate,
@@ -127,8 +127,6 @@ export default function PackageBookingPanel({
     adults,
     childAges: children,
   });
-
-  const selectedAdultRate = adultRate;
 
   /* =======================================================
      TRAVELLER COUNT
@@ -557,9 +555,9 @@ export default function PackageBookingPanel({
               Vehicle
             </label>
 
-            {packageRates ? (
+            {hasVehicleRates ? (
               <span className="rounded-full bg-[#F4E5C3] px-2 py-[2px] text-[8px] font-bold text-[#8B6412]">
-                {formatCurrency(selectedAdultRate)}/adult
+                {formatCurrency(adultRate)}/adult
               </span>
             ) : vehicleUpgradeTotal > 0 && (
               <span
@@ -1318,7 +1316,7 @@ export default function PackageBookingPanel({
 
             {/* Vehicle */}
 
-            {!packageRates && vehicleUpgradeTotal > 0 && (
+            {!hasVehicleRates && vehicleUpgradeTotal > 0 && (
               <div
                 className="
                   flex
