@@ -22,7 +22,7 @@ export default function GalleryPage() {
 
       <section className="relative flex min-h-[460px] items-center justify-center overflow-hidden pt-20 sm:min-h-[480px] md:min-h-[500px]">
         <Image
-          src="/images/hero/gallery-hike-hero.png"
+          src="/images/hero/gallery-hike-hero.webp"
           alt="Himalayan mountain peaks reflected in a peaceful alpine lake at sunset"
           fill
           priority

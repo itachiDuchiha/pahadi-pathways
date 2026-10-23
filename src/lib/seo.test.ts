@@ -80,11 +80,11 @@ describe("pageMetadata", () => {
       title: "Title",
       description: "Description",
       path: "/packages/some-slug",
-      image: "/images/packages/spiti.jpg",
+      image: "/images/packages/spiti.webp",
     });
 
     expect(metadata.openGraph?.images).toEqual([
-      { url: absoluteUrl("/images/packages/spiti.jpg") },
+      { url: absoluteUrl("/images/packages/spiti.webp") },
     ]);
   });
 

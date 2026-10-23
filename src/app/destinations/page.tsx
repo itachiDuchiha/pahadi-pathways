@@ -73,7 +73,7 @@ export default function DestinationsPage() {
           "
           style={{
             backgroundImage:
-              "url('/images/destinations/destination-manali.png')",
+              "url('/images/destinations/destination-manali.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

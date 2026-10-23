@@ -22,7 +22,7 @@ export default function Hero() {
           bg-center
         "
         style={{
-          backgroundImage: "url('/images/hero/hero.png')",
+          backgroundImage: "url('/images/hero/hero-png.webp')",
         }}
       >
 

@@ -16,7 +16,7 @@ export default function Logo() {
       "
     >
       <Image
-        src="/images/logo/navbar-logo5.png"
+        src="/images/logo/navbar-logo5.webp"
         alt="The Himalayan Compass"
         width={280}
         height={70}

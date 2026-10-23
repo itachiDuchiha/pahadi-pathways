@@ -196,7 +196,7 @@ export default function TripPlannerForm() {
         <div
           className="absolute inset-0 bg-[#10264A] bg-cover bg-center"
           style={{
-            backgroundImage: "url('/images/himachal-home.png')",
+            backgroundImage: "url('/images/himachal-home.webp')",
           }}
         />
 

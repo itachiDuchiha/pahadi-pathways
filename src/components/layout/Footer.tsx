@@ -29,7 +29,7 @@ export default function Footer() {
               className="inline-flex items-center rounded-xl bg-white px-3 py-2 shadow-lg transition-all duration-300 hover:scale-[1.02]"
             >
               <Image
-                src="/images/logo/navbar-logo5.png"
+                src="/images/logo/navbar-logo5.webp"
                 alt="The Himalayan Compass"
                 width={240}
                 height={60}

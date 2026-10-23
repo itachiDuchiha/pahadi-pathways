@@ -13,7 +13,8 @@
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "images:optimize": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.24.0",

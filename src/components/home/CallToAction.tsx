@@ -7,7 +7,7 @@ export default function CallToAction() {
     <section
       className="relative my-20 overflow-hidden rounded-3xl"
       style={{
-        backgroundImage: "url('/images/hero/hero.jpg')",
+        backgroundImage: "url('/images/hero/hero-jpg.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

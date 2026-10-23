@@ -213,8 +213,8 @@ export default async function PackagesPage({
   const searchHeroImage =
     hasSearch
       ? matchingPackages[0]?.image ??
-        "/images/hero/packages-hero.png"
-      : "/images/hero/packages-hero.png";
+        "/images/hero/packages-hero.webp"
+      : "/images/hero/packages-hero.webp";
 
   /* =======================================================
      RETURN
@@ -616,7 +616,7 @@ export default async function PackagesPage({
             {/* BACKGROUND IMAGE */}
 
             <Image
-              src="/images/hero/packages-hero.png"
+              src="/images/hero/packages-hero.webp"
               alt="Himalayan mountain journey"
               fill
               className="

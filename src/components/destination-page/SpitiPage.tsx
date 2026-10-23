@@ -14,10 +14,10 @@ export default function SpitiPage({
   destination,
 }: DestinationPageProps) {
   const spitiGallery = [
-    "/images/destinations/spiti-1.png",
-    "/images/destinations/spiti-2.png",
-    "/images/destinations/spiti-3.png",
-    "/images/destinations/spiti-4.png",
+    "/images/destinations/spiti-1.webp",
+    "/images/destinations/spiti-2.webp",
+    "/images/destinations/spiti-3.webp",
+    "/images/destinations/spiti-4.webp",
   ];
 
 

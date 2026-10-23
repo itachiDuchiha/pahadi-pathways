@@ -9,7 +9,7 @@ import {
 const destinations = [
   {
     name: "Manali",
-    image: "/images/destinations/manali-featured.png",
+    image: "/images/destinations/manali-featured.webp",
     tagline: "Valley of Gods",
     altitude: "2,050 m",
     bestTime: "Mar – Jun",
@@ -20,7 +20,7 @@ const destinations = [
   },
   {
     name: "Shimla",
-    image: "/images/destinations/shimla-3.png",
+    image: "/images/destinations/shimla-3.webp",
     tagline: "Queen of Hills",
     altitude: "2,276 m",
     bestTime: "Mar – Jun",
@@ -30,7 +30,7 @@ const destinations = [
   },
   {
     name: "Spiti Valley",
-    image: "/images/destinations/spiti-1.png",
+    image: "/images/destinations/spiti-1.webp",
     tagline: "Cold Desert of India",
     altitude: "3,800 m",
     bestTime: "Jun – Sep",

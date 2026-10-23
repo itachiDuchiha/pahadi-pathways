@@ -46,7 +46,7 @@ export default function CustomJourneyCTA() {
           ================================================= */}
 
           <Image
-            src="/images/hero/packages-hero.png"
+            src="/images/hero/packages-hero.webp"
             alt=""
             aria-hidden="true"
             fill

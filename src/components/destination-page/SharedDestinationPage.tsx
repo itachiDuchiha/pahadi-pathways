@@ -24,10 +24,10 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
  *
  * Images automatically use:
  *
- * /images/destinations/[slug]-1.png
- * /images/destinations/[slug]-2.png
- * /images/destinations/[slug]-3.png
- * /images/destinations/[slug]-4.png
+ * /images/destinations/[slug]-1.webp
+ * /images/destinations/[slug]-2.webp
+ * /images/destinations/[slug]-3.webp
+ * /images/destinations/[slug]-4.webp
  *
  * ============================================================
  */
@@ -36,10 +36,10 @@ export default function SharedDestinationPage({
   destination, packages,
 }: DestinationPageProps) {
   const galleryImages = [
-    `/images/destinations/${destination.slug}-1.png`,
-    `/images/destinations/${destination.slug}-2.png`,
-    `/images/destinations/${destination.slug}-3.png`,
-    `/images/destinations/${destination.slug}-4.png`,
+    `/images/destinations/${destination.slug}-1.webp`,
+    `/images/destinations/${destination.slug}-2.webp`,
+    `/images/destinations/${destination.slug}-3.webp`,
+    `/images/destinations/${destination.slug}-4.webp`,
   ];
 
 

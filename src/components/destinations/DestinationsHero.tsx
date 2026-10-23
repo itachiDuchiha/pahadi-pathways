@@ -37,7 +37,7 @@ export default function DestinationsHero() {
       ===================================================== */}
 
       <Image
-        src="/images/hero/destination-hero.png"
+        src="/images/hero/destination-hero.webp"
         alt="Mountain valley and Himalayan landscape in Himachal Pradesh"
         fill
         priority

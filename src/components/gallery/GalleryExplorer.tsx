@@ -21,70 +21,70 @@ import {
   Later, replace each image path with your own image filename.
 
   Example:
-  "/images/gallery/spiti-valley.jpg"
+  "/images/gallery/spiti-valley.webp"
 */
 
 const galleryItems = [
   {
     title: "Spiti Valley",
     category: "Landscapes",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Spiti, Himachal Pradesh",
     size: "large",
   },
   {
     title: "The Himalayan Roads",
     category: "Road Journeys",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Mountain roads",
     size: "normal",
   },
   {
     title: "Shimla",
     category: "Mountain Towns",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Shimla, Himachal Pradesh",
     size: "normal",
   },
   {
     title: "Manali",
     category: "Valleys",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Manali, Himachal Pradesh",
     size: "large",
   },
   {
     title: "Life in the Mountains",
     category: "Local Life",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Himachal Pradesh",
     size: "normal",
   },
   {
     title: "Beyond the Ordinary",
     category: "Landscapes",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "The Himalayas",
     size: "normal",
   },
   {
     title: "Quiet Mountain Towns",
     category: "Mountain Towns",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Himachal Pradesh",
     size: "normal",
   },
   {
     title: "The Journey Itself",
     category: "Road Journeys",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Himalayan highways",
     size: "large",
   },
   {
     title: "Valleys of Himachal",
     category: "Valleys",
-    image: "/images/hero/hero.jpg",
+    image: "/images/hero/hero-jpg.webp",
     location: "Himachal Pradesh",
     size: "normal",
   },
@@ -116,21 +116,21 @@ const videoItems = [
     title: "A Journey Through Spiti",
     category: "Road Stories",
     src: "",
-    poster: "/images/hero/hero.jpg",
+    poster: "/images/hero/hero-jpg.webp",
     duration: "Travel film",
   },
   {
     title: "The Quiet Side of Himachal",
     category: "Local Life",
     src: "",
-    poster: "/images/hero/hero.jpg",
+    poster: "/images/hero/hero-jpg.webp",
     duration: "Mountain moments",
   },
   {
     title: "Roads Into the Himalayas",
     category: "Scenic Journeys",
     src: "",
-    poster: "/images/hero/hero.jpg",
+    poster: "/images/hero/hero-jpg.webp",
     duration: "On the road",
   },
 ];

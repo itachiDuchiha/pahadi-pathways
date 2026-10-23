@@ -17,7 +17,7 @@ function organization(): JsonLdObject {
     "@id": absoluteUrl("/#organization"),
     name: site.name,
     url: site.url,
-    logo: absoluteUrl("/images/logo/full-logo.png"),
+    logo: absoluteUrl("/images/logo/full-logo.webp"),
     telephone: site.phone.e164,
     email: site.email,
     sameAs: [site.social.instagram, site.social.facebook],
