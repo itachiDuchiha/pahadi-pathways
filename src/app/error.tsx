@@ -1,11 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
+
 type ErrorPageProps = {
   error: Error & { digest?: string };
   reset: () => void;
 };
 
-export default function Error({ reset }: ErrorPageProps) {
+export default function Error({ error, reset }: ErrorPageProps) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
   return (
     <div className="bg-[#F8F6F1] pt-[82px]">
       <div className="flex min-h-[60vh] items-center justify-center bg-[#F8F6F1] px-6 py-20">

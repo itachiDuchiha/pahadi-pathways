@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import type { Destination } from "@/data/destinations";
+import { allDestinations, type Destination } from "@/data/destinations";
 
 import type { Package } from "@/data/packages";
 
@@ -12,8 +12,6 @@ import SpitiPage from "@/components/destination-page/SpitiPage";
 
 import SharedDestinationPage from "@/components/destination-page/SharedDestinationPage";
 
-import GenericDestinationPage from "@/components/destination-page/GenericDestinationPage";
-
 export type DestinationPageProps = {
   destination: Destination;
   packages: Package[];
@@ -23,33 +21,18 @@ const dedicatedPages: Record<string, ComponentType<DestinationPageProps>> = {
   manali: ManaliPage,
   shimla: ShimlaPage,
   "spiti-valley": SpitiPage,
-  spiti: SpitiPage,
 };
 
-export const sharedDestinationSlugs = [
-  "kufri",
-  "solang-valley",
-  "khajjiar",
-  "chitkul",
-  "kalpa",
-  "tosh",
-  "tabo",
-  "dhankar",
-  "manikaran",
-];
+// Every destination without a dedicated page uses the shared layout, so a
+// new entry in `allDestinations` gets a page automatically.
+export const sharedDestinationSlugs: string[] = allDestinations
+  .map((destination) => destination.slug)
+  .filter((slug) => !Object.hasOwn(dedicatedPages, slug));
 
 export function getDestinationPage(
   slug: string
 ): ComponentType<DestinationPageProps> {
-  const dedicated = dedicatedPages[slug];
-
-  if (dedicated) {
-    return dedicated;
-  }
-
-  if (sharedDestinationSlugs.includes(slug)) {
-    return SharedDestinationPage;
-  }
-
-  return GenericDestinationPage;
+  return Object.hasOwn(dedicatedPages, slug)
+    ? dedicatedPages[slug]
+    : SharedDestinationPage;
 }

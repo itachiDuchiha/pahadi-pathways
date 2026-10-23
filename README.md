@@ -135,6 +135,10 @@ The app runs on any Node 24-compatible host, or on Vercel.
 
 - The enquiry rate limiter is per server instance, not global, on
   multi-instance/serverless hosts; there is no CAPTCHA.
+- The rate limiter identifies clients by the first `x-forwarded-for`
+  entry, so it relies on a trusted proxy or edge that sets that header
+  (Vercel does); on a bare `next start` host without a proxy the header
+  can be forged.
 - The Content-Security-Policy header is sent as
   `Content-Security-Policy-Report-Only`, so it currently reports violations
   rather than blocking them.

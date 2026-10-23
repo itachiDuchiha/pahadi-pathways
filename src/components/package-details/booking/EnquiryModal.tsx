@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
@@ -9,6 +9,7 @@ import type { Package } from "@/data/packages";
 import { site, whatsappUrl } from "@/config/site";
 import { useTodayIso } from "@/lib/hooks/useTodayIso";
 import { formatCurrency } from "@/lib/pricing";
+import { useDialog } from "@/components/ui/useDialog";
 import type { BookingPrice } from "@/components/package-details/booking/useBookingState";
 
 type Props = {
@@ -48,19 +49,14 @@ export default function EnquiryModal({
   // client markup match (no hydration mismatch).
   const minTravelDate = useTodayIso();
 
-  // Prevent the page behind the enquiry modal from scrolling.
-  useEffect(() => {
-    if (!isEnquiryOpen) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isEnquiryOpen]);
+  // Scroll lock, focus move/restore, Escape and the Tab focus trap. Escape
+  // is ignored while a submission is in flight, matching the backdrop and
+  // close button.
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeEnquiry = useCallback(() => setIsEnquiryOpen(false), [setIsEnquiryOpen]);
+  useDialog(dialogRef, isEnquiryOpen, closeEnquiry, {
+    closeOnEscape: !isSubmitting,
+  });
 
   // Clear any previous error each time the modal is opened.
   const [wasEnquiryOpen, setWasEnquiryOpen] = useState(isEnquiryOpen);
@@ -166,6 +162,8 @@ export default function EnquiryModal({
 
   return createPortal((
         <div
+          ref={dialogRef}
+          tabIndex={-1}
           className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain bg-[#081526]/75 p-3 backdrop-blur-sm sm:p-4"
           role="dialog"
           aria-modal="true"

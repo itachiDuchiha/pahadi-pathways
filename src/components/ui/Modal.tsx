@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useId, useRef } from "react";
 import { X } from "lucide-react";
+
+import { useDialog } from "@/components/ui/useDialog";
 
 type ModalProps = {
   isOpen: boolean;
@@ -9,10 +11,6 @@ type ModalProps = {
   title?: string;
   children: React.ReactNode;
 };
-
-// Matches the house focus-trap query used by PackageBookingPanel's enquiry modal.
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export default function Modal({
   isOpen,
@@ -22,104 +20,7 @@ export default function Modal({
 }: ModalProps) {
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
-  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
-
-  // Prevent the page behind the modal from scrolling while it is open.
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
-  // Move focus into the dialog on open and restore it to the triggering
-  // element on close.
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    previouslyFocusedRef.current =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-
-    dialogRef.current?.focus();
-
-    return () => {
-      const previouslyFocused = previouslyFocusedRef.current;
-
-      if (previouslyFocused && document.contains(previouslyFocused)) {
-        previouslyFocused.focus();
-      }
-    };
-  }, [isOpen]);
-
-  // Close on Escape and keep Tab/Shift+Tab cycling within the dialog.
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      const dialog = dialogRef.current;
-
-      if (!dialog) {
-        return;
-      }
-
-      const focusable = Array.from(
-        dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      );
-
-      if (focusable.length === 0) {
-        // Nothing inside to cycle to; keep focus on the dialog itself.
-        event.preventDefault();
-        dialog.focus();
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement;
-      // Right after open, focus sits on the dialog container itself (not
-      // on `first`), and `dialog.contains(active)` is true for the dialog
-      // itself too — so that case must be checked explicitly, or neither
-      // branch below fires and native Tab/Shift+Tab escapes the trap.
-      const atDialog = active === dialog;
-
-      if (event.shiftKey) {
-        if (active === first || atDialog || !dialog.contains(active)) {
-          event.preventDefault();
-          last.focus();
-        }
-      } else if (active === last || atDialog || !dialog.contains(active)) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, onClose]);
+  useDialog(dialogRef, isOpen, onClose);
 
   if (!isOpen) return null;
 

@@ -18,9 +18,13 @@ Open items only; each line notes why it is still open.
 
 ## Testing
 
-- **Add browser/E2E tests.** Only Vitest unit tests exist today (71 tests
+- **Add browser/E2E tests.** Only Vitest unit tests exist today (73 tests
   across `src/**/*.test.ts`); there is no coverage that exercises the app
   in a real browser (forms, modal focus trapping, navigation).
+
+## Monitoring
+
+- Add error reporting (for example Sentry or the host's log drain); API and render failures currently go to console.error only.
 
 ## Analytics
 

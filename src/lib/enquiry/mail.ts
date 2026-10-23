@@ -16,13 +16,19 @@ export function getMailConfig(): MailConfig | null {
 
 const MAX_SUBJECT_LENGTH = 120;
 
-/** Removes control characters (including CR/LF) and clamps the length. */
+/**
+ * Removes control characters (including CR/LF and the Unicode line and
+ * paragraph separators), strips bidirectional formatting controls, and
+ * clamps the length by code point so surrogate pairs are never split.
+ */
 export function sanitizeSubject(subject: string): string {
-  return subject
-    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+  const value = subject
+    .replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, " ")
+    .replace(/[\u202a-\u202e\u2066-\u2069]/g, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, MAX_SUBJECT_LENGTH);
+    .trim();
+
+  return Array.from(value).slice(0, MAX_SUBJECT_LENGTH).join("");
 }
 
 export async function sendEnquiryEmail(
