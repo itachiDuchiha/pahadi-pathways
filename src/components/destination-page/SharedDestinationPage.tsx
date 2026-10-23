@@ -22,12 +22,10 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
  * Dhankar
  * Manikaran
  *
- * Images automatically use:
- *
- * /images/destinations/[slug]-1.webp
- * /images/destinations/[slug]-2.webp
- * /images/destinations/[slug]-3.webp
- * /images/destinations/[slug]-4.webp
+ * Only destinations with an explicit `gallery` array of four images
+ * (set on the destination entry in src/data/destinations.ts) render
+ * the four-image photo grid below. Everything else falls back to a
+ * single full-width image using `destination.image`.
  *
  * ============================================================
  */
@@ -35,12 +33,12 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
 export default function SharedDestinationPage({
   destination, packages,
 }: DestinationPageProps) {
-  const galleryImages = [
-    `/images/destinations/${destination.slug}-1.webp`,
-    `/images/destinations/${destination.slug}-2.webp`,
-    `/images/destinations/${destination.slug}-3.webp`,
-    `/images/destinations/${destination.slug}-4.webp`,
-  ];
+  const galleryImages =
+    "gallery" in destination &&
+    destination.gallery &&
+    destination.gallery.length >= 4
+      ? destination.gallery
+      : null;
 
 
   /*
@@ -121,71 +119,93 @@ export default function SharedDestinationPage({
                   FOUR IMAGE GALLERY
               ================================================= */}
 
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.25fr_1fr]">
+              {galleryImages ? (
+
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-[1.25fr_1fr]">
 
 
-                {/* MAIN IMAGE */}
+                  {/* MAIN IMAGE */}
+
+                  <div className="relative h-[300px] overflow-hidden rounded-[20px] md:h-[420px]">
+
+                    <Image
+                      src={galleryImages[0]}
+                      alt={`${destination.name} - featured`}
+                      fill
+                      priority
+                      sizes="(max-width: 768px) 100vw, 55vw"
+                      className="object-cover"
+                    />
+
+                  </div>
+
+
+                  {/* THREE SMALL IMAGES */}
+
+                  <div className="grid grid-cols-2 gap-3 md:grid-rows-[198px_198px]">
+
+
+                    <div className="relative h-[180px] overflow-hidden rounded-[20px] md:h-auto">
+
+                      <Image
+                        src={galleryImages[1]}
+                        alt={`${destination.name} landscape`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+
+                    </div>
+
+
+                    <div className="relative h-[180px] overflow-hidden rounded-[20px] md:h-auto">
+
+                      <Image
+                        src={galleryImages[2]}
+                        alt={`${destination.name} scenic view`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover"
+                      />
+
+                    </div>
+
+
+                    <div className="relative col-span-2 h-[180px] overflow-hidden rounded-[20px] md:h-auto">
+
+                      <Image
+                        src={galleryImages[3]}
+                        alt={`${destination.name} Himalayan landscape`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 45vw"
+                        className="object-cover"
+                      />
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              ) : (
+
+                /* No numbered gallery for this destination: show a
+                   single full-width hero image instead. */
 
                 <div className="relative h-[300px] overflow-hidden rounded-[20px] md:h-[420px]">
 
                   <Image
-                    src={galleryImages[0]}
+                    src={destination.image}
                     alt={`${destination.name} - featured`}
                     fill
                     priority
-                    sizes="(max-width: 768px) 100vw, 55vw"
+                    sizes="100vw"
                     className="object-cover"
                   />
 
                 </div>
 
-
-                {/* THREE SMALL IMAGES */}
-
-                <div className="grid grid-cols-2 gap-3 md:grid-rows-[198px_198px]">
-
-
-                  <div className="relative h-[180px] overflow-hidden rounded-[20px] md:h-auto">
-
-                    <Image
-                      src={galleryImages[1]}
-                      alt={`${destination.name} landscape`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-
-                  </div>
-
-
-                  <div className="relative h-[180px] overflow-hidden rounded-[20px] md:h-auto">
-
-                    <Image
-                      src={galleryImages[2]}
-                      alt={`${destination.name} scenic view`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-
-                  </div>
-
-
-                  <div className="relative col-span-2 h-[180px] overflow-hidden rounded-[20px] md:h-auto">
-
-                    <Image
-                      src={galleryImages[3]}
-                      alt={`${destination.name} Himalayan landscape`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 45vw"
-                      className="object-cover"
-                    />
-
-                  </div>
-
-                </div>
-
-              </div>
+              )}
 
             </div>
 

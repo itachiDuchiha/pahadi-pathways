@@ -76,6 +76,13 @@ export const allDestinations = [
     fullDescription:
       "Kufri is a small hill destination located near Shimla, surrounded by dense cedar and deodar forests and offering beautiful views of the Himalayan ranges. It is especially popular during winter when snowfall transforms the area into a scenic mountain landscape. Kufri is also known for outdoor activities, nature walks, horse riding and adventure attractions, making it a popular stop for travellers exploring the Shimla region.",
 
+    gallery: [
+      "/images/destinations/kufri-1.webp",
+      "/images/destinations/kufri-2.webp",
+      "/images/destinations/kufri-3.webp",
+      "/images/destinations/kufri-4.webp",
+    ],
+
     image: "/images/destinations/kufri.webp",
     category: "Along the Way",
   },

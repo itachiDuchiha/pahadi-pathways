@@ -98,9 +98,19 @@ async function processFile(filePath, webpPath) {
 
   let pipeline = sharp(filePath);
   if (kind === "hero") {
-    pipeline = pipeline.resize({ width: 1920, withoutEnlargement: true });
+    pipeline = pipeline.resize({
+      width: 1920,
+      height: 1920,
+      fit: "inside",
+      withoutEnlargement: true,
+    });
   } else if (kind === "default") {
-    pipeline = pipeline.resize({ width: 1400, withoutEnlargement: true });
+    pipeline = pipeline.resize({
+      width: 1400,
+      height: 1400,
+      fit: "inside",
+      withoutEnlargement: true,
+    });
   }
   // logo: no resize
 
