@@ -47,7 +47,7 @@ export function pageMetadata({
       url,
       title,
       description,
-      images: image ? [{ url: absoluteUrl(image) }] : undefined,
+      ...(image ? { images: [{ url: absoluteUrl(image) }] } : {}),
     },
     twitter: {
       card: "summary_large_image",

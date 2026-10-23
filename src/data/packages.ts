@@ -1070,7 +1070,7 @@ export const packages: Package[] = [
         question:
           "When is the best time to take the Himachal Grand Circuit tour?",
         answer:
-          "The best time to take this tour is March to June and September to November, when the hill stations and plains along the Himachal Grand Circuit have comfortable, clear weather for sightseeing.",
+          "The best months for the Himachal Grand Circuit tour depend on snowfall and road conditions along the route, which change from year to year. Share your preferred dates with us and we will confirm whether they suit this itinerary.",
       },
     ],
 
@@ -1204,7 +1204,7 @@ export const packages: Package[] = [
         question:
           "When is the best time to take the Shimla, Manali & Jibhi Escape tour?",
         answer:
-          "The best time to take this tour is March to June and September to November, when Shimla, Manali and the quiet village of Jibhi all enjoy comfortable, clear weather.",
+          "The best months for the Shimla, Manali & Jibhi Escape tour depend on snowfall and road conditions along the route, which change from year to year. Share your preferred dates with us and we will confirm whether they suit this itinerary.",
       },
     ],
 
@@ -1335,7 +1335,7 @@ export const packages: Package[] = [
         question:
           "When is the best time to take the Shimla, Kinnaur & Spiti Explorer tour?",
         answer:
-          "The best time to take this tour is May to October, when the high-altitude roads through Kinnaur and Spiti are most accessible.",
+          "The best months for the Shimla, Kinnaur & Spiti Explorer tour depend on snowfall and road conditions along the route, which change from year to year. Share your preferred dates with us and we will confirm whether they suit this itinerary.",
       },
     ],
 
