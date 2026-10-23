@@ -4,6 +4,8 @@
 import { useRef, useState } from "react";
 import { Menu, Phone, X, ArrowUpRight } from "lucide-react";
 
+import { site, telUrl } from "@/config/site";
+
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 
@@ -275,7 +277,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                 {/* CALL LINK */}
 
                 <a
-                  href="tel:+917559697919"
+                  href={telUrl()}
                   className="
                     group/call
                     mt-4
@@ -318,7 +320,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                     </span>
 
                     <span className="mt-0.5 block whitespace-nowrap text-sm font-bold tracking-wide text-[#10264A]">
-                      +91 75596 97919
+                      {site.phone.display}
                     </span>
                   </span>
 
@@ -349,7 +351,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
           {/* MOBILE PHONE */}
 
           <a
-            href="tel:+917559697919"
+            href={telUrl()}
             aria-label="Call The Himalayan Compass"
             className="
               group

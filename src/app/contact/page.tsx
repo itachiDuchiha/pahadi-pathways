@@ -1,12 +1,14 @@
 import Link from "next/link";
 import {
   ArrowLeft,
-  ArrowRight,
   Clock3,
   Mail,
   MapPin,
   Phone,
 } from "lucide-react";
+
+import { site, telUrl, mailtoUrl } from "@/config/site";
+import ContactForm from "@/components/forms/ContactForm";
 
 export default function ContactPage() {
   return (
@@ -217,7 +219,7 @@ export default function ContactPage() {
                 {/* Email */}
 
                 <a
-                  href="mailto:thehimalyancompass@gmail.com"
+                  href={mailtoUrl()}
                   className="
                     group
                     flex
@@ -279,7 +281,7 @@ export default function ContactPage() {
                         group-hover:text-[#A97925]
                       "
                     >
-                      thehimalyancompass@gmail.com
+                      {site.email}
                     </span>
 
                   </span>
@@ -290,7 +292,7 @@ export default function ContactPage() {
                 {/* Phone */}
 
                 <a
-                  href="tel:+919876543210"
+                  href={telUrl()}
                   className="
                     group
                     flex
@@ -352,7 +354,7 @@ export default function ContactPage() {
                         group-hover:text-[#A97925]
                       "
                     >
-                      +91 98765 43210
+                      {site.phone.display}
                     </span>
 
                   </span>
@@ -550,241 +552,7 @@ export default function ContactPage() {
 
               {/* Form */}
 
-              <form className="mt-7 space-y-5">
-
-                {/* Name */}
-
-                <div>
-
-                  <label
-                    htmlFor="name"
-                    className="
-                      mb-2
-                      block
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-[#10264A]
-                    "
-                  >
-                    Your Name
-                  </label>
-
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Enter your name"
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-[#10264A]/15
-                      bg-[#FAFAF8]
-                      px-4
-                      py-3.5
-                      text-sm
-                      text-[#10264A]
-                      outline-none
-                      transition-all
-                      placeholder:text-[#9AA2AC]
-                      focus:border-[#C89A3D]
-                      focus:bg-white
-                      focus:ring-2
-                      focus:ring-[#C89A3D]/10
-                    "
-                  />
-
-                </div>
-
-
-                {/* Email */}
-
-                <div>
-
-                  <label
-                    htmlFor="email"
-                    className="
-                      mb-2
-                      block
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-[#10264A]
-                    "
-                  >
-                    Email
-                  </label>
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-[#10264A]/15
-                      bg-[#FAFAF8]
-                      px-4
-                      py-3.5
-                      text-sm
-                      text-[#10264A]
-                      outline-none
-                      transition-all
-                      placeholder:text-[#9AA2AC]
-                      focus:border-[#C89A3D]
-                      focus:bg-white
-                      focus:ring-2
-                      focus:ring-[#C89A3D]/10
-                    "
-                  />
-
-                </div>
-
-
-                {/* Phone */}
-
-                <div>
-
-                  <label
-                    htmlFor="phone"
-                    className="
-                      mb-2
-                      block
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-[#10264A]
-                    "
-                  >
-                    Phone
-                  </label>
-
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="+91"
-                    className="
-                      w-full
-                      rounded-xl
-                      border
-                      border-[#10264A]/15
-                      bg-[#FAFAF8]
-                      px-4
-                      py-3.5
-                      text-sm
-                      text-[#10264A]
-                      outline-none
-                      transition-all
-                      placeholder:text-[#9AA2AC]
-                      focus:border-[#C89A3D]
-                      focus:bg-white
-                      focus:ring-2
-                      focus:ring-[#C89A3D]/10
-                    "
-                  />
-
-                </div>
-
-
-                {/* Message */}
-
-                <div>
-
-                  <label
-                    htmlFor="message"
-                    className="
-                      mb-2
-                      block
-                      text-[10px]
-                      font-bold
-                      uppercase
-                      tracking-[0.15em]
-                      text-[#10264A]
-                    "
-                  >
-                    Your Message
-                  </label>
-
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    placeholder="Tell us where you'd like to go..."
-                    className="
-                      w-full
-                      resize-none
-                      rounded-xl
-                      border
-                      border-[#10264A]/15
-                      bg-[#FAFAF8]
-                      px-4
-                      py-3.5
-                      text-sm
-                      leading-6
-                      text-[#10264A]
-                      outline-none
-                      transition-all
-                      placeholder:text-[#9AA2AC]
-                      focus:border-[#C89A3D]
-                      focus:bg-white
-                      focus:ring-2
-                      focus:ring-[#C89A3D]/10
-                    "
-                  />
-
-                </div>
-
-
-                {/* Submit */}
-
-                <button
-                  type="button"
-                  className="
-                    group
-                    inline-flex
-                    w-full
-                    items-center
-                    justify-center
-                    gap-3
-                    rounded-full
-                    bg-[#10264A]
-                    px-6
-                    py-3.5
-                    text-[10px]
-                    font-bold
-                    uppercase
-                    tracking-[0.16em]
-                    text-white
-                    shadow-[0_8px_22px_rgba(16,38,74,0.16)]
-                    transition-all
-                    duration-300
-                    hover:-translate-y-0.5
-                    hover:bg-[#17345F]
-                    hover:shadow-[0_12px_28px_rgba(16,38,74,0.20)]
-                  "
-                >
-                  Send Message
-
-                  <ArrowRight
-                    size={15}
-                    strokeWidth={1.9}
-                    className="
-                      transition-transform
-                      duration-300
-                      group-hover:translate-x-1
-                    "
-                  />
-
-                </button>
-
-              </form>
+              <ContactForm />
 
             </div>
 
@@ -848,7 +616,7 @@ export default function ContactPage() {
             <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
 
               <a
-                href="tel:+919876543210"
+                href={telUrl()}
                 className="
                   inline-flex
                   items-center

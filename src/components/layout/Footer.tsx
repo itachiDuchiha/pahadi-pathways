@@ -6,6 +6,8 @@ import Link from "next/link";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
+import { site, telUrl, mailtoUrl } from "@/config/site";
+
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
@@ -133,10 +135,10 @@ export default function Footer() {
                 />
 
                 <a
-                  href="tel:+917559697919"
+                  href={telUrl()}
                   className="whitespace-nowrap text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  +91 75596 97919
+                  {site.phone.display}
                 </a>
               </div>
 
@@ -148,10 +150,10 @@ export default function Footer() {
                 />
 
                 <a
-                  href="mailto:thehimalayancompass@gmail.com"
+                  href={mailtoUrl()}
                   className="whitespace-nowrap text-sm text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  thehimalayancompass@gmail.com
+                  {site.email}
                 </a>
               </div>
             </div>
@@ -159,7 +161,7 @@ export default function Footer() {
             {/* SOCIAL ICONS */}
             <div className="mt-5 flex gap-3">
               <a
-                href="https://www.instagram.com/thehimalayancompass.in/"
+                href={site.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit The Himalayan Compass on Instagram"
@@ -170,7 +172,7 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://www.facebook.com/profile.php?id=61595698851399"
+                href={site.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit The Himalayan Compass on Facebook"

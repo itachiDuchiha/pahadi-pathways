@@ -14,6 +14,8 @@ import {
   MessageCircle,
 } from "lucide-react";
 
+import { whatsappUrl } from "@/config/site";
+
 export default function TripPlannerForm() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,9 +123,7 @@ export default function TripPlannerForm() {
   };
 
   const openWhatsApp = () => {
-    const url = `https://wa.me/917559697919?text=${encodeURIComponent(
-      whatsappMessage
-    )}`;
+    const url = whatsappUrl(whatsappMessage);
 
     window.open(url, "_blank", "noopener,noreferrer");
   };

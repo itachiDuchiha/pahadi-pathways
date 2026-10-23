@@ -19,11 +19,9 @@ export async function POST(request: Request) {
   try {
     const apiKey = process.env.RESEND_API_KEY;
     const fromEmail = process.env.RESEND_FROM_EMAIL;
-    const toEmail =
-      process.env.TRIP_ENQUIRY_EMAIL ||
-      "thehimalayancompass@gmail.com";
+    const toEmail = process.env.TRIP_ENQUIRY_EMAIL;
 
-    if (!apiKey || !fromEmail) {
+    if (!apiKey || !fromEmail || !toEmail) {
       console.error("Package enquiry email configuration is missing.");
 
       return NextResponse.json(

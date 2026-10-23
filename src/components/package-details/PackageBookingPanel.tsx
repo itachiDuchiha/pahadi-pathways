@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import type { Package } from "@/data/packages";
+import { telUrl, whatsappUrl } from "@/config/site";
 
 type Props = {
   pkg: Package;
@@ -434,12 +435,12 @@ export default function PackageBookingPanel({
         throw new Error(result.error || "We could not send your enquiry. Please try again.");
       }
 
-      const whatsappUrl = `https://wa.me/917559697919?text=${encodeURIComponent(message)}`;
+      const whatsappLink = whatsappUrl(message);
 
       if (whatsappWindow) {
-        whatsappWindow.location.href = whatsappUrl;
+        whatsappWindow.location.href = whatsappLink;
       } else {
-        window.open(whatsappUrl, "_self");
+        window.open(whatsappLink, "_self");
       }
 
       setIsEnquiryOpen(false);
@@ -1872,7 +1873,7 @@ export default function PackageBookingPanel({
           >
 
             <a
-              href="tel:+917559697919"
+              href={telUrl()}
               className="
                 inline-flex
                 items-center
@@ -1893,7 +1894,7 @@ export default function PackageBookingPanel({
             </a>
 
             <a
-              href="https://wa.me/917559697919"
+              href={whatsappUrl()}
               target="_blank"
               rel="noreferrer"
               className="
