@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -25,6 +25,22 @@ export default function TripPlannerForm() {
   const [budget, setBudget] = useState(40000);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  // Rendered undefined on the server and filled in after mount so the
+  // server and client markup match (today's date depends on the client's
+  // clock/timezone).
+  const [minTravelDate, setMinTravelDate] = useState<string | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    // Deferred via setTimeout (rather than set synchronously in the effect
+    // body) to avoid cascading renders during the commit phase.
+    const timer = window.setTimeout(() => {
+      setMinTravelDate(new Date().toISOString().split("T")[0]);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -362,7 +378,7 @@ export default function TripPlannerForm() {
                   id="planner-date"
                   name="travel-date"
                   type="date"
-                  min={new Date().toISOString().split("T")[0]}
+                  min={minTravelDate}
                   className="h-10 w-full rounded-lg border border-[#D2DCE8] bg-white pl-9 pr-3 text-xs font-medium text-[#10264A] outline-none transition focus:border-[#C89A3D] focus:ring-2 focus:ring-[#C89A3D]/10"
                 />
               </div>

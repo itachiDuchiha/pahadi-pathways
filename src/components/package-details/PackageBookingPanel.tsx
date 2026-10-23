@@ -81,6 +81,23 @@ export default function PackageBookingPanel({
   const [enquiryError, setEnquiryError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Rendered undefined on the server and filled in after mount so the
+  // server and client markup match (today's date depends on the client's
+  // clock/timezone).
+  const [minTravelDate, setMinTravelDate] = useState<string | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    // Deferred via setTimeout (rather than set synchronously in the effect
+    // body) to avoid cascading renders during the commit phase.
+    const timer = window.setTimeout(() => {
+      setMinTravelDate(new Date().toISOString().split("T")[0]);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
   // Prevent the page behind the enquiry modal from scrolling.
   useEffect(() => {
     if (!isEnquiryOpen) {
@@ -1794,7 +1811,7 @@ export default function PackageBookingPanel({
               </div>
               <div>
                 <label htmlFor="package-travel-date" className="mb-1 block text-[10px] font-bold uppercase tracking-[0.1em] text-[#10264A]">Preferred travel date <span className="font-normal normal-case tracking-normal text-[#526078]">(optional)</span></label>
-                <input id="package-travel-date" type="date" min={new Date().toISOString().split("T")[0]} value={travelDate} onChange={(event) => setTravelDate(event.target.value)} className="w-full rounded-lg border border-[#D9D1C3] bg-white px-3.5 py-2.5 text-sm text-[#10264A] outline-none focus:border-[#C89A3D] focus:ring-2 focus:ring-[#C89A3D]/10" />
+                <input id="package-travel-date" type="date" min={minTravelDate} value={travelDate} onChange={(event) => setTravelDate(event.target.value)} className="w-full rounded-lg border border-[#D9D1C3] bg-white px-3.5 py-2.5 text-sm text-[#10264A] outline-none focus:border-[#C89A3D] focus:ring-2 focus:ring-[#C89A3D]/10" />
               </div>
 
               {enquiryError && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{enquiryError}</p>}

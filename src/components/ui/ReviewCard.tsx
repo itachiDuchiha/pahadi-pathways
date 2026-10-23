@@ -35,6 +35,7 @@ export default function ReviewCard({
 
         <div className="flex items-center gap-[2px]">
           {Array.from({ length: testimonial.rating }).map((_, index) => (
+            // Positional: identical rating-icon slots, no stable field to key on.
             <Star
               key={index}
               size={15}

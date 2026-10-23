@@ -76,6 +76,9 @@ export default function HeroPlanner() {
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
 
+  // Safe to compute on every render: it only drives the calendar popup,
+  // which is gated behind `isDateOpen` (starts `false`) and never part of
+  // the initial server-rendered markup, so there is no hydration mismatch.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -1507,6 +1510,7 @@ export default function HeroPlanner() {
 
           <div className="mt-4 grid grid-cols-7 text-center">
             {weekDays.map(
+              // Positional: weekDays has duplicate single-letter labels (e.g. "S", "T"), so only the index is stable.
               (day, index) => (
                 <span
                   key={index}

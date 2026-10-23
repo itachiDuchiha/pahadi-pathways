@@ -162,6 +162,7 @@ export default function ReviewsPage() {
             <div className="flex items-center gap-[2px]">
 
               {Array.from({ length: 5 }).map((_, index) => (
+                // Positional: five identical rating-icon slots, no stable field to key on.
                 <Star
                   key={index}
                   size={15}
@@ -360,6 +361,7 @@ export default function ReviewsPage() {
             <div className="flex justify-center gap-[2px]">
 
               {Array.from({ length: 5 }).map((_, index) => (
+                // Positional: five identical rating-icon slots, no stable field to key on.
                 <Star
                   key={index}
                   size={16}
