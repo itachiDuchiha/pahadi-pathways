@@ -27,7 +27,7 @@ export default function Home() {
 
   return (
     <>
-      <Hero onPlanTrip={openPlanner} />
+      <Hero />
 
       <PopularPackages />
 

@@ -21,7 +21,7 @@ export default function Highlights({ pkg }: Props) {
           </p>
 
           <h2 className="mt-4 text-4xl font-bold text-[#10264A]">
-            Why You'll Love This Journey
+            Why You&apos;ll Love This Journey
           </h2>
 
           <div className="mx-auto mt-5 h-1 w-20 rounded-full bg-[#C89A3D]" />

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import SiteLayout from "@/components/layout/SiteLayout";
 
 import PackageCard from "@/components/packages/PackageCard";
@@ -203,7 +205,7 @@ export default async function PackagesPage({
 
   const searchHeroImage =
     hasSearch
-      ? (matchingPackages[0] as any)?.image ??
+      ? matchingPackages[0]?.image ??
         "/images/hero/packages-hero.png"
       : "/images/hero/packages-hero.png";
 
@@ -240,10 +242,11 @@ export default async function PackagesPage({
 
             {/* BACKGROUND IMAGE */}
 
-            <img
+            <Image
               src={searchHeroImage}
               alt=""
               aria-hidden="true"
+              fill
               className="
                 absolute
                 inset-0
@@ -543,7 +546,7 @@ export default async function PackagesPage({
                               text-gray-500
                             "
                           >
-                            Don't see exactly what
+                            Don&apos;t see exactly what
                             you want? Explore these
                             other journeys.
                           </p>
@@ -605,9 +608,10 @@ export default async function PackagesPage({
 
             {/* BACKGROUND IMAGE */}
 
-            <img
+            <Image
               src="/images/hero/packages-hero.png"
               alt="Himalayan mountain journey"
+              fill
               className="
                 absolute
                 inset-0

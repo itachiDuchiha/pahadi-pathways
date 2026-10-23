@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 import Modal from "@/components/ui/Modal";
 import TripPlannerForm from "@/components/forms/TripPlannerForm";
@@ -47,10 +48,11 @@ export default function CustomJourneyCTA() {
               Same premium packages hero image.
           ================================================= */}
 
-          <img
+          <Image
             src="/images/hero/packages-hero.png"
             alt=""
             aria-hidden="true"
+            fill
             className="
               absolute
               inset-0
@@ -166,7 +168,7 @@ export default function CustomJourneyCTA() {
               "
             >
               Every traveler is different. Tell us
-              what you're looking for and we'll help
+              what you&apos;re looking for and we&apos;ll help
               create a Himalayan journey around you.
             </p>
 

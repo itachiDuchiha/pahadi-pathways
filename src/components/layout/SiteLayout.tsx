@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -12,24 +12,13 @@ type SiteLayoutProps = {
 export default function SiteLayout({
   children,
 }: SiteLayoutProps) {
-  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
-
-  const openPlanner = () => {
-    setIsPlannerOpen(true);
-  };
-
   return (
     <>
-      <Navbar onPlanTrip={openPlanner} />
+      <Navbar />
 
       <main>{children}</main>
 
       <Footer />
-
-      {/* Planner Modal will go here later */}
-      {isPlannerOpen && (
-        <div className="hidden" />
-      )}
     </>
   );
 }

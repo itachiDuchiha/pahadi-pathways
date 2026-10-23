@@ -2,6 +2,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Menu, Phone, X, ArrowUpRight } from "lucide-react";
 
 import { site, telUrl } from "@/config/site";
@@ -9,11 +10,7 @@ import { site, telUrl } from "@/config/site";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 
-type NavbarProps = {
-  onPlanTrip: () => void;
-};
-
-export default function Navbar({ onPlanTrip }: NavbarProps) {
+export default function Navbar() {
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -254,7 +251,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                     text-[#C89A3D]
                   "
                 >
-                  Let's Talk
+                  Let&apos;s Talk
                 </p>
 
                 <h3
@@ -270,7 +267,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                 </h3>
 
                 <p className="mt-1.5 text-xs leading-5 text-slate-500">
-                  Have a question about your Himachal trip? We're here
+                  Have a question about your Himachal trip? We&apos;re here
                   to help.
                 </p>
 
@@ -432,7 +429,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
           <nav>
             <ul className="space-y-1">
               <li>
-                <a
+                <Link
                   href="/"
                   onClick={closeMobileMenu}
                   className="
@@ -448,11 +445,11 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                   "
                 >
                   Home
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
+                <Link
                   href="/destinations"
                   onClick={closeMobileMenu}
                   className="
@@ -468,11 +465,11 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                   "
                 >
                   Destinations
-                </a>
+                </Link>
               </li>
 
               <li>
-                <a
+                <Link
                   href="/packages"
                   onClick={closeMobileMenu}
                   className="
@@ -488,7 +485,7 @@ export default function Navbar({ onPlanTrip }: NavbarProps) {
                   "
                 >
                   Packages
-                </a>
+                </Link>
               </li>
 
               <li>

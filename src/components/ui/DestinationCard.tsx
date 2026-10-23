@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type DestinationCardProps = {
   title: string;
   description: string;
@@ -11,9 +13,11 @@ export default function DestinationCard({
 }: DestinationCardProps) {
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-lg transition duration-300 hover:-translate-y-2 hover:shadow-2xl">
-      <img
+      <Image
         src={image}
         alt={title}
+        width={800}
+        height={256}
         className="h-64 w-full object-cover"
       />
 

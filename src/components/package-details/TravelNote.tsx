@@ -24,7 +24,7 @@ type InfoItem = {
   content: string;
 };
 
-export default function TravelNote({ pkg }: Props) {
+export default function TravelNote({}: Props) {
   const [openItem, setOpenItem] = useState<number | null>(0);
 
   const items: InfoItem[] = [

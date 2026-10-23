@@ -8,7 +8,6 @@ import PackageSectionNav from "@/components/package-details/PackageSectionNav";
 import Overview from "@/components/package-details/Overview";
 import StayPlan from "@/components/package-details/StayPlan";
 import DayTimeline from "@/components/package-details/DayTimeline";
-import Highlights from "@/components/package-details/Highlights";
 import IncludedExcluded from "@/components/package-details/IncludedExcluded";
 import TravelNote from "@/components/package-details/TravelNote";
 

@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import Image from "next/image";
 
+import Link from "next/link";
+
 import SiteLayout from "@/components/layout/SiteLayout";
 
 import { allDestinations } from "@/data/destinations";
@@ -666,7 +668,7 @@ export default async function DestinationPage({
 
                   </div>
 
-                  <a
+                  <Link
                     href="/packages"
                     className="
                       shrink-0
@@ -678,7 +680,7 @@ export default async function DestinationPage({
                     "
                   >
                     View All Packages →
-                  </a>
+                  </Link>
 
                 </div>
 
@@ -1408,7 +1410,7 @@ export default async function DestinationPage({
                 </div>
 
 
-                <a
+                <Link
                   href="/packages"
                   className="
                     shrink-0
@@ -1420,7 +1422,7 @@ export default async function DestinationPage({
                   "
                 >
                   View All Packages →
-                </a>
+                </Link>
 
               </div>
 

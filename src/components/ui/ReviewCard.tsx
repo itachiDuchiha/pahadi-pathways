@@ -84,7 +84,7 @@ export default function ReviewCard({
             text-[#596678]
           "
         >
-          "{testimonial.review}"
+          &quot;{testimonial.review}&quot;
         </p>
 
       </div>

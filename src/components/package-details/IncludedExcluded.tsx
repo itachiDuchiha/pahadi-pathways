@@ -141,7 +141,7 @@ export default function IncludedExcluded({ pkg }: Props) {
                       sm:text-[14px]
                     "
                   >
-                    What's Included
+                    What&apos;s Included
                   </h3>
 
                   <p
@@ -286,7 +286,7 @@ export default function IncludedExcluded({ pkg }: Props) {
                       sm:text-[14px]
                     "
                   >
-                    What's Not Included
+                    What&apos;s Not Included
                   </h3>
 
                   <p

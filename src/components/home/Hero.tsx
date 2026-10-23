@@ -7,11 +7,7 @@ import {
   Users,
 } from "lucide-react";
 
-type HeroProps = {
-  onPlanTrip: () => void;
-};
-
-export default function Hero({ onPlanTrip }: HeroProps) {
+export default function Hero() {
   return (
     <>
       {/* =========================================================
@@ -62,7 +58,7 @@ export default function Hero({ onPlanTrip }: HeroProps) {
             NAVBAR
         ======================================================= */}
 
-        <Navbar onPlanTrip={onPlanTrip} />
+        <Navbar />
 
         {/* =======================================================
             HERO CONTENT

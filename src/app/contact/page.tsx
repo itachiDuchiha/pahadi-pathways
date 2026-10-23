@@ -86,7 +86,7 @@ export default function ContactPage() {
               md:text-6xl
             "
           >
-            Let's Talk About
+            Let&apos;s Talk About
             <br />
             Your Himalayan Journey
           </h1>
@@ -127,8 +127,8 @@ export default function ContactPage() {
               md:leading-8
             "
           >
-            Whether you're planning your first Himalayan escape or
-            returning for another adventure, we're here to help you
+            Whether you&apos;re planning your first Himalayan escape or
+            returning for another adventure, we&apos;re here to help you
             plan the journey.
           </p>
 
@@ -190,7 +190,7 @@ export default function ContactPage() {
                   sm:text-[2.8rem]
                 "
               >
-                We're Here
+                We&apos;re Here
                 <br />
                 To Help
               </h2>
@@ -207,7 +207,7 @@ export default function ContactPage() {
                 "
               >
                 Have a question about a destination, package, vehicle,
-                hotel or custom itinerary? Reach out and we'll help
+                hotel or custom itinerary? Reach out and we&apos;ll help
                 you figure out the details.
               </p>
 
@@ -544,7 +544,7 @@ export default function ContactPage() {
                     text-[#6B7685]
                   "
                 >
-                  Share a few details and we'll get back to you.
+                  Share a few details and we&apos;ll get back to you.
                 </p>
 
               </div>
@@ -606,11 +606,11 @@ export default function ContactPage() {
                 text-[#10264A]
               "
             >
-              Let's plan it together.
+              Let&apos;s plan it together.
             </h3>
 
             <p className="mt-2 text-sm text-[#6D604B]">
-              Call or message us and we'll help you build your journey.
+              Call or message us and we&apos;ll help you build your journey.
             </p>
 
             <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">

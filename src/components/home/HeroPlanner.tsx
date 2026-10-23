@@ -1304,7 +1304,7 @@ export default function HeroPlanner() {
                   >
                     No destination matching{" "}
                     <span className="font-semibold">
-                      "{destination.trim()}"
+                      &quot;{destination.trim()}&quot;
                     </span>{" "}
                     was found.
                   </p>
@@ -1347,7 +1347,7 @@ export default function HeroPlanner() {
                           text-[#10264A]
                         "
                       >
-                        Search "{destination.trim()}"
+                        Search &quot;{destination.trim()}&quot;
                       </p>
 
                       <p
@@ -1411,7 +1411,7 @@ export default function HeroPlanner() {
                         text-[#10264A]
                       "
                     >
-                      Search "{destination.trim()}"
+                      Search &quot;{destination.trim()}&quot;
                     </p>
 
                     <p
