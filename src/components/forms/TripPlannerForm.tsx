@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
@@ -578,6 +579,14 @@ export default function TripPlannerForm() {
 
           <p className="text-center text-[9px] font-medium leading-3 text-[#6B7C91]">
             No payment required · Your details are kept private
+          </p>
+
+          <p className="text-center text-[9px] font-medium leading-3 text-[#6B7C91]">
+            By submitting you agree to our{" "}
+            <Link href="/privacy" className="underline hover:text-[#10264A]">
+              privacy policy
+            </Link>
+            .
           </p>
         </form>
       </div>

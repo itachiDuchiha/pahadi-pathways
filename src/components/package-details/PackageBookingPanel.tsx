@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import {
   ChevronDown,
   Minus,
@@ -1803,6 +1804,13 @@ export default function PackageBookingPanel({
                 {isSubmitting ? "Sending Enquiry..." : "Send Enquiry & Continue to WhatsApp"}
               </button>
               <p className="text-center text-[10px] leading-4 text-[#526078]">Your enquiry is emailed first. WhatsApp then opens with the same message ready to send.</p>
+              <p className="text-center text-[10px] leading-4 text-[#526078]">
+                By submitting you agree to our{" "}
+                <Link href="/privacy" className="underline hover:text-[#10264A]">
+                  privacy policy
+                </Link>
+                .
+              </p>
             </form>
           </div>
         </div>

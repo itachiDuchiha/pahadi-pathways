@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 export default function ContactForm() {
@@ -361,6 +362,14 @@ export default function ContactForm() {
         )}
 
       </button>
+
+      <p className="text-center text-xs leading-5 text-[#6B7685]">
+        By submitting you agree to our{" "}
+        <Link href="/privacy" className="underline hover:text-[#10264A]">
+          privacy policy
+        </Link>
+        .
+      </p>
 
     </form>
   );

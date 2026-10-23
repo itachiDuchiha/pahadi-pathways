@@ -71,6 +71,11 @@ export default function Footer() {
                   Gallery
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy" className="transition-colors duration-300 hover:text-[#C89A3D]">
+                  Privacy
+                </Link>
+              </li>
             </ul>
           </div>
 
