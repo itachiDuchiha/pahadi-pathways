@@ -168,6 +168,32 @@ export interface Package {
       ertiga?: number | null;
       crysta?: number | null;
     };
+    /**
+     * Leave empty to use the site-wide defaults; fill in to override for this package only
+     */
+    stayOptions?:
+      | {
+          label: string;
+          /**
+           * Rupees per adult per night; decimals are allowed.
+           */
+          deltaPerNight: number;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Leave empty to use the site-wide defaults; fill in to override for this package only
+     */
+    mealOptions?:
+      | {
+          label: string;
+          /**
+           * Rupees per adult per night; decimals are allowed.
+           */
+          deltaPerNight: number;
+          id?: string | null;
+        }[]
+      | null;
   };
   summary?: string | null;
   overview?: string | null;
@@ -566,6 +592,20 @@ export interface PackagesSelect<T extends boolean = true> {
               ertiga?: T;
               crysta?: T;
             };
+        stayOptions?:
+          | T
+          | {
+              label?: T;
+              deltaPerNight?: T;
+              id?: T;
+            };
+        mealOptions?:
+          | T
+          | {
+              label?: T;
+              deltaPerNight?: T;
+              id?: T;
+            };
       };
   summary?: T;
   overview?: T;
@@ -875,22 +915,28 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface PricingSetting {
   id: number;
   /**
-   * Hotel tiers. Delta is rupees per adult added to the base rate.
+   * Default hotel tiers. Delta per night is rupees per adult per night added to the base rate. A package can set its own list instead.
    */
   stayOptions?:
     | {
         label: string;
-        delta: number;
+        /**
+         * Rupees per adult per night; decimals are allowed.
+         */
+        deltaPerNight: number;
         id?: string | null;
       }[]
     | null;
   /**
-   * Meal plans. Delta is rupees per adult; negative lowers the price.
+   * Default meal plans. Delta per night is rupees per adult per night; negative lowers the price. A package can set its own list instead.
    */
   mealOptions?:
     | {
         label: string;
-        delta: number;
+        /**
+         * Rupees per adult per night; decimals are allowed.
+         */
+        deltaPerNight: number;
         id?: string | null;
       }[]
     | null;
@@ -952,14 +998,14 @@ export interface PricingSettingsSelect<T extends boolean = true> {
     | T
     | {
         label?: T;
-        delta?: T;
+        deltaPerNight?: T;
         id?: T;
       };
   mealOptions?:
     | T
     | {
         label?: T;
-        delta?: T;
+        deltaPerNight?: T;
         id?: T;
       };
   vehicleOptions?:

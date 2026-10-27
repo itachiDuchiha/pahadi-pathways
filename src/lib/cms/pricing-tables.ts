@@ -1,7 +1,10 @@
 import type { PricingSetting } from "@/cms/payload-types";
 
+import { effectivePricingTables } from "@/lib/pricing";
+
 import { getPayloadClient } from "./client";
-import type { PriceOption, PricingTables, VehiclePriceOption } from "./types";
+import { mapPricingOptions } from "./mappers";
+import type { Package, PricingOption, PricingTables, VehiclePriceOption } from "./types";
 
 function required<T>(rows: T[] | null | undefined, what: string): T[] {
   if (rows?.length) return rows;
@@ -9,19 +12,20 @@ function required<T>(rows: T[] | null | undefined, what: string): T[] {
   throw new Error(`Pricing settings have no ${what}. Run \`npm run cms:seed\` or add them in the admin.`);
 }
 
-function priceOptions(rows: PriceOption[] | null | undefined, what: string): PriceOption[] {
-  return required(rows, what).map(({ label, delta }) => ({ label: label.trim(), delta }));
+function pricingOptions(rows: PricingOption[] | null | undefined, what: string): PricingOption[] {
+  return mapPricingOptions(required(rows, what));
 }
 
 /**
- * The `pricing-settings` global as the tables `computePackagePrice` needs.
+ * The `pricing-settings` global as the site-wide tables. A package's own
+ * stay and meal lists replace these through `effectivePricingTables`.
  * Labels are trimmed, as the enquiry schema trims the submitted ones, so a
  * stray space typed in the admin cannot make every enquiry fail.
  */
 export function mapPricingTables(doc: PricingSetting): PricingTables {
   return {
-    stayOptions: priceOptions(doc.stayOptions, "stay options"),
-    mealOptions: priceOptions(doc.mealOptions, "meal options"),
+    stayOptions: pricingOptions(doc.stayOptions, "stay options"),
+    mealOptions: pricingOptions(doc.mealOptions, "meal options"),
     vehicleOptions: required(doc.vehicleOptions, "vehicle options").map(
       ({ label, key, perDayUpgrade, perDayUpgradeSpiti }): VehiclePriceOption =>
         perDayUpgradeSpiti == null
@@ -44,4 +48,9 @@ export async function getPricingTables(): Promise<PricingTables> {
   });
 
   return mapPricingTables(doc);
+}
+
+/** The tables a package is priced with: its own stay and meal lists over the site-wide ones. */
+export async function getPackagePricingTables(pkg: Pick<Package, "pricing">): Promise<PricingTables> {
+  return effectivePricingTables(pkg, await getPricingTables());
 }

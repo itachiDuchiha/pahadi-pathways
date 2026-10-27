@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isEditorOrAdmin, publishedOnly } from "../access";
 import { imageField } from "../fields/image";
+import { pricingOptionFields } from "../fields/pricingOption";
 import { slugField } from "../fields/slug";
 import { stringList } from "../fields/stringList";
 import { revalidateHooks } from "../hooks/revalidate";
@@ -61,6 +62,24 @@ export const Packages: CollectionConfig = {
             { name: "ertiga", type: "number", min: 0 },
             { name: "crysta", type: "number", min: 0 },
           ],
+        },
+        {
+          name: "stayOptions",
+          type: "array",
+          admin: {
+            description:
+              "Leave empty to use the site-wide defaults; fill in to override for this package only",
+          },
+          fields: pricingOptionFields,
+        },
+        {
+          name: "mealOptions",
+          type: "array",
+          admin: {
+            description:
+              "Leave empty to use the site-wide defaults; fill in to override for this package only",
+          },
+          fields: pricingOptionFields,
         },
       ],
     },

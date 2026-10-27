@@ -22,6 +22,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { assertContentPresent } from "@/lib/cms/guard";
 import { getPackageBySlug, getPackages } from "@/lib/cms/packages";
 import { getPricingTables } from "@/lib/cms/pricing-tables";
+import { effectivePricingTables } from "@/lib/pricing";
 import { getSiteSettings } from "@/lib/cms/site";
 
 import { pageMetadata, truncate } from "@/lib/seo";
@@ -73,7 +74,7 @@ export default async function PackageDetailsPage({
 }: Props) {
   const { slug } = await params;
 
-  const [pkg, pricing, settings] = await Promise.all([
+  const [pkg, globalPricing, settings] = await Promise.all([
     getPackageBySlug(slug),
     getPricingTables(),
     getSiteSettings(),
@@ -82,6 +83,9 @@ export default async function PackageDetailsPage({
   if (!pkg) {
     notFound();
   }
+
+  // The package's own stay and meal lists, else the site-wide ones.
+  const pricing = effectivePricingTables(pkg, globalPricing);
 
   return (
     <>

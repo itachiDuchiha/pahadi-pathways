@@ -71,6 +71,10 @@ export type PackagePricing = {
   basePricePerAdult: number;
   /** Fixed per-adult rate for each vehicle; absent when the package has none. */
   vehicleRates?: Record<VehicleKey, number>;
+  /** The package's own hotel tiers; absent when it uses the site-wide ones. */
+  stayOptions?: PricingOption[];
+  /** The package's own meal plans; absent when it uses the site-wide ones. */
+  mealOptions?: PricingOption[];
 };
 
 /**
@@ -79,7 +83,8 @@ export type PackagePricing = {
  */
 export type Package = PackageContent & { pricing: PackagePricing };
 
-export type PriceOption = { label: string; delta: number };
+/** A stay or meal option: rupees per adult per night, multiplied by the package's nights. */
+export type PricingOption = { label: string; deltaPerNight: number };
 
 export type VehiclePriceOption = {
   label: string;
@@ -91,8 +96,8 @@ export type VehiclePriceOption = {
 
 /** Option tables and rules that `computePackagePrice` needs. */
 export type PricingTables = {
-  stayOptions: PriceOption[];
-  mealOptions: PriceOption[];
+  stayOptions: PricingOption[];
+  mealOptions: PricingOption[];
   vehicleOptions: VehiclePriceOption[];
   gstPercent: number;
   childFreeUnderAge: number;

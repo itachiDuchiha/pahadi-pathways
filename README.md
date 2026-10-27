@@ -149,10 +149,19 @@ clear the shell history afterwards so the password is not kept there.
 ### What is editable and what is code
 
 - Editable in the CMS: package content, itineraries, prices (base price per
-  adult and per-vehicle rates), destinations (including whether a
-  destination uses its dedicated layout or the shared one), testimonials,
-  gallery images, experiences (text and icon name), the stay, meal and
-  vehicle pricing tables, site contact details, and all images.
+  adult, per-vehicle rates and optional per-package stay and meal
+  options), destinations (including whether a destination uses its
+  dedicated layout or the shared one), testimonials, gallery images,
+  experiences (text and icon name), the default stay, meal and vehicle
+  pricing tables, site contact details, and all images.
+- Stay and meal options are priced per adult per night: a quote adds the
+  option's delta per night times the package's nights (the `N` in its
+  duration, so 6 for "6N / 7D"), rounded to the rupee. The pricing
+  settings hold the site-wide defaults. A package can list its own stay or
+  meal options; a filled-in list replaces the default list for that
+  package entirely (rows are not merged by label), and an empty list uses
+  the defaults. Vehicle upgrades, GST and the child rule always come from
+  the pricing settings.
 - Code: page layouts, the dedicated Manali, Shimla and Spiti destination
   pages, gallery videos, the experience icon set, the price calculation
   rules and the enquiry forms.
@@ -207,8 +216,9 @@ and `contact`) and `POST /api/package-enquiry`. Both share the pipeline in
    is present the limiter is skipped and a warning is logged.
 6. Validate the payload with a Zod schema (`src/lib/enquiry/schema.ts`).
 7. Recompute package pricing on the server (`src/lib/pricing.ts`), using
-   the prices stored in the CMS, rather than trusting a client-submitted
-   total.
+   the prices stored in the CMS and the package's own stay and meal
+   options where it has them, rather than trusting a client-submitted
+   total. A stay or meal label must be one the package offers.
 8. Store the enquiry in the CMS (Leads) and send the notification email via
    Resend (`src/lib/enquiry/mail.ts`). A stored enquiry counts as success
    for the visitor even if the email fails; the failure is logged.

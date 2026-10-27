@@ -13,7 +13,7 @@ import { experiences } from "./experiences";
 import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages, type PackageContent } from "./packages";
-import { packageVehicleRates, pricingSettings } from "./pricing";
+import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -384,6 +384,8 @@ function packageData(
     pricing: {
       basePricePerAdult: parsePackagePrice(pkg.price),
       vehicleRates: packageVehicleRates[pkg.slug] ?? {},
+      stayOptions: packageOptionOverrides[pkg.slug]?.stayOptions ?? [],
+      mealOptions: packageOptionOverrides[pkg.slug]?.mealOptions ?? [],
     },
     summary: pkg.summary,
     overview: pkg.overview,

@@ -1,5 +1,5 @@
 import type { PricingSetting } from "@/cms/payload-types";
-import type { VehicleKey } from "@/lib/cms/types";
+import type { PricingOption, VehicleKey } from "@/lib/cms/types";
 
 /**
  * Per-adult rate for each upgraded vehicle, by package slug. The Sedan is
@@ -17,14 +17,15 @@ export const packageVehicleRates: Record<string, Partial<Record<VehicleKey, numb
 export type PricingSeed = Omit<PricingSetting, "id" | "updatedAt" | "createdAt">;
 
 export const pricingSettings: PricingSeed = {
+  // Rupees per adult per night: round defaults for packages without their own lists.
   stayOptions: [
-    { label: "Deluxe", delta: 0 },
-    { label: "Premium", delta: 2500 },
-    { label: "Luxury", delta: 5000 },
+    { label: "Deluxe", deltaPerNight: 0 },
+    { label: "Premium", deltaPerNight: 300 },
+    { label: "Luxury", deltaPerNight: 600 },
   ],
   mealOptions: [
-    { label: "Breakfast + Dinner (MAP)", delta: 0 },
-    { label: "Breakfast Only (CP)", delta: -2500 },
+    { label: "Breakfast + Dinner (MAP)", deltaPerNight: 0 },
+    { label: "Breakfast Only (CP)", deltaPerNight: -300 },
   ],
   // Upgrades over a Sedan per day: daily rates of 3500 / 4500 / 6000,
   // and 4500 / 5500 / 8000 on Spiti routes.
@@ -37,3 +38,42 @@ export const pricingSettings: PricingSeed = {
   childFreeUnderAge: 5,
   childPercentOfAdult: 25,
 };
+
+/**
+ * Flat per-adult deltas the seeded packages were quoted with before stay
+ * and meal options were priced per night.
+ */
+const flatStayDeltas: [label: string, delta: number][] = [
+  ["Deluxe", 0],
+  ["Premium", 2500],
+  ["Luxury", 5000],
+];
+const flatMealDeltas: [label: string, delta: number][] = [
+  ["Breakfast + Dinner (MAP)", 0],
+  ["Breakfast Only (CP)", -2500],
+];
+
+/** Nights of each seeded package, from its duration. */
+export const seededPackageNights: Record<string, number> = {
+  "shimla-kinnaur-spiti-chandratal": 9,
+  "shimla-manali-getaway": 6,
+  "himachal-grand-circuit": 9,
+  "shimla-manali-jibhi": 7,
+  "shimla-kinnaur-spiti-kalpa": 8,
+};
+
+function perNight(flat: [label: string, delta: number][], nights: number): PricingOption[] {
+  return flat.map(([label, delta]) => ({ label, deltaPerNight: delta / nights }));
+}
+
+/**
+ * Each seeded package's own stay and meal lists: the flat delta divided by
+ * its nights, unrounded, so its quotes match the flat-delta quotes exactly.
+ */
+export const packageOptionOverrides: Record<string, { stayOptions: PricingOption[]; mealOptions: PricingOption[] }> =
+  Object.fromEntries(
+    Object.entries(seededPackageNights).map(([slug, nights]) => [
+      slug,
+      { stayOptions: perNight(flatStayDeltas, nights), mealOptions: perNight(flatMealDeltas, nights) },
+    ])
+  );

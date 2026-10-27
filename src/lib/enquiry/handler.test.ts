@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } fr
 
 import { withTempPayload } from "@/cms/test/withTempPayload";
 import { packages } from "@/cms/seed/packages";
-import { packageVehicleRates, pricingSettings } from "@/cms/seed/pricing";
+import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "@/cms/seed/pricing";
 import type { VehicleKey } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
 
@@ -81,8 +81,12 @@ const pkg = {
 const quiet = { skipRevalidate: true } as const;
 const SLUG = "shimla-manali-getaway";
 
-/** Publishes the fixture package with its seeded rates, like `npm run cms:seed`. */
-async function seedPackage(slug: string, vehicleRates: Partial<Record<VehicleKey, number>> = packageVehicleRates[slug]) {
+/** Publishes the fixture package with its seeded rates and option overrides, like `npm run cms:seed`. */
+async function seedPackage(
+  slug: string,
+  vehicleRates: Partial<Record<VehicleKey, number>> = packageVehicleRates[slug],
+  optionOverrides: (typeof packageOptionOverrides)[string] | undefined = packageOptionOverrides[slug]
+) {
   const fixture = packages.find((item) => item.slug === slug);
   if (!fixture) throw new Error(`No package fixture ${slug}`);
 
@@ -106,7 +110,7 @@ async function seedPackage(slug: string, vehicleRates: Partial<Record<VehicleKey
       duration: fixture.duration,
       rating: fixture.rating,
       pickup: fixture.pickup,
-      pricing: { basePricePerAdult: parsePackagePrice(fixture.price), vehicleRates },
+      pricing: { basePricePerAdult: parsePackagePrice(fixture.price), vehicleRates, ...optionOverrides },
       itinerary: fixture.itinerary.map((item) => ({ item })),
       includes: fixture.includes.map((item) => ({ item })),
       _status: "published",
@@ -296,9 +300,49 @@ describe("enquiry handler pipeline", () => {
   });
 
   it("accepts an option an editor added to the pricing tables without a deploy", async () => {
+    // A package without overrides uses the site-wide options.
+    await seedPackage("shimla-manali-jibhi", packageVehicleRates["shimla-manali-jibhi"], { stayOptions: [], mealOptions: [] });
     await temp.payload.updateGlobal({
       slug: "pricing-settings",
-      data: { stayOptions: [...(pricingSettings.stayOptions ?? []), { label: "Boutique", delta: 4000 }] },
+      data: { stayOptions: [...(pricingSettings.stayOptions ?? []), { label: "Boutique", deltaPerNight: 500 }] },
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, slug: "shimla-manali-jibhi", stay: "Boutique" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    // Ertiga 19999 x 2 + child 5000, Boutique 500 and CP -300 over 7 nights.
+    expect(Object.fromEntries(sendMock.mock.calls[0][0].rows)["Package Cost"]).toBe("₹46,398");
+  });
+
+  it("accepts a label that only the package's own options offer", async () => {
+    const { docs } = await temp.payload.find({ collection: "packages", where: { slug: { equals: SLUG } }, depth: 0 });
+    const doc = docs[0];
+    if (!doc) throw new Error("package not found");
+    await temp.payload.update({
+      collection: "packages",
+      id: doc.id,
+      data: { pricing: { ...doc.pricing, stayOptions: [{ label: "Riverside Cottage", deltaPerNight: 500 }] } },
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, stay: "Riverside Cottage" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    // 48654 with Premium (+2500) becomes 49154 with 500 over 6 nights (+3000).
+    expect(Object.fromEntries(sendMock.mock.calls[0][0].rows)["Package Cost"]).toBe("₹49,154");
+  });
+
+  it("rejects a site-wide label that the package's own options leave out", async () => {
+    await temp.payload.updateGlobal({
+      slug: "pricing-settings",
+      data: { stayOptions: [...(pricingSettings.stayOptions ?? []), { label: "Boutique", deltaPerNight: 500 }] },
       overrideAccess: true,
       context: quiet,
     });
@@ -307,9 +351,9 @@ describe("enquiry handler pipeline", () => {
       post(PACKAGE_URL, { ...pkg, stay: "Boutique" }, { "x-forwarded-for": freshIp() })
     );
 
-    expect(response.status).toBe(200);
-    // 48654 with Premium (+2500) becomes 50154 with Boutique (+4000).
-    expect(Object.fromEntries(sendMock.mock.calls[0][0].rows)["Package Cost"]).toBe("₹50,154");
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, message: "Please choose a valid stay." });
+    expect(sendMock).not.toHaveBeenCalled();
   });
 });
 

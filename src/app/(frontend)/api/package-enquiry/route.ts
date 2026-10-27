@@ -1,6 +1,6 @@
 import { storeEnquiry } from "@/lib/cms/enquiries";
 import { getPackageForEnquiry } from "@/lib/cms/packages";
-import { getPricingTables } from "@/lib/cms/pricing-tables";
+import { getPackagePricingTables } from "@/lib/cms/pricing-tables";
 import type { PricingTables } from "@/lib/cms/types";
 import {
   createEnquiryHandler,
@@ -17,7 +17,10 @@ import {
 
 export const runtime = "nodejs";
 
-/** The schema checks only the labels' shape; they must be options editors have published. */
+/**
+ * The schema checks only the labels' shape; they must be options editors
+ * have published for this package (its own lists, else the site-wide ones).
+ */
 function unknownOption(enquiry: PackageEnquiry, tables: PricingTables): string | null {
   const has = (options: { label: string }[], label: string) =>
     options.some((option) => option.label === label);
@@ -37,7 +40,7 @@ async function buildPackageEnquiry(
   if (!found) return null;
   const { pkg } = found;
 
-  const tables = await getPricingTables();
+  const tables = await getPackagePricingTables(pkg);
   const invalid = unknownOption(enquiry, tables);
   if (invalid) return { invalid };
 

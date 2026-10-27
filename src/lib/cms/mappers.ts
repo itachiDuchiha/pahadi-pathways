@@ -15,6 +15,7 @@ import type {
   GalleryItem,
   Package,
   PackagePricing,
+  PricingOption,
   Testimonial,
   VehicleKey,
 } from "./types";
@@ -58,23 +59,42 @@ function list(rows: { item: string }[] | null | undefined): string[] | undefined
 
 const VEHICLE_KEYS: readonly VehicleKey[] = ["sedan", "ertiga", "crysta"];
 
-/**
- * The package's `pricing` group. Vehicle rates are kept only when at
- * least one is set; a vehicle left empty then uses the base rate.
- */
-export function mapPackagePricing(pricing: PackageDoc["pricing"]): PackagePricing {
+/** Stay or meal option rows with trimmed labels, as the enquiry schema trims submitted ones. */
+export function mapPricingOptions(
+  rows: readonly { label: string; deltaPerNight: number }[] | null | undefined
+): PricingOption[] {
+  return (rows ?? []).map(({ label, deltaPerNight }) => ({ label: label.trim(), deltaPerNight }));
+}
+
+function vehicleRatesOf(pricing: PackageDoc["pricing"]): PackagePricing["vehicleRates"] {
   const { basePricePerAdult } = pricing;
   const rates = pricing.vehicleRates;
 
-  if (!rates || VEHICLE_KEYS.every((key) => rates[key] == null)) return { basePricePerAdult };
+  if (!rates || VEHICLE_KEYS.every((key) => rates[key] == null)) return undefined;
 
   return {
-    basePricePerAdult,
-    vehicleRates: {
-      sedan: rates.sedan ?? basePricePerAdult,
-      ertiga: rates.ertiga ?? basePricePerAdult,
-      crysta: rates.crysta ?? basePricePerAdult,
-    },
+    sedan: rates.sedan ?? basePricePerAdult,
+    ertiga: rates.ertiga ?? basePricePerAdult,
+    crysta: rates.crysta ?? basePricePerAdult,
+  };
+}
+
+/**
+ * The package's `pricing` group. Vehicle rates are kept only when at
+ * least one is set; a vehicle left empty then uses the base rate. Stay
+ * and meal lists are kept only when filled in; an empty list means the
+ * package uses the site-wide options.
+ */
+export function mapPackagePricing(pricing: PackageDoc["pricing"]): PackagePricing {
+  const vehicleRates = vehicleRatesOf(pricing);
+  const stayOptions = mapPricingOptions(pricing.stayOptions);
+  const mealOptions = mapPricingOptions(pricing.mealOptions);
+
+  return {
+    basePricePerAdult: pricing.basePricePerAdult,
+    ...(vehicleRates && { vehicleRates }),
+    ...(stayOptions.length > 0 && { stayOptions }),
+    ...(mealOptions.length > 0 && { mealOptions }),
   };
 }
 

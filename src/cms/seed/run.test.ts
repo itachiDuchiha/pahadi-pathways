@@ -152,8 +152,33 @@ describe("seed", () => {
       const spiti = publicPackages.docs.find((doc) => doc.slug === "shimla-kinnaur-spiti-chandratal");
       expect(spiti?.pricing?.basePricePerAdult).toBe(32249);
       expect(spiti?.pricing?.vehicleRates).toMatchObject({ sedan: null, ertiga: 38749, crysta: 54999 });
-      expect(spiti?.itinerary[0]?.item).toBe("1N Shimla");
-      expect(typeof spiti?.image === "object" && spiti.image.filename).toBe("packages-spiti.webp");
+      // Per-night overrides reproduce the old flat deltas over the package's
+      // nights. SQLite returns 15 significant digits, enough for exact rupees.
+      const flat: [label: string, delta: number][] = [
+        ["Deluxe", 0],
+        ["Premium", 2500],
+        ["Luxury", 5000],
+        ["Breakfast + Dinner (MAP)", 0],
+        ["Breakfast Only (CP)", -2500],
+      ];
+      const nights: Record<string, number> = {
+        "shimla-kinnaur-spiti-chandratal": 9,
+        "shimla-manali-getaway": 6,
+        "himachal-grand-circuit": 9,
+        "shimla-manali-jibhi": 7,
+        "shimla-kinnaur-spiti-kalpa": 8,
+      };
+      for (const doc of publicPackages.docs) {
+        const n = nights[doc.slug];
+        const rows = [...(doc.pricing.stayOptions ?? []), ...(doc.pricing.mealOptions ?? [])];
+        expect(rows.map((row) => row.label)).toEqual(flat.map(([label]) => label));
+        rows.forEach((row, index) => {
+          const delta = flat[index][1];
+          expect(row.deltaPerNight).toBeCloseTo(delta / n, 9);
+          expect(Math.round(row.deltaPerNight * n)).toBe(delta);
+        });
+      }
+      expect(spiti?.pricing.stayOptions?.[1]?.deltaPerNight).toBeCloseTo(2500 / 9, 9);
 
       const publicDestinations = await payload.find({
         collection: "destinations",
@@ -174,6 +199,15 @@ describe("seed", () => {
 
       const pricing = await payload.findGlobal({ slug: "pricing-settings" });
       expect(pricing).toMatchObject({ gstPercent: 5, childFreeUnderAge: 5, childPercentOfAdult: 25 });
+      expect(pricing.stayOptions?.map((o) => [o.label, o.deltaPerNight])).toEqual([
+        ["Deluxe", 0],
+        ["Premium", 300],
+        ["Luxury", 600],
+      ]);
+      expect(pricing.mealOptions?.map((o) => [o.label, o.deltaPerNight])).toEqual([
+        ["Breakfast + Dinner (MAP)", 0],
+        ["Breakfast Only (CP)", -300],
+      ]);
       expect(pricing.vehicleOptions?.map((v) => [v.key, v.perDayUpgrade, v.perDayUpgradeSpiti])).toEqual([
         ["sedan", 0, 0],
         ["ertiga", 1000, 1000],

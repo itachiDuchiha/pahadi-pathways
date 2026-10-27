@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { isEditorOrAdmin } from "../access";
+import { pricingOptionFields } from "../fields/pricingOption";
 import { revalidateHooks } from "../hooks/revalidate";
 
 const revalidate = revalidateHooks("pricing");
@@ -35,21 +36,21 @@ export const PricingSettings: GlobalConfig = {
       name: "stayOptions",
       type: "array",
       minRows: 1,
-      admin: { description: "Hotel tiers. Delta is rupees per adult added to the base rate." },
-      fields: [
-        { name: "label", type: "text", required: true },
-        { name: "delta", type: "number", required: true },
-      ],
+      admin: {
+        description:
+          "Default hotel tiers. Delta per night is rupees per adult per night added to the base rate. A package can set its own list instead.",
+      },
+      fields: pricingOptionFields,
     },
     {
       name: "mealOptions",
       type: "array",
       minRows: 1,
-      admin: { description: "Meal plans. Delta is rupees per adult; negative lowers the price." },
-      fields: [
-        { name: "label", type: "text", required: true },
-        { name: "delta", type: "number", required: true },
-      ],
+      admin: {
+        description:
+          "Default meal plans. Delta per night is rupees per adult per night; negative lowers the price. A package can set its own list instead.",
+      },
+      fields: pricingOptionFields,
     },
     {
       name: "vehicleOptions",

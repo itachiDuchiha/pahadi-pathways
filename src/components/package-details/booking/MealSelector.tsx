@@ -1,11 +1,11 @@
 import { ChevronDown } from "lucide-react";
 
-import type { PriceOption } from "@/lib/cms/types";
+import type { PricingOption } from "@/lib/pricing";
 
 type Props = {
   meals: string;
   setMeals: (value: string) => void;
-  options: PriceOption[];
+  options: PricingOption[];
 };
 
 export default function MealSelector({
