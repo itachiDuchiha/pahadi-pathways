@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { CollectionSlug, Payload, RequiredDataFromCollectionSlug } from "payload";
+import type { Payload, RequiredDataFromCollectionSlug } from "payload";
 
 import { ensureAdmin, type EnsureAdminResult } from "../bootstrap/ensureAdmin";
 import { DESTINATION_CATEGORIES } from "../collections/Destinations";
@@ -450,16 +450,9 @@ function destinationData(
 
 // ---- Enquiry retention -------------------------------------------------
 
-const ENQUIRIES = "enquiries";
-
-function isRegistered(payload: Payload, slug: string): slug is CollectionSlug {
-  return Object.hasOwn(payload.collections, slug);
-}
-
 /**
  * Deletes enquiries created more than `olderThanMonths` months ago and
- * returns how many were removed. Returns 0 while the collection is not
- * registered.
+ * returns how many were removed.
  */
 export async function pruneEnquiries(
   payload: Payload,
@@ -470,14 +463,11 @@ export async function pruneEnquiries(
     throw new Error("olderThanMonths must be a positive whole number");
   }
 
-  const slug: string = ENQUIRIES;
-  if (!isRegistered(payload, slug)) return 0;
-
   const cutoff = new Date(now);
   cutoff.setMonth(cutoff.getMonth() - olderThanMonths);
 
   const result = await payload.delete({
-    collection: slug,
+    collection: "enquiries",
     where: { createdAt: { less_than: cutoff.toISOString() } },
     overrideAccess: true,
     context: { internal: true, skipRevalidate: true },

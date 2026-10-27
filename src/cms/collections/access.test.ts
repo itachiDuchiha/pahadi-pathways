@@ -508,6 +508,8 @@ describe("enquiries access", () => {
       "children",
       "budgetPerPerson",
       "package",
+      "packageSlug",
+      "packageTitle",
       "selections",
       "computedPrice",
     ]);

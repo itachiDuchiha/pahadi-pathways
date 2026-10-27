@@ -46,6 +46,10 @@ export const Enquiries: CollectionConfig = {
     { name: "children", type: "number" },
     { name: "budgetPerPerson", type: "number", admin: { description: "Rupees." } },
     { name: "package", type: "relationship", relationTo: "packages" },
+    // Copied at enquiry time so the lead stays readable if the package is
+    // later retired and the relationship is cleared.
+    { name: "packageSlug", type: "text", admin: { readOnly: true } },
+    { name: "packageTitle", type: "text", admin: { readOnly: true } },
     {
       name: "selections",
       type: "group",

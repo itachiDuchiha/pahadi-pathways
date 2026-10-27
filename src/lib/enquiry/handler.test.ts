@@ -418,6 +418,7 @@ describe("enquiry storage alongside email", () => {
     expect(response.status).toBe(200);
     expect((await response.json()).ok).toBe(true);
     expect(sendMock).not.toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledTimes(1);
     const docs = await enquiries();
     expect(docs).toHaveLength(1);
     expect(docs[0]).toMatchObject({ source: "trip", name: "Asha", adults: 2, budgetPerPerson: 25000 });
@@ -442,6 +443,8 @@ describe("enquiry storage alongside email", () => {
 
     expect(response.status).toBe(502);
     expect((await response.json()).ok).toBe(false);
+    // One line for the storage failure, one for the mail failure.
+    expect(errorSpy).toHaveBeenCalledTimes(2);
   });
 
   it("answers 503 when storage fails and mail is not configured", async () => {
@@ -452,6 +455,29 @@ describe("enquiry storage alongside email", () => {
 
     expect(response.status).toBe(503);
     expect(sendMock).not.toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it("stores nothing for an unknown package", async () => {
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, slug: "no-such-trip" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(400);
+    expect(await enquiries()).toHaveLength(0);
+  });
+
+  it("stores nothing for a throttled request", async () => {
+    const ip = freshIp();
+    const statuses: number[] = [];
+
+    for (let i = 0; i < 6; i += 1) {
+      const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": ip }));
+      statuses.push(response.status);
+    }
+
+    expect(statuses.at(-1)).toBe(429);
+    expect(await enquiries()).toHaveLength(5);
   });
 
   it("stores a package enquiry with the server-computed price, never the client's", async () => {
@@ -468,6 +494,9 @@ describe("enquiry storage alongside email", () => {
     expect(docs[0]).toMatchObject({
       source: "package",
       package: published.id,
+      packageSlug: SLUG,
+      packageTitle: published.title,
+      children: 2,
       selections: {
         stay: "Premium",
         meals: "Breakfast Only (CP)",

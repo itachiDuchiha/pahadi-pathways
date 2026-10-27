@@ -33,7 +33,7 @@ type HandlerConfig<S extends EnquirySource> = {
    * `invalidMessage`; returning `{ invalid }` answers 400 with that
    * message instead.
    */
-  buildEmail: (
+  buildEnquiry: (
     enquiry: Extract<Enquiry, { source: S }>
   ) => BuildResult | Promise<BuildResult>;
   /** Stores the lead in the CMS; a failure is reported, not thrown. */
@@ -132,7 +132,7 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(400, false, "Invalid enquiry details.");
       }
 
-      const built = await config.buildEmail(enquiry as Extract<Enquiry, { source: S }>);
+      const built = await config.buildEnquiry(enquiry as Extract<Enquiry, { source: S }>);
 
       if (!built) {
         return respond(400, false, config.invalidMessage ?? "Invalid enquiry details.");

@@ -1,10 +1,11 @@
 import { storeEnquiry } from "@/lib/cms/enquiries";
-import { getPackageBySlug } from "@/lib/cms/packages";
+import { getPackageForEnquiry } from "@/lib/cms/packages";
 import { getPricingTables } from "@/lib/cms/pricing-tables";
 import type { PricingTables } from "@/lib/cms/types";
 import {
   createEnquiryHandler,
   type BuiltEnquiry,
+  type EnquiryEmail,
   type InvalidEnquiry,
 } from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
@@ -33,8 +34,9 @@ async function buildPackageEnquiry(
 ): Promise<BuiltEnquiry | InvalidEnquiry | null> {
   // The schema checks the slug's shape only; only a published package counts.
   // Prices come from the CMS on every enquiry; client totals are never used.
-  const pkg = await getPackageBySlug(enquiry.slug);
-  if (!pkg) return null;
+  const found = await getPackageForEnquiry(enquiry.slug);
+  if (!found) return null;
+  const { pkg } = found;
 
   const tables = await getPricingTables();
   const invalid = unknownOption(enquiry, tables);
@@ -56,8 +58,8 @@ async function buildPackageEnquiry(
     ? `${enquiry.childAges.length} (${enquiry.childAges.map((age) => `Age ${age}`).join(", ")})`
     : "None";
 
-  const email = {
-    kind: "package" as const,
+  const email: EnquiryEmail = {
+    kind: "package",
     heading: "New Package Booking Enquiry",
     subject: sanitizeSubject(`Package enquiry: ${pkg.title} — ${enquiry.name}`),
     intro: "A customer has submitted a package booking enquiry through your website.",
@@ -75,12 +77,13 @@ async function buildPackageEnquiry(
       ["Package Cost", formatCurrency(price.packageCost)],
       [`GST (${price.gstPercent}%)`, formatCurrency(price.gst)],
       ["Estimated Total", formatCurrency(price.estimatedTotal)],
-    ] satisfies [string, string][],
+    ],
   };
 
   // Only the server-computed price is stored alongside the typed fields.
   const stored = {
     ...enquiry,
+    pkg: { id: found.id, slug: pkg.slug, title: pkg.title },
     price: {
       packageCost: price.packageCost,
       gst: price.gst,
@@ -98,7 +101,7 @@ export const POST = createEnquiryHandler({
   successMessage: {
     package: "Your package enquiry has been sent successfully.",
   },
-  buildEmail: buildPackageEnquiry,
+  buildEnquiry: buildPackageEnquiry,
   storeEnquiry,
   invalidMessage: "Please choose a valid package.",
 });

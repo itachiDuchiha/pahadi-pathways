@@ -113,6 +113,7 @@ describe("storeEnquiry", () => {
       stay: "Premium",
       meals: "Breakfast Only (CP)",
       vehicle: "Sedan",
+      pkg: { id: packageId, slug: "shimla-escape", title: "Shimla Escape" },
       price: { packageCost: 48654, gst: 2433, gstPercent: 5, estimatedTotal: 51087 },
     });
 
@@ -123,7 +124,10 @@ describe("storeEnquiry", () => {
       source: "package",
       name: "Meera",
       adults: 2,
+      children: 2,
       package: packageId,
+      packageSlug: "shimla-escape",
+      packageTitle: "Shimla Escape",
       selections: {
         stay: "Premium",
         meals: "Breakfast Only (CP)",
@@ -132,6 +136,35 @@ describe("storeEnquiry", () => {
       },
       computedPrice: { packageCost: 48654, gst: 2433, gstPercent: 5, estimatedTotal: 51087 },
     });
+  });
+
+  it("keeps the package slug and title after the package is deleted", async () => {
+    const result = await storeEnquiry({
+      source: "package",
+      name: "Meera",
+      phone: "9876543210",
+      slug: "shimla-escape",
+      adults: 1,
+      childAges: [],
+      stay: "Deluxe",
+      meals: "Breakfast Only (CP)",
+      vehicle: "Sedan",
+      pkg: { id: packageId, slug: "shimla-escape", title: "Shimla Escape" },
+      price: { packageCost: 12000, gst: 600, gstPercent: 5, estimatedTotal: 12600 },
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    await temp.payload.delete({
+      collection: "packages",
+      id: packageId,
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    const doc = await stored(result.id);
+    expect(doc.package ?? null).toBeNull();
+    expect(doc).toMatchObject({ packageSlug: "shimla-escape", packageTitle: "Shimla Escape" });
   });
 
   it("returns an error instead of throwing when the write fails", async () => {

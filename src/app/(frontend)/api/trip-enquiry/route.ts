@@ -1,12 +1,12 @@
 import { storeEnquiry } from "@/lib/cms/enquiries";
-import { createEnquiryHandler, type EnquiryEmail } from "@/lib/enquiry/handler";
+import { createEnquiryHandler, type BuiltEnquiry, type EnquiryEmail } from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
 import { DESTINATIONS, type ContactEnquiry, type TripEnquiry } from "@/lib/enquiry/schema";
 
 export const runtime = "nodejs";
 
-function tripEmail(enquiry: TripEnquiry): EnquiryEmail {
-  return {
+function buildTripEnquiry(enquiry: TripEnquiry): BuiltEnquiry {
+  const email: EnquiryEmail = {
     kind: "trip",
     heading: "New Trip Enquiry",
     subject: sanitizeSubject(`Trip enquiry from ${enquiry.name} (${enquiry.phone})`),
@@ -26,10 +26,12 @@ function tripEmail(enquiry: TripEnquiry): EnquiryEmail {
       ["Additional requirements", enquiry.message || "None specified"],
     ],
   };
+
+  return { email, stored: enquiry };
 }
 
-function contactEmail(enquiry: ContactEnquiry): EnquiryEmail {
-  return {
+function buildContactEnquiry(enquiry: ContactEnquiry): BuiltEnquiry {
+  const email: EnquiryEmail = {
     kind: "contact",
     heading: "New Contact Enquiry",
     subject: sanitizeSubject(`Contact enquiry from ${enquiry.name} (${enquiry.phone})`),
@@ -41,6 +43,8 @@ function contactEmail(enquiry: ContactEnquiry): EnquiryEmail {
       ["Message", enquiry.message || "None"],
     ],
   };
+
+  return { email, stored: enquiry };
 }
 
 export const POST = createEnquiryHandler({
@@ -50,9 +54,7 @@ export const POST = createEnquiryHandler({
     trip: "Your trip enquiry was sent successfully.",
     contact: "Your message was sent successfully.",
   },
-  buildEmail: (enquiry) => ({
-    email: enquiry.source === "trip" ? tripEmail(enquiry) : contactEmail(enquiry),
-    stored: enquiry,
-  }),
+  buildEnquiry: (enquiry) =>
+    enquiry.source === "trip" ? buildTripEnquiry(enquiry) : buildContactEnquiry(enquiry),
   storeEnquiry,
 });

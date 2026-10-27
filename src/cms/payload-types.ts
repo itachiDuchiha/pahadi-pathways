@@ -392,6 +392,8 @@ export interface Enquiry {
    */
   budgetPerPerson?: number | null;
   package?: (number | null) | Package;
+  packageSlug?: string | null;
+  packageTitle?: string | null;
   selections?: {
     stay?: string | null;
     meals?: string | null;
@@ -724,6 +726,8 @@ export interface EnquiriesSelect<T extends boolean = true> {
   children?: T;
   budgetPerPerson?: T;
   package?: T;
+  packageSlug?: T;
+  packageTitle?: T;
   selections?:
     | T
     | {
