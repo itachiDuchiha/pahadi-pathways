@@ -8,7 +8,6 @@ import {
   type EnquiryEmail,
   type InvalidEnquiry,
 } from "@/lib/enquiry/handler";
-import { sanitizeSubject } from "@/lib/enquiry/mail";
 import type { PackageEnquiry } from "@/lib/enquiry/schema";
 import {
   computePackagePrice,
@@ -61,7 +60,7 @@ async function buildPackageEnquiry(
   const email: EnquiryEmail = {
     kind: "package",
     heading: "New Package Booking Enquiry",
-    subject: sanitizeSubject(`Package enquiry: ${pkg.title} — ${enquiry.name}`),
+    subject: `Package enquiry: ${pkg.title} — ${enquiry.name}`,
     intro: "A customer has submitted a package booking enquiry through your website.",
     rows: [
       ["Customer Name", enquiry.name],

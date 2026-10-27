@@ -171,6 +171,32 @@ describe("enquiry handler pipeline", () => {
     expect(sendMock).toHaveBeenCalledTimes(5);
   });
 
+  it("does not throttle requests without proxy headers (no shared unknown bucket)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const statuses: number[] = [];
+
+    for (let i = 0; i < 6; i += 1) {
+      const response = await tripPOST(post(TRIP_URL, contact));
+      statuses.push(response.status);
+    }
+
+    expect(statuses).toEqual([200, 200, 200, 200, 200, 200]);
+    expect(sendMock).toHaveBeenCalledTimes(6);
+    expect(warn.mock.calls.length).toBeLessThanOrEqual(1);
+    warn.mockRestore();
+  });
+
+  it("hands the subject to the mail layer unsanitised (sanitised once, in mail)", async () => {
+    const response = await tripPOST(
+      post(TRIP_URL, { ...contact, name: "As\u202eha" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    expect(sendMock.mock.calls[0][0].subject).toBe(
+      "Contact enquiry from As\u202eha (+91 75596 97919)"
+    );
+  });
+
   it("answers a filled honeypot with 200 without sending or consuming the limit", async () => {
     const ip = freshIp();
 

@@ -4,10 +4,8 @@
 // succeeds. Idempotent: re-running skips any source whose .webp sibling
 // already exists and whose original is already gone.
 //
-// Uses `sharp`, which is not a direct dependency of this project: it ships
-// as a transitive dependency of Next.js (next/dist/.../image-optimizer),
-// so it is already present under node_modules without being declared in
-// package.json.
+// Uses `sharp`, a declared dependency of this project (also used by the CMS
+// to re-encode uploads).
 import { readdir, stat, unlink } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";

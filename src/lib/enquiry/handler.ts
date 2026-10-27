@@ -1,7 +1,7 @@
 import { site } from "@/config/site";
 import type { StoredEnquiryInput, StoreEnquiryResult } from "@/lib/cms/enquiries";
 
-import { checkOrigin, clientIp, declaredBodyTooLarge, readJson } from "./guards";
+import { checkOrigin, rateLimitKey, readJson } from "./guards";
 import type { EnquiryContent } from "./html";
 import { getMailConfig, sendEnquiryEmail } from "./mail";
 import { rateLimit } from "./rate-limit";
@@ -67,8 +67,8 @@ function honeypotFilled(body: unknown): boolean {
 
 /**
  * Builds a POST handler that runs every enquiry through the same pipeline:
- * body-size guard, origin check, JSON read, honeypot, rate limit, schema,
- * then storage and mail. Honeypot hits are answered before the limiter so
+ * origin check, size-capped JSON read, honeypot, rate limit, schema, then
+ * storage and mail. Honeypot hits are answered before the limiter so
  * they never consume a real visitor's allowance.
  *
  * A stored lead counts as success: when the email cannot be sent the
@@ -84,10 +84,6 @@ export function createEnquiryHandler<S extends EnquirySource>(
 
   return async function POST(request: Request): Promise<Response> {
     try {
-      if (declaredBodyTooLarge(request)) {
-        return respond(413, false, "Your enquiry is too large.");
-      }
-
       if (!originAllowed(request)) {
         return respond(403, false, "This request is not allowed.");
       }
@@ -109,9 +105,10 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(200, true, text);
       }
 
-      const limit = rateLimit(`${config.routeKey}:${clientIp(request)}`);
+      const key = rateLimitKey(config.routeKey, request);
+      const limit = key === null ? null : rateLimit(key);
 
-      if (!limit.allowed) {
+      if (limit && !limit.allowed) {
         return respond(
           429,
           false,

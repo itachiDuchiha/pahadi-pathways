@@ -1,6 +1,5 @@
 import { storeEnquiry } from "@/lib/cms/enquiries";
 import { createEnquiryHandler, type BuiltEnquiry, type EnquiryEmail } from "@/lib/enquiry/handler";
-import { sanitizeSubject } from "@/lib/enquiry/mail";
 import { DESTINATIONS, type ContactEnquiry, type TripEnquiry } from "@/lib/enquiry/schema";
 
 export const runtime = "nodejs";
@@ -9,7 +8,7 @@ function buildTripEnquiry(enquiry: TripEnquiry): BuiltEnquiry {
   const email: EnquiryEmail = {
     kind: "trip",
     heading: "New Trip Enquiry",
-    subject: sanitizeSubject(`Trip enquiry from ${enquiry.name} (${enquiry.phone})`),
+    subject: `Trip enquiry from ${enquiry.name} (${enquiry.phone})`,
     intro: "A traveller has submitted a new trip planning request through your website.",
     rows: [
       ["Name", enquiry.name],
@@ -34,7 +33,7 @@ function buildContactEnquiry(enquiry: ContactEnquiry): BuiltEnquiry {
   const email: EnquiryEmail = {
     kind: "contact",
     heading: "New Contact Enquiry",
-    subject: sanitizeSubject(`Contact enquiry from ${enquiry.name} (${enquiry.phone})`),
+    subject: `Contact enquiry from ${enquiry.name} (${enquiry.phone})`,
     intro: "A visitor has sent a message through the contact page of your website.",
     rows: [
       ["Name", enquiry.name],

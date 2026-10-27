@@ -34,8 +34,9 @@ export function checkOrigin(request: Request, siteUrl: string): boolean {
  * Trust assumption: the hosting edge overwrites `x-forwarded-for` with the
  * real client address (Vercel does). Behind a proxy that appends to a
  * client-supplied header instead, the first entry is attacker-controlled and
- * the limit can be bypassed. Requests with neither header all share one
- * global "unknown" bucket.
+ * the limit can be bypassed. Headers are read in this order:
+ * `x-forwarded-for` (first entry), `x-real-ip`, `cf-connecting-ip`. With
+ * none of them the result is "unknown".
  */
 export function clientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
@@ -44,7 +45,32 @@ export function clientIp(request: Request): string {
   const realIp = request.headers.get("x-real-ip")?.trim();
   if (realIp) return realIp;
 
+  const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
+  if (cloudflareIp) return cloudflareIp;
+
   return "unknown";
+}
+
+let unknownIpWarned = false;
+
+/**
+ * Rate-limit bucket key for this request, or `null` when the client IP is
+ * unknown. Unknown clients are not limited at all rather than sharing one
+ * bucket, which would cap the whole site at the per-visitor allowance. The
+ * first such request logs a warning; later ones stay quiet.
+ */
+export function rateLimitKey(routeKey: string, request: Request): string | null {
+  const ip = clientIp(request);
+  if (ip !== "unknown") return `${routeKey}:${ip}`;
+
+  if (!unknownIpWarned) {
+    unknownIpWarned = true;
+    console.warn(
+      "Enquiry rate limiting: client IP is unknown (no x-forwarded-for, x-real-ip or cf-connecting-ip header); rate limiting is disabled for these requests. Configure the reverse proxy to set x-forwarded-for."
+    );
+  }
+
+  return null;
 }
 
 /** True when the declared Content-Length is over the body limit. */

@@ -23,8 +23,10 @@ const aiCrawlers = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: "/api/" },
-      ...aiCrawlers.map((userAgent) => ({ userAgent, allow: "/" })),
+      { userAgent: "*", allow: "/", disallow: ["/api/"] },
+      // A crawler-specific group replaces the "*" group for that crawler,
+      // so each one repeats the disallow list.
+      ...aiCrawlers.map((userAgent) => ({ userAgent, allow: "/", disallow: ["/api/"] })),
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
   };
