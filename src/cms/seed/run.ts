@@ -36,11 +36,18 @@ export type SeedOptions = {
   env?: Env;
   /** Directory the manifest's public paths resolve against; defaults to `./public`. */
   publicDir?: string;
+  /**
+   * Upsert every fixture by its key, restoring fixture values (alt text and
+   * globals included) and recreating deleted documents. Off by default.
+   */
+  overwrite?: boolean;
 };
 
 export type SeedResult = {
   created: Record<SeedTarget, number>;
   updated: Record<SeedTarget, number>;
+  /** Fixture items left alone because the target already holds content. */
+  skipped: Record<SeedTarget, number>;
   /** Media documents that back the manifest after the run. */
   media: number;
   admin: EnsureAdminResult;
@@ -98,18 +105,58 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
   return (DESTINATION_CATEGORIES as readonly string[]).includes(value);
 }
 
+const MISSING_SCHEMA = /no such table|relation "[^"]+" does not exist/i;
+
+/** True when the error (or one it wraps) says the schema has not been migrated. */
+export function isMissingSchemaError(error: unknown): boolean {
+  for (let current = error, depth = 0; current && depth < 5; depth++) {
+    if (current instanceof Error) {
+      if (MISSING_SCHEMA.test(current.message)) return true;
+      current = current.cause;
+    } else {
+      return MISSING_SCHEMA.test(String(current));
+    }
+  }
+  return false;
+}
+
 /**
- * Creates or updates every fixture under `src/cms/seed` as published
- * content, uploading the images under `public/images` into Media first.
- * Idempotent: documents are matched by their natural key and updated in
- * place. Creates the first admin only when no user exists.
+ * Seeds the fixtures under `src/cms/seed` as published content, uploading
+ * the images under `public/images` into Media first, and creates the first
+ * admin only when no user exists.
+ *
+ * Default mode (what deploys run) never touches editor content: a content
+ * collection is seeded only while it is empty, media are uploaded only
+ * while the Media collection is empty, `pricing-settings` is written only
+ * while it has no stay options and `site-settings` only while it has no
+ * phone number. Everything else is reported under `skipped`. A deleted or
+ * renamed document is therefore never brought back.
+ *
+ * `overwrite: true` upserts every fixture by its key (slug, name + tour,
+ * title, filename), restoring fixture values including alt text and both
+ * globals, and recreating deleted documents.
  */
 export async function seed(payload: Payload, options: SeedOptions = {}): Promise<SeedResult> {
+  try {
+    return await runSeed(payload, options);
+  } catch (error) {
+    if (isMissingSchemaError(error)) {
+      throw new Error("Database schema is missing. Run `npm run payload migrate` first.", {
+        cause: error,
+      });
+    }
+    throw error;
+  }
+}
+
+async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResult> {
   const env = options.env ?? process.env;
   const publicDir = options.publicDir ?? path.resolve(process.cwd(), "public");
+  const overwrite = options.overwrite ?? false;
   const context = { internal: true, skipRevalidate: options.skipRevalidate ?? true };
   const created = emptyCounts();
   const updated = emptyCounts();
+  const skipped = emptyCounts();
 
   const admin = await ensureAdmin(payload, env);
 
@@ -122,46 +169,58 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
     overrideAccess: true,
   });
   const mediaByFilename = new Map(existingMedia.docs.map((doc) => [doc.filename, doc]));
-  const mediaIds = new Map<string, number>();
+  const manifest = Object.entries(mediaManifest);
 
-  for (const [publicPath, alt] of Object.entries(mediaManifest)) {
-    const filename = mediaFilename(publicPath);
-    const existing = mediaByFilename.get(filename);
+  if (!overwrite && existingMedia.docs.length > 0) {
+    skipped.media = manifest.length;
+  } else {
+    for (const [publicPath, alt] of manifest) {
+      const filename = mediaFilename(publicPath);
+      const existing = mediaByFilename.get(filename);
 
-    if (existing) {
-      if (existing.alt !== alt) {
-        await payload.update({
-          collection: "media",
-          id: existing.id,
-          data: { alt },
-          overrideAccess: true,
-          context,
-        });
-        updated.media++;
+      if (existing) {
+        if (existing.alt !== alt) {
+          await payload.update({
+            collection: "media",
+            id: existing.id,
+            data: { alt },
+            overrideAccess: true,
+            context,
+          });
+          updated.media++;
+        } else {
+          skipped.media++;
+        }
+        continue;
       }
-      mediaIds.set(publicPath, existing.id);
-      continue;
-    }
 
-    const mimetype = MIME_TYPES[path.extname(publicPath).toLowerCase()];
-    if (!mimetype) throw new Error(`Unsupported image type: ${publicPath}`);
-    const data = await readFile(path.join(publicDir, publicPath));
-    const doc = await payload.create({
-      collection: "media",
-      data: { alt },
-      file: { data, mimetype, name: filename, size: data.length },
-      overwriteExistingFiles: true,
-      overrideAccess: true,
-      context,
-    });
-    mediaIds.set(publicPath, doc.id);
-    created.media++;
+      const mimetype = MIME_TYPES[path.extname(publicPath).toLowerCase()];
+      if (!mimetype) throw new Error(`Unsupported image type: ${publicPath}`);
+      const data = await readFile(path.join(publicDir, publicPath));
+      const doc = await payload.create({
+        collection: "media",
+        data: { alt },
+        file: { data, mimetype, name: filename, size: data.length },
+        overwriteExistingFiles: true,
+        overrideAccess: true,
+        context,
+      });
+      mediaByFilename.set(filename, doc);
+      created.media++;
+    }
   }
 
+  /** Resolved only when a collection is actually written. */
   function mediaId(publicPath: string): number {
-    const id = mediaIds.get(publicPath);
-    if (id === undefined) throw new Error(`Image is missing from the media manifest: ${publicPath}`);
-    return id;
+    const filename = mediaFilename(publicPath);
+    const doc = mediaByFilename.get(filename);
+    if (!doc) {
+      throw new Error(
+        `Media "${filename}" (for ${publicPath}) is missing from the media collection. ` +
+          "Upload it or run `npm run cms:seed -- --overwrite`."
+      );
+    }
+    return doc.id;
   }
 
   // ---- Collections ---------------------------------------------------
@@ -170,7 +229,8 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
 
   async function upsert<T>(
     target: Exclude<SeedCollection, "media">,
-    items: readonly T[],
+    fixtureCount: number,
+    build: () => readonly T[],
     keyOf: (item: T) => string,
     ops: {
       existing: readonly { id: number; key: string }[];
@@ -178,9 +238,14 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
       update(id: number, data: T): Promise<unknown>;
     }
   ): Promise<void> {
+    if (!overwrite && ops.existing.length > 0) {
+      skipped[target] = fixtureCount;
+      return;
+    }
+
     const idsByKey = new Map(ops.existing.map(({ id, key }) => [key, id]));
 
-    for (const item of items) {
+    for (const item of build()) {
       const id = idsByKey.get(keyOf(item));
       if (id === undefined) {
         await ops.create(item);
@@ -194,7 +259,8 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
 
   await upsert(
     "packages",
-    packages.map((pkg) => packageData(pkg, mediaId)),
+    packages.length,
+    () => packages.map((pkg) => packageData(pkg, mediaId)),
     (item) => item.slug,
     {
       existing: (await payload.find({ collection: "packages", ...read })).docs.map((doc) => ({
@@ -208,7 +274,8 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
 
   await upsert(
     "destinations",
-    allDestinations.map((destination) => destinationData(destination, mediaId)),
+    allDestinations.length,
+    () => allDestinations.map((destination) => destinationData(destination, mediaId)),
     (item) => item.slug,
     {
       existing: (await payload.find({ collection: "destinations", ...read })).docs.map((doc) => ({
@@ -223,7 +290,8 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
   const testimonialKey = (item: { name: string; tour: string }) => `${item.name}\u0000${item.tour}`;
   await upsert(
     "testimonials",
-    testimonials.map(({ name, city, tour, review, rating }) => ({ name, city, tour, review, rating })),
+    testimonials.length,
+    () => testimonials.map(({ name, city, tour, review, rating }) => ({ name, city, tour, review, rating })),
     testimonialKey,
     {
       existing: (await payload.find({ collection: "testimonials", ...read })).docs.map((doc) => ({
@@ -237,14 +305,16 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
 
   await upsert(
     "gallery-items",
-    galleryItems.map(({ title, category, location, size, image }, order) => ({
-      title,
-      category,
-      location,
-      size,
-      image: mediaId(image),
-      order,
-    })),
+    galleryItems.length,
+    () =>
+      galleryItems.map(({ title, category, location, size, image }, order) => ({
+        title,
+        category,
+        location,
+        size,
+        image: mediaId(image),
+        order,
+      })),
     (item) => item.title,
     {
       existing: (await payload.find({ collection: "gallery-items", ...read })).docs.map((doc) => ({
@@ -258,13 +328,15 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
 
   await upsert(
     "experiences",
-    experiences.map(({ title, description, icon, image }, order) => ({
-      title,
-      description,
-      icon,
-      image: mediaId(image),
-      order,
-    })),
+    experiences.length,
+    () =>
+      experiences.map(({ title, description, icon, image }, order) => ({
+        title,
+        description,
+        icon,
+        image: mediaId(image),
+        order,
+      })),
     (item) => item.title,
     {
       existing: (await payload.find({ collection: "experiences", ...read })).docs.map((doc) => ({
@@ -277,23 +349,35 @@ export async function seed(payload: Payload, options: SeedOptions = {}): Promise
   );
 
   // ---- Globals -------------------------------------------------------
-  await payload.updateGlobal({
-    slug: "pricing-settings",
-    data: pricingSettings,
-    overrideAccess: true,
-    context,
-  });
-  updated["pricing-settings"]++;
+  const pricing = await payload.findGlobal({ slug: "pricing-settings", depth: 0, overrideAccess: true });
+  if (overwrite || !pricing.stayOptions?.length) {
+    await payload.updateGlobal({
+      slug: "pricing-settings",
+      data: pricingSettings,
+      overrideAccess: true,
+      context,
+    });
+    updated["pricing-settings"]++;
+  } else {
+    skipped["pricing-settings"]++;
+  }
 
-  await payload.updateGlobal({
-    slug: "site-settings",
-    data: siteSettings,
-    overrideAccess: true,
-    context,
-  });
-  updated["site-settings"]++;
+  const siteDoc = await payload.findGlobal({ slug: "site-settings", depth: 0, overrideAccess: true });
+  if (overwrite || !siteDoc.phoneE164) {
+    await payload.updateGlobal({
+      slug: "site-settings",
+      data: siteSettings,
+      overrideAccess: true,
+      context,
+    });
+    updated["site-settings"]++;
+  } else {
+    skipped["site-settings"]++;
+  }
 
-  return { created, updated, media: mediaIds.size, admin };
+  const media = manifest.filter(([publicPath]) => mediaByFilename.has(mediaFilename(publicPath))).length;
+
+  return { created, updated, skipped, media, admin };
 }
 
 function packageData(

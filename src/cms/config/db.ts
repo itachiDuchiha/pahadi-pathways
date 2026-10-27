@@ -35,7 +35,9 @@ export function buildDbAdapter(env: NodeJS.ProcessEnv) {
 
   return sqliteAdapter({
     client: { url },
-    push: env.NODE_ENV !== "production",
+    // Scripts set PAYLOAD_DB_PUSH=false so they never push the schema,
+    // which would mark the database as dev-pushed for the next migrate.
+    push: env.NODE_ENV !== "production" && env.PAYLOAD_DB_PUSH?.trim() !== "false",
     migrationDir: migrationDir(adapter),
   });
 }

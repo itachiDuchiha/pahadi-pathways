@@ -51,6 +51,14 @@ describe("buildDbAdapter", () => {
     );
   });
 
+  it("turns sqlite push off when PAYLOAD_DB_PUSH is false, whatever NODE_ENV says", () => {
+    buildDbAdapter({ NODE_ENV: "development", PAYLOAD_DB_PUSH: "false", DATABASE_URL: url });
+
+    expect(sqliteAdapter).toHaveBeenCalledWith(
+      expect.objectContaining({ push: false })
+    );
+  });
+
   it("builds the postgres adapter with push off", () => {
     const pgUrl = "postgres://user:pass@localhost:5432/cms";
     buildDbAdapter({ NODE_ENV: "development", DATABASE_ADAPTER: "postgres", DATABASE_URL: pgUrl });

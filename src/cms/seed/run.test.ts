@@ -1,7 +1,9 @@
-import { readdir } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { describe, expect, it, vi } from "vitest";
+import type { CollectionSlug } from "payload";
+import sharp from "sharp";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { withTempPayload } from "../test/withTempPayload";
 import { allDestinations } from "./destinations";
@@ -9,7 +11,7 @@ import { experiences } from "./experiences";
 import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages } from "./packages";
-import { assertSeedEnv, mediaFilename, pruneEnquiries, seed } from "./run";
+import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
 
 const temp = withTempPayload();
@@ -66,54 +68,75 @@ describe("assertSeedEnv", () => {
   });
 });
 
+/** Fixture counts per target, as the first seed into an empty database creates them. */
+const FIXTURE_COUNTS = {
+  media: Object.keys(mediaManifest).length,
+  packages: packages.length,
+  destinations: allDestinations.length,
+  testimonials: testimonials.length,
+  "gallery-items": galleryItems.length,
+  experiences: experiences.length,
+} as const;
+
+const quiet = { skipRevalidate: true } as const;
+
 describe("seed", () => {
+  // Tiny stand-ins for every manifest image keep uploads fast; the manifest
+  // test above checks the real files.
+  let publicDir = "";
+  beforeAll(async () => {
+    publicDir = path.join(temp.dir, "public");
+    const pixel = await sharp({
+      create: { width: 4, height: 4, channels: 3, background: "#336699" },
+    })
+      .webp()
+      .toBuffer();
+    for (const publicPath of Object.keys(mediaManifest)) {
+      const file = path.join(publicDir, publicPath);
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, pixel);
+    }
+  });
+
+  const run = (overwrite = false) =>
+    seed(temp.payload, { skipRevalidate: true, env: {}, publicDir, overwrite });
+
+  async function count(collection: CollectionSlug): Promise<number> {
+    return (await temp.payload.count({ collection, overrideAccess: true })).totalDocs;
+  }
+
+  async function packageBySlug(slug: string) {
+    const { docs } = await temp.payload.find({
+      collection: "packages",
+      where: { slug: { equals: slug } },
+      limit: 1,
+      depth: 0,
+    });
+    const doc = docs[0];
+    if (!doc) throw new Error(`package ${slug} not found`);
+    return doc;
+  }
+
   it(
-    "creates every fixture once, publishes it and is idempotent",
+    "fills an empty database with every fixture, published",
     async () => {
       const { payload } = temp;
       const warn = vi.spyOn(payload.logger, "warn");
 
-      const first = await seed(payload, { skipRevalidate: true, env: {} });
+      const first = await run();
 
-      const mediaCount = Object.keys(mediaManifest).length;
-      expect(first.created).toEqual({
-        media: mediaCount,
-        packages: packages.length,
-        destinations: allDestinations.length,
-        testimonials: testimonials.length,
-        "gallery-items": galleryItems.length,
-        experiences: experiences.length,
-        "pricing-settings": 0,
-        "site-settings": 0,
-      });
+      expect(first.created).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 0, "site-settings": 0 });
       expect(first.updated["pricing-settings"]).toBe(1);
       expect(first.updated["site-settings"]).toBe(1);
-      expect(first.media).toBe(mediaCount);
+      expect(Object.values(first.skipped).every((n) => n === 0)).toBe(true);
+      expect(first.media).toBe(FIXTURE_COUNTS.media);
       expect(first.admin).toBe("skipped");
-
-      const second = await seed(payload, { skipRevalidate: true, env: {} });
-      expect(Object.values(second.created).every((count) => count === 0)).toBe(true);
-      expect(second.updated.packages).toBe(packages.length);
-      expect(second.media).toBe(mediaCount);
 
       expect(packages.length).toBe(5);
       expect(allDestinations.length).toBe(12);
-      const counts = {
-        media: (await payload.count({ collection: "media" })).totalDocs,
-        packages: (await payload.count({ collection: "packages" })).totalDocs,
-        destinations: (await payload.count({ collection: "destinations" })).totalDocs,
-        testimonials: (await payload.count({ collection: "testimonials" })).totalDocs,
-        gallery: (await payload.count({ collection: "gallery-items" })).totalDocs,
-        experiences: (await payload.count({ collection: "experiences" })).totalDocs,
-      };
-      expect(counts).toEqual({
-        media: mediaCount,
-        packages: packages.length,
-        destinations: allDestinations.length,
-        testimonials: testimonials.length,
-        gallery: galleryItems.length,
-        experiences: experiences.length,
-      });
+      for (const [collection, expected] of Object.entries(FIXTURE_COUNTS)) {
+        expect(await count(collection as CollectionSlug)).toBe(expected);
+      }
 
       // Anonymous published reads see every package and destination.
       const publicPackages = await payload.find({
@@ -141,7 +164,12 @@ describe("seed", () => {
       });
       expect(publicDestinations.totalDocs).toBe(allDestinations.length);
       const layouts = Object.fromEntries(publicDestinations.docs.map((doc) => [doc.slug, doc.layout]));
-      expect(layouts).toMatchObject({ manali: "dedicated", shimla: "dedicated", "spiti-valley": "dedicated", kufri: "shared" });
+      expect(layouts).toMatchObject({
+        manali: "dedicated",
+        shimla: "dedicated",
+        "spiti-valley": "dedicated",
+        kufri: "shared",
+      });
       const kufri = publicDestinations.docs.find((doc) => doc.slug === "kufri");
       expect(kufri?.gallery).toHaveLength(4);
 
@@ -160,8 +188,167 @@ describe("seed", () => {
       expect(revalidationWarnings).toEqual([]);
       warn.mockRestore();
     },
-    240_000
+    120_000
   );
+
+  it(
+    "keeps editor changes when it runs again",
+    async () => {
+      const { payload } = temp;
+      await run();
+
+      const pkg = await packageBySlug("shimla-manali-getaway");
+      await payload.update({
+        collection: "packages",
+        id: pkg.id,
+        data: { title: "Edited title", pricing: { basePricePerAdult: 12345 } },
+        draft: false,
+        overrideAccess: true,
+        context: quiet,
+      });
+      await payload.updateGlobal({ slug: "pricing-settings", data: { gstPercent: 12 }, context: quiet });
+      await payload.updateGlobal({ slug: "site-settings", data: { tagline: "Edited tagline" }, context: quiet });
+      const media = (await payload.find({ collection: "media", where: { filename: { equals: "packages-spiti.webp" } } }))
+        .docs[0];
+      if (!media) throw new Error("media not found");
+      await payload.update({ collection: "media", id: media.id, data: { alt: "Edited alt" }, context: quiet });
+
+      const second = await run();
+
+      expect(Object.values(second.created).every((n) => n === 0)).toBe(true);
+      expect(Object.values(second.updated).every((n) => n === 0)).toBe(true);
+      expect(second.skipped).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 1, "site-settings": 1 });
+
+      const after = await packageBySlug("shimla-manali-getaway");
+      expect(after.title).toBe("Edited title");
+      expect(after.pricing?.basePricePerAdult).toBe(12345);
+      expect((await payload.findGlobal({ slug: "pricing-settings" })).gstPercent).toBe(12);
+      expect((await payload.findGlobal({ slug: "site-settings" })).tagline).toBe("Edited tagline");
+      expect((await payload.findByID({ collection: "media", id: media.id })).alt).toBe("Edited alt");
+    },
+    120_000
+  );
+
+  it(
+    "does not bring back a deleted testimonial",
+    async () => {
+      const { payload } = temp;
+      await run();
+      const victim = (await payload.find({ collection: "testimonials", limit: 1 })).docs[0];
+      if (!victim) throw new Error("testimonial not found");
+      await payload.delete({ collection: "testimonials", id: victim.id, context: quiet });
+
+      const second = await run();
+
+      expect(second.created.testimonials).toBe(0);
+      expect(second.skipped.testimonials).toBe(testimonials.length);
+      expect(await count("testimonials")).toBe(testimonials.length - 1);
+      const names = (await payload.find({ collection: "testimonials", limit: 0 })).docs.map((d) => d.name);
+      expect(names).not.toContain(victim.name);
+    },
+    120_000
+  );
+
+  it(
+    "restores fixture values and recreates deleted documents with overwrite",
+    async () => {
+      const { payload } = temp;
+      await run();
+
+      const pkg = await packageBySlug("shimla-manali-getaway");
+      await payload.update({
+        collection: "packages",
+        id: pkg.id,
+        data: { title: "Edited title", pricing: { basePricePerAdult: 12345 } },
+        draft: false,
+        overrideAccess: true,
+        context: quiet,
+      });
+      await payload.updateGlobal({ slug: "pricing-settings", data: { gstPercent: 12 }, context: quiet });
+      await payload.updateGlobal({ slug: "site-settings", data: { tagline: "Edited tagline" }, context: quiet });
+      const media = (await payload.find({ collection: "media", where: { filename: { equals: "packages-spiti.webp" } } }))
+        .docs[0];
+      if (!media) throw new Error("media not found");
+      await payload.update({ collection: "media", id: media.id, data: { alt: "Edited alt" }, context: quiet });
+      const victim = (await payload.find({ collection: "testimonials", limit: 1 })).docs[0];
+      if (!victim) throw new Error("testimonial not found");
+      await payload.delete({ collection: "testimonials", id: victim.id, context: quiet });
+
+      const result = await run(true);
+
+      expect(result.created).toMatchObject({ media: 0, packages: 0, testimonials: 1 });
+      expect(result.updated).toMatchObject({
+        media: 1,
+        packages: packages.length,
+        testimonials: testimonials.length - 1,
+        "pricing-settings": 1,
+        "site-settings": 1,
+      });
+
+      const after = await packageBySlug("shimla-manali-getaway");
+      expect(after.title).toBe("Shimla & Manali Getaway");
+      expect(after.pricing?.basePricePerAdult).toBe(18999);
+      expect((await payload.findGlobal({ slug: "pricing-settings" })).gstPercent).toBe(5);
+      expect((await payload.findGlobal({ slug: "site-settings" })).tagline).toBe("Handcrafted Himalayan Journeys");
+      expect((await payload.findByID({ collection: "media", id: media.id })).alt).toBe(
+        "Kinnaur & Spiti: The Himalayan Circuit"
+      );
+      expect(await count("testimonials")).toBe(testimonials.length);
+      expect(await count("media")).toBe(FIXTURE_COUNTS.media);
+    },
+    120_000
+  );
+
+  it(
+    "fills an emptied collection from the existing media without uploading",
+    async () => {
+      const { payload } = temp;
+      await run();
+      const mediaIds = new Set(
+        (await payload.find({ collection: "media", limit: 0, depth: 0 })).docs.map((doc) => doc.id)
+      );
+      await payload.delete({ collection: "experiences", where: {}, context: quiet });
+      expect(await count("experiences")).toBe(0);
+
+      const second = await run();
+
+      expect(second.created).toMatchObject({ media: 0, experiences: experiences.length, packages: 0 });
+      expect(second.skipped.media).toBe(FIXTURE_COUNTS.media);
+      expect(await count("media")).toBe(FIXTURE_COUNTS.media);
+      const recreated = (await payload.find({ collection: "experiences", limit: 0, depth: 0 })).docs;
+      expect(recreated).toHaveLength(experiences.length);
+      for (const doc of recreated) expect(mediaIds.has(Number(doc.image))).toBe(true);
+    },
+    120_000
+  );
+
+  it(
+    "names the missing media file when an emptied collection needs it",
+    async () => {
+      const { payload } = temp;
+      await run();
+      await payload.delete({ collection: "experiences", where: {}, context: quiet });
+      await payload.delete({
+        collection: "media",
+        where: { filename: { equals: "packages-keylong.webp" } },
+        context: quiet,
+      });
+
+      await expect(run()).rejects.toThrow(/packages-keylong\.webp/);
+    },
+    120_000
+  );
+});
+
+describe("isMissingSchemaError", () => {
+  it("recognises a missing table, also when wrapped", () => {
+    expect(isMissingSchemaError(new Error("SQLITE_ERROR: no such table: users"))).toBe(true);
+    expect(
+      isMissingSchemaError(new Error("Failed query", { cause: new Error("no such table: media") }))
+    ).toBe(true);
+    expect(isMissingSchemaError(new Error('relation "users" does not exist'))).toBe(true);
+    expect(isMissingSchemaError(new Error("UNIQUE constraint failed"))).toBe(false);
+  });
 });
 
 describe("pruneEnquiries", () => {
