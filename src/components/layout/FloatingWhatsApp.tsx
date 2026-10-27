@@ -5,7 +5,10 @@ import { FaWhatsapp } from "react-icons/fa";
 
 import { whatsappUrl } from "@/config/site";
 
+import { useSiteSettings } from "./SiteSettingsProvider";
+
 export default function FloatingWhatsApp() {
+  const settings = useSiteSettings();
   const [isOpen, setIsOpen] = useState(false);
 
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,7 +48,7 @@ export default function FloatingWhatsApp() {
         onBlur={closePopup}
         onClick={() => {
           window.open(
-            whatsappUrl(),
+            whatsappUrl(settings),
             "_blank",
             "noopener,noreferrer"
           );
@@ -123,7 +126,7 @@ export default function FloatingWhatsApp() {
 
         {/* WHATSAPP LINK */}
         <a
-          href={whatsappUrl()}
+          href={whatsappUrl(settings)}
           target="_blank"
           rel="noopener noreferrer"
           className="

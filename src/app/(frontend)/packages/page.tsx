@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 
 import PackageCard from "@/components/packages/PackageCard";
@@ -8,13 +9,21 @@ import { getPackages } from "@/lib/cms/packages";
 import type { Package } from "@/lib/cms/types";
 
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Tour Packages",
-  description:
-    "Curated Himachal tour packages with transport, stays and sightseeing included. Compare routes, durations and prices.",
-  path: "/packages",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: "Tour Packages",
+      description:
+        "Curated Himachal tour packages with transport, stays and sightseeing included. Compare routes, durations and prices.",
+      path: "/packages",
+    },
+    settings
+  );
+}
 
 type PackagesPageProps = {
   searchParams: Promise<{

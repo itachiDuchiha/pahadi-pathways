@@ -7,6 +7,7 @@ import { packages } from "@/cms/seed/packages";
 import { absoluteUrl } from "./seo";
 import {
   breadcrumbJsonLd,
+  contactPageJsonLd,
   destinationJsonLd,
   faqJsonLd,
   organizationJsonLd,
@@ -18,7 +19,7 @@ type Offer = { "@type": string; price: number; priceCurrency: string };
 type ItemList = { itemListElement: { position: number; name: string }[] };
 
 describe("packageJsonLd", () => {
-  const data = packageJsonLd(packages[0]);
+  const data = packageJsonLd(packages[0], site);
 
   it("prices the offer as a number in INR", () => {
     const offers = data.offers as Offer;
@@ -46,7 +47,7 @@ describe("packageJsonLd", () => {
 
   it("falls back to the itinerary stops without day titles", () => {
     const pkg = { ...packages[0], itineraryDays: undefined };
-    const itinerary = packageJsonLd(pkg).itinerary as ItemList;
+    const itinerary = packageJsonLd(pkg, site).itinerary as ItemList;
 
     expect(itinerary.itemListElement.map((item) => item.name)).toEqual(
       pkg.itinerary
@@ -57,7 +58,7 @@ describe("packageJsonLd", () => {
     const provider = data.provider as Record<string, unknown>;
 
     expect(provider["@type"]).toBe("TravelAgency");
-    expect(provider["@id"]).toBe(organizationJsonLd()["@id"]);
+    expect(provider["@id"]).toBe(organizationJsonLd(site)["@id"]);
     expect(provider["@context"]).toBeUndefined();
   });
 });
@@ -88,12 +89,36 @@ describe("faqJsonLd", () => {
 
 describe("organizationJsonLd", () => {
   it("uses the E.164 phone number and the site name", () => {
-    const data = organizationJsonLd();
+    const data = organizationJsonLd(site);
 
     expect(data.telephone).toBe("+917559697919");
     expect(data["@id"]).toBe(absoluteUrl("/#organization"));
     expect(data.name).toBe(site.name);
     expect(data["@context"]).toBe("https://schema.org");
+  });
+
+  it("takes the contact details and socials from the settings it is given", () => {
+    const data = organizationJsonLd({
+      ...site,
+      phone: { ...site.phone, e164: "+910000000000" },
+      email: "desk@example.com",
+      social: { instagram: "https://instagram.com/x", facebook: "https://facebook.com/x" },
+    });
+
+    expect(data.telephone).toBe("+910000000000");
+    expect(data.email).toBe("desk@example.com");
+    expect(data.sameAs).toEqual(["https://instagram.com/x", "https://facebook.com/x"]);
+    expect(data.url).toBe(site.url);
+  });
+});
+
+describe("contactPageJsonLd", () => {
+  it("uses the settings for the contact point", () => {
+    const data = contactPageJsonLd({ ...site, email: "desk@example.com" });
+    const entity = data.mainEntity as { contactPoint: Record<string, unknown> };
+
+    expect(entity.contactPoint.email).toBe("desk@example.com");
+    expect(entity.contactPoint.telephone).toBe(site.phone.e164);
   });
 });
 

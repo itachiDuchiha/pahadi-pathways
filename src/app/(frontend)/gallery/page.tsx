@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Camera, Mountain, ArrowRight } from "lucide-react";
@@ -6,13 +7,21 @@ import GalleryExplorer from "@/components/gallery/GalleryExplorer";
 
 import { getGalleryItems } from "@/lib/cms/gallery";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Gallery",
-  description:
-    "Photographs from our Himachal journeys: mountain passes, valleys, villages and travellers on the road.",
-  path: "/gallery",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: "Gallery",
+      description:
+        "Photographs from our Himachal journeys: mountain passes, valleys, villages and travellers on the road.",
+      path: "/gallery",
+    },
+    settings
+  );
+}
 
 export default async function GalleryPage() {
   const galleryItems = await getGalleryItems();

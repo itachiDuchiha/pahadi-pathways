@@ -1,18 +1,26 @@
+import type { Metadata } from "next";
 import PlannerButton from "@/components/layout/PlannerButton";
 import DestinationsHero from "@/components/destinations/DestinationsHero";
 import DestinationSection from "@/components/destinations/DestinationSection";
 
 import { destinationsInCategory, getDestinations } from "@/lib/cms/destinations";
 
-import { site } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Destinations",
-  description:
-    `Explore Shimla, Manali, Spiti Valley, Kinnaur and hidden Himachal villages with ${site.name}.`,
-  path: "/destinations",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: "Destinations",
+      description:
+        `Explore Shimla, Manali, Spiti Valley, Kinnaur and hidden Himachal villages with ${settings.name}.`,
+      path: "/destinations",
+    },
+    settings
+  );
+}
 
 export default async function DestinationsPage() {
   const destinations = await getDestinations();

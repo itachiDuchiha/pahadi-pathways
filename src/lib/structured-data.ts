@@ -1,5 +1,5 @@
 import { site } from "@/config/site";
-import type { Destination, PackageContent } from "@/lib/cms/types";
+import type { Destination, PackageContent, Site } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -10,27 +10,28 @@ const SCHEMA_CONTEXT = "https://schema.org";
 type Faq = { question: string; answer: string };
 type Crumb = { name: string; path: string };
 
-function organization(): JsonLdObject {
+/** `settings` is the merged site settings; the URL always comes from the environment. */
+function organization(settings: Site): JsonLdObject {
   return {
     "@type": "TravelAgency",
     "@id": absoluteUrl("/#organization"),
-    name: site.name,
+    name: settings.name,
     url: site.url,
     logo: absoluteUrl("/images/logo/full-logo.webp"),
-    telephone: site.phone.e164,
-    email: site.email,
-    sameAs: [site.social.instagram, site.social.facebook],
+    telephone: settings.phone.e164,
+    email: settings.email,
+    sameAs: [settings.social.instagram, settings.social.facebook],
     areaServed: "Himachal Pradesh, India",
     address: {
       "@type": "PostalAddress",
-      addressRegion: site.address.region,
-      addressCountry: site.address.country,
+      addressRegion: settings.address.region,
+      addressCountry: settings.address.country,
     },
   };
 }
 
-export function organizationJsonLd(): JsonLdObject {
-  return { "@context": SCHEMA_CONTEXT, ...organization() };
+export function organizationJsonLd(settings: Site): JsonLdObject {
+  return { "@context": SCHEMA_CONTEXT, ...organization(settings) };
 }
 
 export function websiteJsonLd(): JsonLdObject {
@@ -50,27 +51,27 @@ export function websiteJsonLd(): JsonLdObject {
   };
 }
 
-export function contactPageJsonLd(): JsonLdObject {
+export function contactPageJsonLd(settings: Site): JsonLdObject {
   return {
     "@context": SCHEMA_CONTEXT,
     "@type": "ContactPage",
-    name: `Contact ${site.name}`,
+    name: `Contact ${settings.name}`,
     url: absoluteUrl("/contact"),
     mainEntity: {
-      ...organization(),
+      ...organization(settings),
       "@type": ["TravelAgency", "LocalBusiness"],
       contactPoint: {
         "@type": "ContactPoint",
         contactType: "customer service",
-        telephone: site.phone.e164,
-        email: site.email,
+        telephone: settings.phone.e164,
+        email: settings.email,
         areaServed: "IN",
       },
     },
   };
 }
 
-export function packageJsonLd(pkg: PackageContent): JsonLdObject {
+export function packageJsonLd(pkg: PackageContent, settings: Site): JsonLdObject {
   const url = absoluteUrl(`/packages/${pkg.slug}`);
   const stops = pkg.itineraryDays?.map((day) => day.title) ?? pkg.itinerary;
 
@@ -98,7 +99,7 @@ export function packageJsonLd(pkg: PackageContent): JsonLdObject {
       availability: "https://schema.org/InStock",
       url,
     },
-    provider: organization(),
+    provider: organization(settings),
   };
 }
 

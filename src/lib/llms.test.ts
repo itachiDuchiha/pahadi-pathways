@@ -7,7 +7,7 @@ import { packages } from "@/cms/seed/packages";
 import { buildLlmsFullTxt, buildLlmsTxt } from "./llms";
 import { absoluteUrl } from "./seo";
 
-const content = { packages, destinations: allDestinations };
+const content = { packages, destinations: allDestinations, site };
 
 describe("buildLlmsTxt", () => {
   const text = buildLlmsTxt(content);
@@ -51,5 +51,22 @@ describe("buildLlmsFullTxt", () => {
         expect(text).toContain(faq.question);
       }
     }
+  });
+});
+
+describe("contact details", () => {
+  it("come from the settings it is given", () => {
+    const text = buildLlmsTxt({
+      ...content,
+      site: {
+        ...site,
+        phone: { display: "+91 00000 00000", e164: "+910000000000", whatsapp: "910000000000" },
+        email: "desk@example.com",
+      },
+    });
+
+    expect(text).toContain("- Phone: +91 00000 00000");
+    expect(text).toContain("- Email: desk@example.com");
+    expect(text).toContain("- WhatsApp: https://wa.me/910000000000");
   });
 });

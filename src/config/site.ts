@@ -26,18 +26,27 @@ export const site = {
   },
 } as const;
 
-export function whatsappUrl(message?: string): string {
-  const base = `https://wa.me/${site.phone.whatsapp}`;
+/**
+ * The contact details the link helpers need. `site` above satisfies it, and
+ * so does the merged CMS value, so callers pass whichever they hold.
+ */
+export type ContactDetails = {
+  phone: { e164: string; whatsapp: string };
+  email: string;
+};
+
+export function whatsappUrl(details: ContactDetails, message?: string): string {
+  const base = `https://wa.me/${details.phone.whatsapp}`;
 
   if (!message) return base;
 
   return `${base}?text=${encodeURIComponent(message)}`;
 }
 
-export function telUrl(): string {
-  return `tel:${site.phone.e164}`;
+export function telUrl(details: ContactDetails): string {
+  return `tel:${details.phone.e164}`;
 }
 
-export function mailtoUrl(): string {
-  return `mailto:${site.email}`;
+export function mailtoUrl(details: ContactDetails): string {
+  return `mailto:${details.email}`;
 }

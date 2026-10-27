@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { SiteSetting } from "@/cms/payload-types";
 import { site } from "@/config/site";
 
@@ -29,7 +31,11 @@ export function mergeSiteSettings(doc: SiteSetting): Site {
   };
 }
 
-export async function getSiteSettings(): Promise<Site> {
+/**
+ * Request-scoped (React `cache`): the layout, its metadata and the page
+ * each ask for the settings, and they share one read.
+ */
+export const getSiteSettings = cache(async (): Promise<Site> => {
   const payload = await getPayloadClient();
   const doc = await payload.findGlobal({
     slug: "site-settings",
@@ -39,4 +45,4 @@ export async function getSiteSettings(): Promise<Site> {
   });
 
   return mergeSiteSettings(doc);
-}
+});

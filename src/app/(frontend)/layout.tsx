@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { site } from "@/config/site";
+import { getSiteSettings } from "@/lib/cms/site";
 import { defaultDescription, defaultTitle } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/structured-data";
 
@@ -12,6 +13,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FloatingButtons from "@/components/layout/FloatingButtons";
 import PlannerProvider from "@/components/layout/PlannerProvider";
+import SiteSettingsProvider from "@/components/layout/SiteSettingsProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,49 +25,53 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: defaultTitle,
-    template: `%s | ${site.name}`,
-  },
-  description: defaultDescription,
-  openGraph: {
-    title: {
-      default: defaultTitle,
-      template: `%s | ${site.name}`,
-    },
-    siteName: site.name,
-    type: "website",
-    locale: "en_IN",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: {
-      default: defaultTitle,
-      template: `%s | ${site.name}`,
-    },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const title = {
+    default: defaultTitle(settings),
+    template: `%s | ${settings.name}`,
+  };
 
-export default function RootLayout({
+  return {
+    // The site URL always comes from the environment, never the CMS.
+    metadataBase: new URL(site.url),
+    title,
+    description: defaultDescription,
+    openGraph: {
+      title,
+      siteName: settings.name,
+      type: "website",
+      locale: "en_IN",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <JsonLd data={organizationJsonLd()} />
-        <PlannerProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <FloatingButtons />
-        </PlannerProvider>
+        <JsonLd data={organizationJsonLd(settings)} />
+        <SiteSettingsProvider settings={settings}>
+          <PlannerProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FloatingButtons />
+          </PlannerProvider>
+        </SiteSettingsProvider>
       </body>
     </html>
   );

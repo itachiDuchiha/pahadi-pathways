@@ -22,6 +22,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { assertContentPresent } from "@/lib/cms/guard";
 import { getPackageBySlug, getPackages } from "@/lib/cms/packages";
 import { getPricingTables } from "@/lib/cms/pricing-tables";
+import { getSiteSettings } from "@/lib/cms/site";
 
 import { pageMetadata, truncate } from "@/lib/seo";
 import {
@@ -54,12 +55,17 @@ export async function generateMetadata({
     return { title: "Not found" };
   }
 
-  return pageMetadata({
-    title: pkg.title,
-    description: truncate(pkg.overview ?? pkg.summary ?? pkg.title, 155),
-    path: `/packages/${pkg.slug}`,
-    image: pkg.heroImage ?? pkg.image,
-  });
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: pkg.title,
+      description: truncate(pkg.overview ?? pkg.summary ?? pkg.title, 155),
+      path: `/packages/${pkg.slug}`,
+      image: pkg.heroImage ?? pkg.image,
+    },
+    settings
+  );
 }
 
 export default async function PackageDetailsPage({
@@ -67,9 +73,10 @@ export default async function PackageDetailsPage({
 }: Props) {
   const { slug } = await params;
 
-  const [pkg, pricing] = await Promise.all([
+  const [pkg, pricing, settings] = await Promise.all([
     getPackageBySlug(slug),
     getPricingTables(),
+    getSiteSettings(),
   ]);
 
   if (!pkg) {
@@ -78,7 +85,7 @@ export default async function PackageDetailsPage({
 
   return (
     <>
-      <JsonLd data={packageJsonLd(pkg)} />
+      <JsonLd data={packageJsonLd(pkg, settings)} />
 
       <JsonLd
         data={breadcrumbJsonLd([

@@ -16,9 +16,11 @@ import {
 } from "lucide-react";
 
 import { whatsappUrl } from "@/config/site";
+import { useSiteSettings } from "@/components/layout/SiteSettingsProvider";
 import { useTodayIso } from "@/lib/hooks/useTodayIso";
 
 export default function TripPlannerForm() {
+  const settings = useSiteSettings();
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -132,7 +134,7 @@ export default function TripPlannerForm() {
   };
 
   const openWhatsApp = () => {
-    const url = whatsappUrl(whatsappMessage);
+    const url = whatsappUrl(settings, whatsappMessage);
 
     window.open(url, "_blank", "noopener,noreferrer");
   };

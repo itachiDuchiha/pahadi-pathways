@@ -7,6 +7,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import { getDestinationBySlug, getDestinations } from "@/lib/cms/destinations";
 import { assertContentPresent } from "@/lib/cms/guard";
 import { getPackages } from "@/lib/cms/packages";
+import { getSiteSettings } from "@/lib/cms/site";
 import { pageMetadata, truncate } from "@/lib/seo";
 import { breadcrumbJsonLd, destinationJsonLd } from "@/lib/structured-data";
 
@@ -35,12 +36,17 @@ export async function generateMetadata({
     return { title: "Not found" };
   }
 
-  return pageMetadata({
-    title: destination.name,
-    description: truncate(destination.description, 155),
-    path: `/destinations/${destination.slug}`,
-    image: destination.image,
-  });
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: destination.name,
+      description: truncate(destination.description, 155),
+      path: `/destinations/${destination.slug}`,
+      image: destination.image,
+    },
+    settings
+  );
 }
 
 export default async function DestinationPage({ params }: Props) {

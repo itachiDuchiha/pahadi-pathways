@@ -83,7 +83,9 @@ describe("pathsFor", () => {
   it("revalidates the root and the whole layout for site settings", () => {
     const targets = pathsFor("site", {}, {});
 
-    expect(targets.map((target) => target.path)).toContain("/");
+    expect(targets.map((target) => target.path)).toEqual(
+      expect.arrayContaining(["/contact", "/privacy", ...COMMON])
+    );
     expect(targets).toContainEqual({ path: "/", type: "layout" });
   });
 });

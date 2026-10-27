@@ -1,16 +1,31 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { site, whatsappUrl } from "./site";
+import { mailtoUrl, site, telUrl, whatsappUrl } from "./site";
+
+const custom = {
+  ...site,
+  phone: { display: "+91 00000 00000", e164: "+910000000000", whatsapp: "910000000000" },
+  email: "desk@example.com",
+};
 
 describe("site config", () => {
   it("builds a plain WhatsApp URL with no message", () => {
-    expect(whatsappUrl()).toBe("https://wa.me/917559697919");
+    expect(whatsappUrl(site)).toBe("https://wa.me/917559697919");
   });
 
   it("builds a WhatsApp URL with an encoded message", () => {
-    expect(whatsappUrl("hi there")).toBe(
+    expect(whatsappUrl(site, "hi there")).toBe(
       "https://wa.me/917559697919?text=hi%20there"
     );
+  });
+
+  it("builds the links from the settings it is given", () => {
+    expect(whatsappUrl(custom, "hi")).toBe("https://wa.me/910000000000?text=hi");
+    expect(whatsappUrl(custom, "a&b ✓")).toBe(
+      "https://wa.me/910000000000?text=a%26b%20%E2%9C%93"
+    );
+    expect(telUrl(custom)).toBe("tel:+910000000000");
+    expect(mailtoUrl(custom)).toBe("mailto:desk@example.com");
   });
 
   it("has a site URL with no trailing slash", () => {

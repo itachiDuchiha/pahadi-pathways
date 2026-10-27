@@ -4,6 +4,7 @@ import { site } from "@/config/site";
 
 import {
   absoluteUrl,
+  defaultTitle,
   ogImageAlt,
   ogImageSize,
   pageMetadata,
@@ -45,11 +46,14 @@ describe("truncate", () => {
 
 describe("pageMetadata", () => {
   it("sets the canonical alternate to the absolute URL", () => {
-    const metadata = pageMetadata({
-      title: "Title",
-      description: "Description",
-      path: "/packages/some-slug",
-    });
+    const metadata = pageMetadata(
+      {
+        title: "Title",
+        description: "Description",
+        path: "/packages/some-slug",
+      },
+      site
+    );
 
     expect(metadata.alternates?.canonical).toBe(
       absoluteUrl("/packages/some-slug")
@@ -57,18 +61,21 @@ describe("pageMetadata", () => {
   });
 
   it("falls back to the default generated image when no image is given", () => {
-    const metadata = pageMetadata({
-      title: "Title",
-      description: "Description",
-      path: "/packages/some-slug",
-    });
+    const metadata = pageMetadata(
+      {
+        title: "Title",
+        description: "Description",
+        path: "/packages/some-slug",
+      },
+      site
+    );
 
     expect(metadata.openGraph?.images).toEqual([
       {
         url: absoluteUrl("/opengraph-image"),
         width: 1200,
         height: 630,
-        alt: ogImageAlt,
+        alt: ogImageAlt(site),
       },
     ]);
     expect(ogImageSize).toEqual({ width: 1200, height: 630 });
@@ -76,12 +83,15 @@ describe("pageMetadata", () => {
   });
 
   it("sets an absolute openGraph image when given", () => {
-    const metadata = pageMetadata({
-      title: "Title",
-      description: "Description",
-      path: "/packages/some-slug",
-      image: "/images/packages/spiti.webp",
-    });
+    const metadata = pageMetadata(
+      {
+        title: "Title",
+        description: "Description",
+        path: "/packages/some-slug",
+        image: "/images/packages/spiti.webp",
+      },
+      site
+    );
 
     expect(metadata.openGraph?.images).toEqual([
       { url: absoluteUrl("/images/packages/spiti.webp") },
@@ -89,11 +99,14 @@ describe("pageMetadata", () => {
   });
 
   it("includes openGraph and twitter fields", () => {
-    const metadata = pageMetadata({
-      title: "Title",
-      description: "Description",
-      path: "/packages/some-slug",
-    });
+    const metadata = pageMetadata(
+      {
+        title: "Title",
+        description: "Description",
+        path: "/packages/some-slug",
+      },
+      site
+    );
 
     expect(metadata.title).toBe("Title");
     expect(metadata.description).toBe("Description");
@@ -109,13 +122,28 @@ describe("pageMetadata", () => {
   });
 
   it("omits the page title and uses the site default for social titles when no title is given", () => {
-    const metadata = pageMetadata({
-      description: "Description",
-      path: "/",
-    });
+    const metadata = pageMetadata(
+      {
+        description: "Description",
+        path: "/",
+      },
+      site
+    );
 
     expect(metadata.title).toBeUndefined();
     expect(metadata.openGraph?.title).toBe(`${site.name} | ${site.tagline}`);
     expect(metadata.twitter?.title).toBe(`${site.name} | ${site.tagline}`);
+  });
+
+  it("takes the default social title from the settings it is given", () => {
+    const metadata = pageMetadata(
+      { description: "Description", path: "/" },
+      { ...site, tagline: "Edited tagline" }
+    );
+
+    expect(metadata.openGraph?.title).toBe(`${site.name} | Edited tagline`);
+    expect(defaultTitle({ ...site, tagline: "Edited tagline" })).toBe(
+      `${site.name} | Edited tagline`
+    );
   });
 });

@@ -1,12 +1,12 @@
-import { site, whatsappUrl } from "@/config/site";
-import type { Destination, PackageContent } from "@/lib/cms/types";
+import { whatsappUrl } from "@/config/site";
+import type { Destination, PackageContent, Site } from "@/lib/cms/types";
 import { absoluteUrl } from "@/lib/seo";
 
 function packageUrl(pkg: PackageContent): string {
   return absoluteUrl(`/packages/${pkg.slug}`);
 }
 
-function header(): string[] {
+function header(site: Site): string[] {
   return [
     `# ${site.name}`,
     "",
@@ -24,6 +24,8 @@ function packageLine(pkg: PackageContent): string {
 export type LlmsContent = {
   packages: readonly PackageContent[];
   destinations: readonly Destination[];
+  /** The merged site settings, for the name, tagline and contact details. */
+  site: Site;
 };
 
 function destinationLines(destinations: readonly Destination[]): string[] {
@@ -33,13 +35,13 @@ function destinationLines(destinations: readonly Destination[]): string[] {
   );
 }
 
-function footer(): string[] {
+function footer(site: Site): string[] {
   return [
     "## Contact",
     "",
     `- Phone: ${site.phone.display}`,
     `- Email: ${site.email}`,
-    `- WhatsApp: ${whatsappUrl()}`,
+    `- WhatsApp: ${whatsappUrl(site)}`,
     `- Contact page: ${absoluteUrl("/contact")}`,
     "",
     "## Policies",
@@ -86,9 +88,9 @@ function join(lines: string[]): string {
   return `${lines.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`;
 }
 
-export function buildLlmsTxt({ packages, destinations }: LlmsContent): string {
+export function buildLlmsTxt({ packages, destinations, site }: LlmsContent): string {
   return join([
-    ...header(),
+    ...header(site),
     "",
     "## Packages",
     "",
@@ -98,13 +100,13 @@ export function buildLlmsTxt({ packages, destinations }: LlmsContent): string {
     "",
     ...destinationLines(destinations),
     "",
-    ...footer(),
+    ...footer(site),
   ]);
 }
 
-export function buildLlmsFullTxt({ packages, destinations }: LlmsContent): string {
+export function buildLlmsFullTxt({ packages, destinations, site }: LlmsContent): string {
   return join([
-    ...header(),
+    ...header(site),
     "",
     "## Packages",
     "",
@@ -114,6 +116,6 @@ export function buildLlmsFullTxt({ packages, destinations }: LlmsContent): strin
     "",
     ...destinationLines(destinations),
     "",
-    ...footer(),
+    ...footer(site),
   ]);
 }

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -7,15 +8,22 @@ import {
   Mountain,
 } from "lucide-react";
 
-import { site } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Traveller Reviews",
-  description:
-    `What travellers say about their Himachal trips with ${site.name}.`,
-  path: "/reviews",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: "Traveller Reviews",
+      description:
+        `What travellers say about their Himachal trips with ${settings.name}.`,
+      path: "/reviews",
+    },
+    settings
+  );
+}
 
 export default function ReviewsPage() {
   return (

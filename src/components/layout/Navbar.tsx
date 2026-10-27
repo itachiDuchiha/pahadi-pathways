@@ -5,12 +5,14 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, Phone, X, ArrowUpRight } from "lucide-react";
 
-import { site, telUrl } from "@/config/site";
+import { telUrl } from "@/config/site";
 
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
+import { useSiteSettings } from "./SiteSettingsProvider";
 
 export default function Navbar() {
+  const settings = useSiteSettings();
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -274,7 +276,7 @@ export default function Navbar() {
                 {/* CALL LINK */}
 
                 <a
-                  href={telUrl()}
+                  href={telUrl(settings)}
                   className="
                     group/call
                     mt-4
@@ -317,7 +319,7 @@ export default function Navbar() {
                     </span>
 
                     <span className="mt-0.5 block whitespace-nowrap text-sm font-bold tracking-wide text-[#10264A]">
-                      {site.phone.display}
+                      {settings.phone.display}
                     </span>
                   </span>
 
@@ -348,7 +350,7 @@ export default function Navbar() {
           {/* MOBILE PHONE */}
 
           <a
-            href={telUrl()}
+            href={telUrl(settings)}
             aria-label="Call The Himalayan Compass"
             className="
               group

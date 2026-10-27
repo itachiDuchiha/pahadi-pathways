@@ -6,9 +6,13 @@ import Link from "next/link";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { FaFacebookF, FaInstagram } from "react-icons/fa";
 
-import { site, telUrl, mailtoUrl } from "@/config/site";
+import { telUrl, mailtoUrl } from "@/config/site";
+
+import { useSiteSettings } from "./SiteSettingsProvider";
 
 export default function Footer() {
+  const settings = useSiteSettings();
+
   return (
     <footer className="relative overflow-hidden">
       {/* Background */}
@@ -140,10 +144,10 @@ export default function Footer() {
                 />
 
                 <a
-                  href={telUrl()}
+                  href={telUrl(settings)}
                   className="whitespace-nowrap text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  {site.phone.display}
+                  {settings.phone.display}
                 </a>
               </div>
 
@@ -155,10 +159,10 @@ export default function Footer() {
                 />
 
                 <a
-                  href={mailtoUrl()}
+                  href={mailtoUrl(settings)}
                   className="whitespace-nowrap text-sm text-gray-300 transition-colors duration-300 hover:text-[#C89A3D]"
                 >
-                  {site.email}
+                  {settings.email}
                 </a>
               </div>
             </div>
@@ -166,7 +170,7 @@ export default function Footer() {
             {/* SOCIAL ICONS */}
             <div className="mt-5 flex gap-3">
               <a
-                href={site.social.instagram}
+                href={settings.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit The Himalayan Compass on Instagram"
@@ -177,7 +181,7 @@ export default function Footer() {
               </a>
 
               <a
-                href={site.social.facebook}
+                href={settings.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visit The Himalayan Compass on Facebook"

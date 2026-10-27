@@ -195,6 +195,20 @@ describe("globals", () => {
     expect(await getSiteSettings()).toEqual({ ...site, email: "desk@example.com" });
   });
 
+  it("returns an edited phone display and keeps every other value", async () => {
+    await temp.payload.updateGlobal({
+      slug: "site-settings",
+      data: { phoneDisplay: "+91 00000 00000" },
+      overrideAccess: true,
+      context,
+    });
+
+    const settings = await getSiteSettings();
+
+    expect(settings.phone.display).toBe("+91 00000 00000");
+    expect(settings).toEqual({ ...site, phone: { ...site.phone, display: "+91 00000 00000" } });
+  });
+
   it("reads the pricing tables", async () => {
     await temp.payload.updateGlobal({
       slug: "pricing-settings",

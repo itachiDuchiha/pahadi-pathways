@@ -1,15 +1,20 @@
 import { ImageResponse } from "next/og";
 
 import { site } from "@/config/site";
+import { getSiteSettings } from "@/lib/cms/site";
 import { ogImageAlt, ogImageSize } from "@/lib/seo";
 
-export const alt = ogImageAlt;
+// The `alt` export is a plain constant, so it uses the code fallback;
+// the image itself is drawn from the settings.
+export const alt = ogImageAlt(site);
 
 export const size = ogImageSize;
 
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const settings = await getSiteSettings();
+
   return new ImageResponse(
     (
       <div
@@ -40,7 +45,7 @@ export default function OpengraphImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          {site.name}
+          {settings.name}
         </div>
         <div
           style={{
@@ -49,7 +54,7 @@ export default function OpengraphImage() {
             color: "#C89A3D",
           }}
         >
-          {site.tagline}
+          {settings.tagline}
         </div>
         <div
           style={{
@@ -61,7 +66,7 @@ export default function OpengraphImage() {
             opacity: 0.7,
           }}
         >
-          {`${site.address.region}, India`}
+          {`${settings.address.region}, India`}
         </div>
       </div>
     ),

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -17,13 +18,21 @@ import {
 import { getExperiences } from "@/lib/cms/experiences";
 import type { ExperienceIcon } from "@/lib/cms/types";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Experiences",
-  description:
-    "Trekking, camping, river rafting, monastery visits and local culture across Himachal Pradesh.",
-  path: "/experiences",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return pageMetadata(
+    {
+      title: "Experiences",
+      description:
+        "Trekking, camping, river rafting, monastery visits and local culture across Himachal Pradesh.",
+      path: "/experiences",
+    },
+    settings
+  );
+}
 
 const experienceIcons: Record<ExperienceIcon, LucideIcon> = {
   Camera,

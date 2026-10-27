@@ -10,6 +10,7 @@ import {
 
 import type { Package, PricingTables } from "@/lib/cms/types";
 import { telUrl, whatsappUrl } from "@/config/site";
+import { useSiteSettings } from "@/components/layout/SiteSettingsProvider";
 import EnquiryModal from "@/components/package-details/booking/EnquiryModal";
 import MealSelector from "@/components/package-details/booking/MealSelector";
 import PriceSummary from "@/components/package-details/booking/PriceSummary";
@@ -33,6 +34,8 @@ export default function PackageBookingPanel({
   pkg,
   pricing,
 }: Props) {
+  const settings = useSiteSettings();
+
   /* =======================================================
      STATE
   ======================================================= */
@@ -313,7 +316,7 @@ export default function PackageBookingPanel({
           >
 
             <a
-              href={telUrl()}
+              href={telUrl(settings)}
               className="
                 inline-flex
                 items-center
@@ -334,7 +337,7 @@ export default function PackageBookingPanel({
             </a>
 
             <a
-              href={whatsappUrl()}
+              href={whatsappUrl(settings)}
               target="_blank"
               rel="noreferrer"
               className="

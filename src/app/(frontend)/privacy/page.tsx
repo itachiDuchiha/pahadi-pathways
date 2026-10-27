@@ -1,17 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-import { site, mailtoUrl } from "@/config/site";
+import { mailtoUrl } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 
-export const metadata = pageMetadata({
-  title: "Privacy Policy",
-  description:
-    `How ${site.name} collects, uses and protects the personal data you share when you enquire.`,
-  path: "/privacy",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
 
-export default function PrivacyPage() {
+  return pageMetadata(
+    {
+      title: "Privacy Policy",
+      description:
+        `How ${settings.name} collects, uses and protects the personal data you share when you enquire.`,
+      path: "/privacy",
+    },
+    settings
+  );
+}
+
+export default async function PrivacyPage() {
+  const settings = await getSiteSettings();
+
   return (
     <div className="min-h-screen bg-[#F8F7F3] pt-[82px]">
 
@@ -126,7 +137,7 @@ export default function PrivacyPage() {
               md:leading-8
             "
           >
-            How {site.name} collects, uses and protects the information
+            How {settings.name} collects, uses and protects the information
             you share when you plan a trip with us.
           </p>
 
@@ -319,10 +330,10 @@ export default function PrivacyPage() {
               the personal data you have shared with us. To exercise any
               of these rights, email us at{" "}
               <a
-                href={mailtoUrl()}
+                href={mailtoUrl(settings)}
                 className="font-semibold text-[#10264A] underline hover:text-[#A97925]"
               >
-                {site.email}
+                {settings.email}
               </a>
               .
             </p>
@@ -355,10 +366,10 @@ export default function PrivacyPage() {
               If you have any questions about this privacy policy or how
               your information is handled, reach out to us at{" "}
               <a
-                href={mailtoUrl()}
+                href={mailtoUrl(settings)}
                 className="font-semibold text-[#10264A] underline hover:text-[#A97925]"
               >
-                {site.email}
+                {settings.email}
               </a>
               .
             </p>

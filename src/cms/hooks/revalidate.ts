@@ -82,7 +82,11 @@ export function pathsFor(
     targets.push({ path: "/destinations" }, { path: "/destinations/[slug]", type: "page" });
   }
   if (kind === "pricing") targets.push({ path: "/packages/[slug]", type: "page" });
-  if (kind === "site") targets.push({ path: "/", type: "layout" });
+  // Contact details render in the footer and navbar of every page, so the
+  // whole layout goes; the two pages that list them are named as well.
+  if (kind === "site") {
+    targets.push({ path: "/contact" }, { path: "/privacy" }, { path: "/", type: "layout" });
+  }
 
   return targets;
 }

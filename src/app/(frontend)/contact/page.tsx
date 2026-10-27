@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -7,23 +8,33 @@ import {
   Phone,
 } from "lucide-react";
 
-import { site, telUrl, mailtoUrl } from "@/config/site";
+import { telUrl, mailtoUrl } from "@/config/site";
 import ContactForm from "@/components/forms/ContactForm";
 import JsonLd from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/seo";
+import { getSiteSettings } from "@/lib/cms/site";
 import { contactPageJsonLd } from "@/lib/structured-data";
 
-export const metadata = pageMetadata({
-  title: "Contact Us",
-  description:
-    `Call, WhatsApp or email ${site.name} to plan your Himachal trip.`,
-  path: "/contact",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
 
-export default function ContactPage() {
+  return pageMetadata(
+    {
+      title: "Contact Us",
+      description:
+        `Call, WhatsApp or email ${settings.name} to plan your Himachal trip.`,
+      path: "/contact",
+    },
+    settings
+  );
+}
+
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
+
   return (
     <div className="min-h-screen bg-[#F8F7F3] pt-[82px]">
-      <JsonLd data={contactPageJsonLd()} />
+      <JsonLd data={contactPageJsonLd(settings)} />
 
       {/* =====================================================
           HERO
@@ -230,7 +241,7 @@ export default function ContactPage() {
                 {/* Email */}
 
                 <a
-                  href={mailtoUrl()}
+                  href={mailtoUrl(settings)}
                   className="
                     group
                     flex
@@ -292,7 +303,7 @@ export default function ContactPage() {
                         group-hover:text-[#A97925]
                       "
                     >
-                      {site.email}
+                      {settings.email}
                     </span>
 
                   </span>
@@ -303,7 +314,7 @@ export default function ContactPage() {
                 {/* Phone */}
 
                 <a
-                  href={telUrl()}
+                  href={telUrl(settings)}
                   className="
                     group
                     flex
@@ -365,7 +376,7 @@ export default function ContactPage() {
                         group-hover:text-[#A97925]
                       "
                     >
-                      {site.phone.display}
+                      {settings.phone.display}
                     </span>
 
                   </span>
@@ -627,7 +638,7 @@ export default function ContactPage() {
             <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
 
               <a
-                href={telUrl()}
+                href={telUrl(settings)}
                 className="
                   inline-flex
                   items-center
