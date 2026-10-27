@@ -83,7 +83,7 @@ export type PackagePricing = {
  */
 export type Package = PackageContent & { pricing: PackagePricing };
 
-/** A stay or meal option: rupees per adult per night, multiplied by the package's nights. */
+/** A stay or meal option: rupees per booking per night (once, regardless of adults), times the package's nights. */
 export type PricingOption = { label: string; deltaPerNight: number };
 
 export type VehiclePriceOption = {

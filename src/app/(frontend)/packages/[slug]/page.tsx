@@ -86,6 +86,13 @@ export default async function PackageDetailsPage({
 
   // The package's own stay and meal lists, else the site-wide ones.
   const pricing = effectivePricingTables(pkg, globalPricing);
+  // The panel reads stay and meal options from `pricing` only, so the
+  // package's own lists are not sent to the client a second time.
+  const { basePricePerAdult, vehicleRates } = pkg.pricing;
+  const panelPkg = {
+    ...pkg,
+    pricing: { basePricePerAdult, ...(vehicleRates && { vehicleRates }) },
+  };
 
   return (
     <>
@@ -220,7 +227,7 @@ export default async function PackageDetailsPage({
                   scrollbar-track-transparent
                 "
             >
-              <PackageBookingPanel pkg={pkg} pricing={pricing} />
+              <PackageBookingPanel pkg={panelPkg} pricing={pricing} />
             </div>
 
           </aside>

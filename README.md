@@ -154,8 +154,9 @@ clear the shell history afterwards so the password is not kept there.
   dedicated layout or the shared one), testimonials, gallery images,
   experiences (text and icon name), the default stay, meal and vehicle
   pricing tables, site contact details, and all images.
-- Stay and meal options are priced per adult per night: a quote adds the
-  option's delta per night times the package's nights (the `N` in its
+- Stay and meal options are priced in rupees per booking per night (added
+  once, regardless of the number of adults): a quote adds the option's
+  delta per night times the package's nights (the `N` in its
   duration, so 6 for "6N / 7D"), rounded to the rupee. The pricing
   settings hold the site-wide defaults. A package can list its own stay or
   meal options; a filled-in list replaces the default list for that

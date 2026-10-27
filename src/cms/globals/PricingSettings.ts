@@ -38,7 +38,7 @@ export const PricingSettings: GlobalConfig = {
       minRows: 1,
       admin: {
         description:
-          "Default hotel tiers. Delta per night is rupees per adult per night added to the base rate. A package can set its own list instead.",
+          "Default hotel tiers. Delta per night is rupees per booking per night (added once, regardless of the number of adults). A package can set its own list instead.",
       },
       fields: pricingOptionFields,
     },
@@ -48,7 +48,7 @@ export const PricingSettings: GlobalConfig = {
       minRows: 1,
       admin: {
         description:
-          "Default meal plans. Delta per night is rupees per adult per night; negative lowers the price. A package can set its own list instead.",
+          "Default meal plans. Delta per night is rupees per booking per night (added once, regardless of the number of adults); negative lowers the price. A package can set its own list instead.",
       },
       fields: pricingOptionFields,
     },

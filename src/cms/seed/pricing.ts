@@ -17,7 +17,7 @@ export const packageVehicleRates: Record<string, Partial<Record<VehicleKey, numb
 export type PricingSeed = Omit<PricingSetting, "id" | "updatedAt" | "createdAt">;
 
 export const pricingSettings: PricingSeed = {
-  // Rupees per adult per night: round defaults for packages without their own lists.
+  // Rupees per booking per night: round defaults for packages without their own lists.
   stayOptions: [
     { label: "Deluxe", deltaPerNight: 0 },
     { label: "Premium", deltaPerNight: 300 },
@@ -40,7 +40,7 @@ export const pricingSettings: PricingSeed = {
 };
 
 /**
- * Flat per-adult deltas the seeded packages were quoted with before stay
+ * Flat per-booking deltas the seeded packages were quoted with before stay
  * and meal options were priced per night.
  */
 const flatStayDeltas: [label: string, delta: number][] = [

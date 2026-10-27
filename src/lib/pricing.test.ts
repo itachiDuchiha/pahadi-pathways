@@ -196,7 +196,7 @@ describe("packageNights", () => {
 });
 
 /*
-  Quotes recorded from the flat per-adult deltas (Premium +2500, Luxury
+  Quotes recorded from the flat per-booking deltas (Premium +2500, Luxury
   +5000, CP -2500) before options were priced per night: Sedan, two adults
   and one child aged 7. The seeded per-night overrides must reproduce them.
 */
@@ -233,7 +233,7 @@ const FLAT_QUOTES: [slug: string, stay: string, meals: string, packageCost: numb
   ["shimla-manali-jibhi", "Luxury", "Breakfast Only (CP)", 45248, 2262, 47510],
 ];
 
-/** The flat per-adult deltas the overrides replace. */
+/** The flat per-booking deltas the overrides replace. */
 const FLAT_DELTAS: Record<string, number> = {
   Deluxe: 0,
   Premium: 2500,

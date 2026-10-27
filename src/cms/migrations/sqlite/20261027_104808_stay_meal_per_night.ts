@@ -3,8 +3,8 @@ import { randomBytes } from 'node:crypto'
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-sqlite'
 
 /*
-  Stay and meal options move from a flat per-adult delta to a delta per
-  adult per night, with optional per-package lists.
+  Stay and meal options move from a flat per-booking delta to a delta per
+  booking per night, with optional per-package lists.
 
   Data conversion:
   - The five seeded packages get their own lists: each site-wide option's
@@ -35,7 +35,7 @@ const MEAL_DEFAULTS: Record<string, [perNight: number, flat: number]> = {
   'Breakfast Only (CP)': [-300, -2500],
 }
 
-/** The app's rule: the N count in the duration, else days - 1, at least 1. */
+/** The N count in the duration, else falls back to the D count minus 1, at least 1. */
 function nightsOf(duration: string): number {
   const nights = Number(duration.match(/(\d+)\s*N/i)?.[1])
   const days = Number(duration.match(/(\d+)\s*D/i)?.[1])

@@ -10,7 +10,7 @@ import type {
   Pricing arithmetic only. The option tables, GST and child rule come
   from the `pricing-settings` global and each package's rates from its
   `pricing` group, so editors change prices without a deploy. Stay and
-  meal options are priced per adult per night; a package's own lists
+  meal options are priced per booking per night; a package's own lists
   replace the site-wide ones. The booking panel and the package enquiry
   route call the same functions, so the server recomputes exactly what
   the visitor sees.

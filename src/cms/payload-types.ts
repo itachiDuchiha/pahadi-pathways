@@ -175,7 +175,7 @@ export interface Package {
       | {
           label: string;
           /**
-           * Rupees per adult per night; decimals are allowed.
+           * Rupees per booking per night (added once, regardless of the number of adults); decimals are allowed.
            */
           deltaPerNight: number;
           id?: string | null;
@@ -188,7 +188,7 @@ export interface Package {
       | {
           label: string;
           /**
-           * Rupees per adult per night; decimals are allowed.
+           * Rupees per booking per night (added once, regardless of the number of adults); decimals are allowed.
            */
           deltaPerNight: number;
           id?: string | null;
@@ -915,26 +915,26 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface PricingSetting {
   id: number;
   /**
-   * Default hotel tiers. Delta per night is rupees per adult per night added to the base rate. A package can set its own list instead.
+   * Default hotel tiers. Delta per night is rupees per booking per night (added once, regardless of the number of adults). A package can set its own list instead.
    */
   stayOptions?:
     | {
         label: string;
         /**
-         * Rupees per adult per night; decimals are allowed.
+         * Rupees per booking per night (added once, regardless of the number of adults); decimals are allowed.
          */
         deltaPerNight: number;
         id?: string | null;
       }[]
     | null;
   /**
-   * Default meal plans. Delta per night is rupees per adult per night; negative lowers the price. A package can set its own list instead.
+   * Default meal plans. Delta per night is rupees per booking per night (added once, regardless of the number of adults); negative lowers the price. A package can set its own list instead.
    */
   mealOptions?:
     | {
         label: string;
         /**
-         * Rupees per adult per night; decimals are allowed.
+         * Rupees per booking per night (added once, regardless of the number of adults); decimals are allowed.
          */
         deltaPerNight: number;
         id?: string | null;

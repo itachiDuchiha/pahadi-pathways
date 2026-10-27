@@ -14,7 +14,7 @@
 - Read all site content from Payload through a typed data layer, with a build guard against an empty database (a220936).
 - Moved the stay, meal and vehicle pricing tables into the CMS while keeping quotes computed on the server (b2ff325).
 - Refresh changelog commit references after a history rewrite (af2c281)
-- Priced stay and meal options per adult per night, with site-wide defaults and optional per-package lists that replace them; a migration gives the five existing packages per-night values that keep their quotes unchanged (this commit).
+- Priced stay and meal options per booking per night (added once, regardless of the number of adults), with site-wide defaults and optional per-package lists that replace them; a migration gives the five existing packages per-night values that keep their quotes unchanged (this commit).
 
 ### Fixed
 - Made gallery captions optional, tested draft isolation and extended package pricing fields (44931a3).
