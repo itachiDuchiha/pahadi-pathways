@@ -16,6 +16,7 @@ import { bootstrapAdmin } from "./cms/bootstrap/ensureAdmin";
 import { adminGraphics, adminMeta } from "./cms/config/admin";
 import { buildDbAdapter } from "./cms/config/db";
 import { securityConfig } from "./cms/config/security";
+import { AnalyticsSettings } from "./cms/globals/AnalyticsSettings";
 import { LegalSettings } from "./cms/globals/LegalSettings";
 import { NotificationSettings } from "./cms/globals/NotificationSettings";
 import { PricingSettings } from "./cms/globals/PricingSettings";
@@ -44,7 +45,7 @@ export default buildConfig({
   },
   routes: { admin: "/ramram" },
   collections: [Packages, Destinations, Testimonials, GalleryItems, Experiences, Enquiries, Media, Users],
-  globals: [PricingSettings, SiteSettings, LegalSettings, NotificationSettings],
+  globals: [PricingSettings, SiteSettings, LegalSettings, NotificationSettings, AnalyticsSettings],
   db: buildDbAdapter(process.env),
   sharp,
   typescript: {

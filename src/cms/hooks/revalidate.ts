@@ -12,6 +12,7 @@ export type RevalidateKind =
   | "pricing"
   | "site"
   | "legal"
+  | "analytics"
   | "media";
 
 export type RevalidateTarget = { path: string; type?: "page" | "layout" };
@@ -28,6 +29,7 @@ const TAGS: Record<RevalidateKind, string> = {
   pricing: "pricing-settings",
   site: "site-settings",
   legal: "legal-settings",
+  analytics: "analytics-settings",
   media: "media",
 };
 
@@ -40,6 +42,7 @@ const LISTINGS: Record<RevalidateKind, string | null> = {
   pricing: "/packages",
   site: null,
   legal: null,
+  analytics: null,
   media: null,
 };
 
@@ -98,6 +101,9 @@ export function pathsFor(
   if (kind === "legal") {
     targets.push({ path: "/privacy" }, { path: "/terms" }, { path: "/", type: "layout" });
   }
+  // Analytics IDs drive the banner and scripts on every page (layout) and
+  // the vendor paragraph on the privacy page.
+  if (kind === "analytics") targets.push({ path: "/privacy" }, { path: "/", type: "layout" });
   // An image (or its alt text) can appear on any page, so the whole
   // layout goes.
   if (kind === "media") targets.push({ path: "/", type: "layout" });

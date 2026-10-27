@@ -3,6 +3,18 @@
 
 export type HeaderRule = { source: string; headers: { key: string; value: string }[] };
 
+// Google Analytics and Microsoft Clarity, loaded only after the visitor
+// accepts the consent banner (and only when an ID is configured). Clarity's
+// tag on www.clarity.ms pulls its runtime from scripts.clarity.ms.
+const ANALYTICS_SCRIPTS = ["https://www.googletagmanager.com", "https://www.clarity.ms", "https://scripts.clarity.ms"];
+const ANALYTICS_CONNECT = [
+  "https://*.google-analytics.com",
+  "https://*.analytics.google.com",
+  "https://*.googletagmanager.com",
+  "https://*.clarity.ms",
+];
+const ANALYTICS_IMG = ["https://*.google-analytics.com", "https://*.googletagmanager.com"];
+
 const siteHeaders = [
   {
     key: "X-Frame-Options",
@@ -26,8 +38,17 @@ const siteHeaders = [
   },
   {
     key: "Content-Security-Policy-Report-Only",
-    value:
-      "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    value: [
+      "default-src 'self'",
+      `img-src 'self' data: blob: ${ANALYTICS_IMG.join(" ")}`,
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self' data:",
+      `script-src 'self' 'unsafe-inline' ${ANALYTICS_SCRIPTS.join(" ")}`,
+      `connect-src 'self' ${ANALYTICS_CONNECT.join(" ")}`,
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join("; "),
   },
 ];
 

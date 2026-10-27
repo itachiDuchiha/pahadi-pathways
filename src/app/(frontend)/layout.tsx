@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { site } from "@/config/site";
+import { getAnalyticsSettings } from "@/lib/cms/analytics";
 import { getSiteSettings } from "@/lib/cms/site";
 import { defaultDescription, defaultTitle } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/structured-data";
@@ -14,6 +15,9 @@ import Footer from "@/components/layout/Footer";
 import FloatingButtons from "@/components/layout/FloatingButtons";
 import PlannerProvider from "@/components/layout/PlannerProvider";
 import SiteSettingsProvider from "@/components/layout/SiteSettingsProvider";
+import AnalyticsScripts from "@/components/analytics/AnalyticsScripts";
+import ConsentBanner from "@/components/analytics/ConsentBanner";
+import ConsentProvider from "@/components/analytics/ConsentProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,7 +59,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, analytics] = await Promise.all([getSiteSettings(), getAnalyticsSettings()]);
 
   return (
     <html
@@ -65,12 +69,19 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <JsonLd data={organizationJsonLd(settings)} />
         <SiteSettingsProvider settings={settings}>
-          <PlannerProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <FloatingButtons />
-          </PlannerProvider>
+          <ConsentProvider>
+            <PlannerProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <FloatingButtons />
+            </PlannerProvider>
+            <AnalyticsScripts
+              gaMeasurementId={analytics.gaMeasurementId}
+              clarityProjectId={analytics.clarityProjectId}
+            />
+            <ConsentBanner text={analytics.consentBannerText} enabled={analytics.enabled} />
+          </ConsentProvider>
         </SiteSettingsProvider>
       </body>
     </html>

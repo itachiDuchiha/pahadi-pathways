@@ -200,6 +200,34 @@ form and package enquiries, whether an email is sent and to whom.
 - The seed turns email on for every source and leaves the lists empty;
   re-running it never changes an admin's choices.
 
+### Analytics and consent
+
+The analytics settings hold a Google Analytics 4 measurement ID and a
+Microsoft Clarity project ID. Both are empty by default, and while both
+are empty the site loads no analytics and shows no banner.
+
+- **Google Analytics 4:** in Google Analytics open Admin, then Data
+  streams, pick (or create) the web stream for the site and copy the
+  Measurement ID. It looks like `G-ABC123XYZ9`.
+- **Microsoft Clarity:** in clarity.microsoft.com open the project for
+  the site, then Settings, Overview, and copy the Project ID (lowercase
+  letters and digits, for example `k2l9x8m7q1`).
+- Only admins can change the IDs; each is checked on save and again when
+  the site reads it, and an invalid stored ID is ignored.
+- **The banner:** once an ID is set, visitors see a small banner at the
+  bottom of the page with the banner text, Accept and Decline buttons and
+  a link to the privacy policy. Their choice is kept for a year in the
+  browser (`localStorage` and a `thc-consent` cookie), so the banner does
+  not return.
+- **Accept** loads the configured vendor scripts in the browser. **Decline**
+  (or no choice) loads nothing; declining is remembered and the site works
+  the same either way. The server-rendered pages never contain a vendor
+  script; they are added on the client only after an accept.
+- The privacy page names the configured vendors and lets a visitor change
+  their choice. Switching from accept to decline reloads the page so no
+  vendor script keeps running.
+- The seed leaves both IDs empty and only fills in a missing banner text.
+
 ### Seeding
 
 - `npm run cms:seed` is create-only: it fills collections and settings that

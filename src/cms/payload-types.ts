@@ -104,12 +104,14 @@ export interface Config {
     'site-settings': SiteSetting;
     'legal-settings': LegalSetting;
     'notification-settings': NotificationSetting;
+    'analytics-settings': AnalyticsSetting;
   };
   globalsSelect: {
     'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'legal-settings': LegalSettingsSelect<false> | LegalSettingsSelect<true>;
     'notification-settings': NotificationSettingsSelect<false> | NotificationSettingsSelect<true>;
+    'analytics-settings': AnalyticsSettingsSelect<false> | AnalyticsSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1088,6 +1090,29 @@ export interface NotificationSetting {
   createdAt?: string | null;
 }
 /**
+ * Leave both IDs empty to run no analytics and show no consent banner. With an ID set, visitors see a banner and the script loads only after they accept.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-settings".
+ */
+export interface AnalyticsSetting {
+  id: number;
+  /**
+   * Starts with G-. In Google Analytics: Admin → Data streams → your web stream → Measurement ID.
+   */
+  gaMeasurementId?: string | null;
+  /**
+   * In Microsoft Clarity: your project → Settings → Overview → Project ID.
+   */
+  clarityProjectId?: string | null;
+  /**
+   * One or two sentences shown above the Accept and Decline buttons. A link to the privacy policy is added.
+   */
+  consentBannerText: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing-settings_select".
  */
@@ -1196,6 +1221,18 @@ export interface NotificationSettingsSelect<T extends boolean = true> {
               id?: T;
             };
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "analytics-settings_select".
+ */
+export interface AnalyticsSettingsSelect<T extends boolean = true> {
+  gaMeasurementId?: T;
+  clarityProjectId?: T;
+  consentBannerText?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

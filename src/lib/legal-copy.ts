@@ -26,6 +26,9 @@ export const GRIEVANCE_PLACEHOLDER = "Grievance officer details will be publishe
 const NO_SALE =
   "We do not sell or share your data with third parties, except the service providers we use to deliver email and, when enabled, measure site usage.";
 
+/** The privacy section that names the processors, analytics vendors included. */
+export const PROCESSORS_HEADING = "Who Processes It";
+
 const ACT = "Digital Personal Data Protection Act, 2023";
 
 function months(count: number): string {
@@ -80,7 +83,7 @@ export function privacySections(legal: Legal, options: PrivacyOptions): Section[
         "We collect this information only for this website's own purpose: to respond to your enquiry, plan your Himalayan journey and follow up with the details you have asked for. We do not use it for any other purpose.",
       ],
     },
-    { heading: "Who Processes It", paragraphs: processors },
+    { heading: PROCESSORS_HEADING, paragraphs: processors },
     {
       heading: "Retention",
       paragraphs: [

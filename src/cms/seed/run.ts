@@ -15,6 +15,7 @@ import { mediaManifest } from "./media-manifest";
 import { packages, type PackageContent } from "./packages";
 import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
 import { legalFill, legalSettings } from "./legal";
+import { analyticsFill, analyticsSettings } from "./analytics";
 import { notificationFill, notificationSettings } from "./notifications";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
@@ -31,7 +32,12 @@ export type SeedCollection =
   | "testimonials"
   | "gallery-items"
   | "experiences";
-export type SeedGlobal = "pricing-settings" | "site-settings" | "legal-settings" | "notification-settings";
+export type SeedGlobal =
+  | "pricing-settings"
+  | "site-settings"
+  | "legal-settings"
+  | "notification-settings"
+  | "analytics-settings";
 export type SeedTarget = SeedCollection | SeedGlobal;
 
 export type SeedOptions = {
@@ -101,6 +107,7 @@ function emptyCounts(): Record<SeedTarget, number> {
     "site-settings": 0,
     "legal-settings": 0,
     "notification-settings": 0,
+    "analytics-settings": 0,
   };
 }
 
@@ -122,7 +129,8 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
  * while the Media collection is empty, `pricing-settings` is written only
  * while it has no stay options, `site-settings` only while it has no
  * phone number; `legal-settings` only gets its still-empty fields filled,
- * and `notification-settings` only a never-set email switch (turned on).
+ * `notification-settings` only a never-set email switch (turned on), and
+ * `analytics-settings` only an empty banner text (the IDs are never written).
  * Everything else is reported under `skipped`. A deleted or renamed
  * document is therefore never brought back.
  *
@@ -395,6 +403,20 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
     updated["notification-settings"]++;
   } else {
     skipped["notification-settings"]++;
+  }
+
+  const analyticsDoc = await payload.findGlobal({ slug: "analytics-settings", depth: 0, overrideAccess: true });
+  const analyticsData = overwrite ? analyticsSettings : analyticsFill(analyticsDoc);
+  if (analyticsData) {
+    await payload.updateGlobal({
+      slug: "analytics-settings",
+      data: analyticsData,
+      overrideAccess: true,
+      context,
+    });
+    updated["analytics-settings"]++;
+  } else {
+    skipped["analytics-settings"]++;
   }
 
   const media = manifest.filter(([publicPath]) => mediaByFilename.has(mediaFilename(publicPath))).length;

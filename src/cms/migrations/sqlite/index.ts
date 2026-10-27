@@ -8,6 +8,7 @@ import * as migration_20261027_104808_stay_meal_per_night from './20261027_10480
 import * as migration_20261027_114014_legal_settings from './20261027_114014_legal_settings';
 import * as migration_20261027_115006_legal_effective_date_required from './20261027_115006_legal_effective_date_required';
 import * as migration_20261027_115708_notification_settings from './20261027_115708_notification_settings';
+import * as migration_20261027_121121_analytics_settings from './20261027_121121_analytics_settings';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20261027_115708_notification_settings.up,
     down: migration_20261027_115708_notification_settings.down,
-    name: '20261027_115708_notification_settings'
+    name: '20261027_115708_notification_settings',
+  },
+  {
+    up: migration_20261027_121121_analytics_settings.up,
+    down: migration_20261027_121121_analytics_settings.down,
+    name: '20261027_121121_analytics_settings'
   },
 ];

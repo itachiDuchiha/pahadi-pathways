@@ -12,10 +12,12 @@ import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages } from "./packages";
 import { legalFill, legalSettings } from "./legal";
+import { analyticsFill, analyticsSettings } from "./analytics";
 import { notificationFill, notificationSettings } from "./notifications";
 import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
 import { site } from "@/config/site";
+import { DEFAULT_CONSENT_BANNER_TEXT } from "@/lib/consent";
 
 const temp = withTempPayload();
 
@@ -112,6 +114,24 @@ describe("notificationFill", () => {
   });
 });
 
+describe("analyticsFill", () => {
+  it("seeds empty IDs and the default banner text", () => {
+    expect(analyticsSettings).toEqual({
+      gaMeasurementId: "",
+      clarityProjectId: "",
+      consentBannerText: DEFAULT_CONSENT_BANNER_TEXT,
+    });
+    expect(analyticsFill({})).toEqual({ consentBannerText: DEFAULT_CONSENT_BANNER_TEXT });
+  });
+
+  it("never touches the IDs or an edited banner text", () => {
+    expect(analyticsFill({ gaMeasurementId: "G-ABC1234", consentBannerText: "  " })).toEqual({
+      consentBannerText: DEFAULT_CONSENT_BANNER_TEXT,
+    });
+    expect(analyticsFill({ gaMeasurementId: null, consentBannerText: "Our own words." })).toBeNull();
+  });
+});
+
 /** Fixture counts per target, as the first seed into an empty database creates them. */
 const FIXTURE_COUNTS = {
   media: Object.keys(mediaManifest).length,
@@ -175,12 +195,16 @@ describe("seed", () => {
         "site-settings": 0,
         "legal-settings": 0,
         "notification-settings": 0,
+        "analytics-settings": 0,
       });
       expect(first.updated["pricing-settings"]).toBe(1);
       expect(first.updated["site-settings"]).toBe(1);
       expect(first.updated["legal-settings"]).toBe(1);
-      // The test reset already wrote the field defaults (email on), so there is nothing to fill.
-      expect(Object.entries(first.skipped).filter(([, n]) => n !== 0)).toEqual([["notification-settings", 1]]);
+      // The test reset already wrote the field defaults (email on, banner text), so there is nothing to fill.
+      expect(Object.entries(first.skipped).filter(([, n]) => n !== 0)).toEqual([
+        ["notification-settings", 1],
+        ["analytics-settings", 1],
+      ]);
       expect(first.media).toBe(FIXTURE_COUNTS.media);
       expect(first.admin).toBe("skipped");
 
@@ -312,6 +336,7 @@ describe("seed", () => {
         "site-settings": 1,
         "legal-settings": 1,
         "notification-settings": 1,
+        "analytics-settings": 1,
       });
 
       const after = await packageBySlug("shimla-manali-getaway");
@@ -432,6 +457,7 @@ describe("seed", () => {
         "site-settings": 1,
         "legal-settings": 1,
         "notification-settings": 1,
+        "analytics-settings": 1,
       });
 
       const after = await packageBySlug("shimla-manali-getaway");

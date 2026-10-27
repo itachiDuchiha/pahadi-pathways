@@ -43,10 +43,12 @@ type Props = {
   description: string;
   effectiveDate: string;
   sections: Section[];
+  /** Rendered after the section with the matching heading. */
+  extras?: Partial<Record<string, ReactNode>>;
 };
 
 /** The shared shell of the legal pages: hero, then the sections in a card. */
-export default function LegalDocument({ title, description, effectiveDate, sections }: Props) {
+export default function LegalDocument({ title, description, effectiveDate, sections, extras }: Props) {
   return (
     <div className="min-h-screen bg-[#F8F7F3] pt-[82px]">
       <section className="relative overflow-hidden bg-[#10264A]">
@@ -89,6 +91,8 @@ export default function LegalDocument({ title, description, effectiveDate, secti
                     {inline(paragraph)}
                   </p>
                 ))}
+
+                {extras?.[section.heading]}
               </div>
             ))}
 

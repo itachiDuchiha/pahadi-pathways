@@ -98,6 +98,13 @@ describe("pathsFor", () => {
     expect(targets).toContainEqual({ path: "/", type: "layout" });
   });
 
+  it("revalidates the privacy page, the layout and the shared routes for analytics settings", () => {
+    const targets = pathsFor("analytics", {}, {});
+
+    expect(targets.map((target) => target.path)).toEqual(expect.arrayContaining(["/privacy", ...COMMON]));
+    expect(targets).toContainEqual({ path: "/", type: "layout" });
+  });
+
   it("revalidates the whole layout and the shared routes for media changes", () => {
     const targets = pathsFor("media", { filename: "x.webp" });
 
@@ -122,6 +129,7 @@ describe("tagFor", () => {
     expect(tagFor("site")).toBe("site-settings");
     expect(tagFor("legal")).toBe("legal-settings");
     expect(tagFor("media")).toBe("media");
+    expect(tagFor("analytics")).toBe("analytics-settings");
   });
 });
 

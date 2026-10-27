@@ -91,7 +91,7 @@ of the documentation.
 - `src/cms/config/` — database adapter selection and security settings,
   with tests.
 - `src/cms/fields/` — reusable fields (slug, image, string list).
-- `src/cms/globals/` — pricing, site, legal and notification settings.
+- `src/cms/globals/` — pricing, site, legal, notification and analytics settings.
 - `src/cms/hooks/` — revalidation of public pages on publish and the
   anonymous-create guard, with tests.
 - `src/cms/migrations/postgres/` — committed Postgres migrations.
@@ -103,6 +103,8 @@ of the documentation.
 
 ## `src/components/`
 
+- `src/components/analytics/` — consent provider, consent banner and the
+  consent-gated analytics scripts.
 - `src/components/destination-page/` — destination page templates
   (dedicated pages for Manali, Shimla and Spiti, the shared template, and
   the `registry.ts` that picks a page from the destination's layout field).

@@ -471,6 +471,41 @@ describe("notification settings access", () => {
   });
 });
 
+describe("analytics settings access", () => {
+  const data = { gaMeasurementId: "G-ABC1234" };
+
+  it("is publicly readable", async () => {
+    const settings = await temp.payload.findGlobal({ slug: "analytics-settings", overrideAccess: false });
+
+    expect(settings.consentBannerText).toMatch(/accept or decline/);
+  });
+
+  it("forbids anonymous and editor updates", async () => {
+    await expect(
+      temp.payload.updateGlobal({ slug: "analytics-settings", data, overrideAccess: false, context })
+    ).rejects.toThrow(/not allowed/i);
+
+    const editor = await makeUser("editor");
+    await expect(
+      temp.payload.updateGlobal({ slug: "analytics-settings", data, overrideAccess: false, user: editor, context })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("lets an admin set the IDs", async () => {
+    const admin = await makeUser("admin");
+
+    const settings = await temp.payload.updateGlobal({
+      slug: "analytics-settings",
+      data: { ...data, clarityProjectId: "abcde12" },
+      overrideAccess: false,
+      user: admin,
+      context,
+    });
+
+    expect(settings).toMatchObject({ gaMeasurementId: "G-ABC1234", clarityProjectId: "abcde12" });
+  });
+});
+
 describe("validateUniqueVehicleKeys", () => {
   it("accepts distinct keys and an empty list", () => {
     expect(validateUniqueVehicleKeys([{ key: "sedan" }, { key: "crysta" }])).toBe(true);

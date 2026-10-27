@@ -42,3 +42,38 @@ describe("header rules", () => {
     }
   );
 });
+
+/** The value of one directive in a CSP string. */
+function directive(csp: string, name: string): string[] {
+  const part = csp.split(";").map((item) => item.trim()).find((item) => item.startsWith(`${name} `));
+  return part ? part.split(/\s+/).slice(1) : [];
+}
+
+describe("site CSP (report-only)", () => {
+  const csp = headersFor("/")["Content-Security-Policy-Report-Only"] ?? "";
+
+  it("allows the analytics script hosts", () => {
+    expect(directive(csp, "script-src")).toEqual(
+      expect.arrayContaining(["'self'", "https://www.googletagmanager.com", "https://www.clarity.ms"])
+    );
+  });
+
+  it("allows the analytics beacon hosts", () => {
+    expect(directive(csp, "connect-src")).toEqual(
+      expect.arrayContaining([
+        "'self'",
+        "https://*.google-analytics.com",
+        "https://*.analytics.google.com",
+        "https://*.googletagmanager.com",
+        "https://*.clarity.ms",
+      ])
+    );
+    expect(directive(csp, "img-src")).toEqual(
+      expect.arrayContaining(["'self'", "https://*.google-analytics.com", "https://*.googletagmanager.com"])
+    );
+  });
+
+  it("keeps the analytics hosts out of the CMS policy", () => {
+    expect(headersFor("/ramram")["Content-Security-Policy-Report-Only"]).not.toMatch(/googletagmanager|clarity/);
+  });
+});
