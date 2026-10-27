@@ -25,16 +25,16 @@
 - Made the content seed skip populated collections by default, with `--overwrite` to reset them (e10acb7).
 - Explained the base price versus vehicle rates in the admin and trimmed option labels (a27e0ad).
 - Kept the package slug and title on stored leads (c4e316b).
+- Closed editor workflow gaps: media changes revalidate the site, base-price changes reach Sedan quotes (seeded and stored Sedan rates equal to the base price are cleared by a migration), users can change their own password while role and email stay admin-only, `npm run cms:set-password` recovers an account, in-use images cannot be deleted, and a missing schema at startup says which commands to run (6998267).
 - Described stay and meal upgrades as per booking per night across the site and admin (52d44c5).
 - Removed the per-adult price claim from the terms, made the legal effective date required with a default, and made the seed fill only empty legal fields (5dd94db).
-- Closed editor workflow gaps: media changes revalidate the site, base-price changes reach Sedan quotes (seeded and stored Sedan rates equal to the base price are cleared by a migration), users can change their own password while role and email stay admin-only, `npm run cms:set-password` recovers an account, in-use images cannot be deleted, and a missing schema at startup says which commands to run (6998267).
 
 ### Security
 - Restricted unlocking locked user accounts to admins and tested the authentication seams (9a69e3c).
 - Hardened the admin routes and robots rules, and skipped the rate limiter instead of sharing one bucket when the client IP is unknown (ff47d7b).
 - Kept CMS media indexable and closed a bypass through an empty `x-forwarded-for` header (4e4bcda).
-- Allowed the Google Analytics and Clarity hosts in the report-only Content-Security-Policy (7ae1eec).
 - Made the deploy script create the database and media directories and back up the SQLite file before migrating, and corrected the reverse-proxy guidance to require `X-Forwarded-For` (6734f5e).
+- Allowed the Google Analytics and Clarity hosts in the report-only Content-Security-Policy (7ae1eec).
 
 ## 2026-10-23
 

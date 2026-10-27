@@ -482,6 +482,8 @@ describe("seed", () => {
       expect(after.pricing?.basePricePerAdult).toBe(18999);
       expect((await payload.findGlobal({ slug: "pricing-settings" })).gstPercent).toBe(5);
       expect((await payload.findGlobal({ slug: "site-settings" })).tagline).toBe("Handcrafted Himalayan Journeys");
+      // Overwrite never pins the config email either: the live read keeps falling back to the site email.
+      expect((await payload.findGlobal({ slug: "legal-settings" })).dataContactEmail ?? "").toBe("");
       expect((await payload.findByID({ collection: "media", id: media.id })).alt).toBe(
         "Kinnaur & Spiti: The Himalayan Circuit"
       );
