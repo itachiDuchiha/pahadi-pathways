@@ -10,10 +10,14 @@ function required<T>(rows: T[] | null | undefined, what: string): T[] {
 }
 
 function priceOptions(rows: PriceOption[] | null | undefined, what: string): PriceOption[] {
-  return required(rows, what).map(({ label, delta }) => ({ label, delta }));
+  return required(rows, what).map(({ label, delta }) => ({ label: label.trim(), delta }));
 }
 
-/** The `pricing-settings` global as the tables `computePackagePrice` needs. */
+/**
+ * The `pricing-settings` global as the tables `computePackagePrice` needs.
+ * Labels are trimmed, as the enquiry schema trims the submitted ones, so a
+ * stray space typed in the admin cannot make every enquiry fail.
+ */
 export function mapPricingTables(doc: PricingSetting): PricingTables {
   return {
     stayOptions: priceOptions(doc.stayOptions, "stay options"),
@@ -21,8 +25,8 @@ export function mapPricingTables(doc: PricingSetting): PricingTables {
     vehicleOptions: required(doc.vehicleOptions, "vehicle options").map(
       ({ label, key, perDayUpgrade, perDayUpgradeSpiti }): VehiclePriceOption =>
         perDayUpgradeSpiti == null
-          ? { label, key, perDayUpgrade }
-          : { label, key, perDayUpgrade, perDayUpgradeSpiti }
+          ? { label: label.trim(), key, perDayUpgrade }
+          : { label: label.trim(), key, perDayUpgrade, perDayUpgradeSpiti }
     ),
     gstPercent: doc.gstPercent,
     childFreeUnderAge: doc.childFreeUnderAge,

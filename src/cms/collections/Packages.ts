@@ -45,7 +45,8 @@ export const Packages: CollectionConfig = {
           required: true,
           min: 0,
           admin: {
-            description: "Rupees per adult before upgrades and GST. Shown on cards as the starting price.",
+            description:
+              "Rupees per adult before upgrades and GST. Shown on cards as the starting price, and used as the Sedan rate unless a Sedan vehicle rate is set below.",
           },
         },
         {
@@ -53,7 +54,7 @@ export const Packages: CollectionConfig = {
           type: "group",
           admin: {
             description:
-              "Per-adult rate in rupees for each vehicle. Leave all empty to price from the base rate plus the per-day vehicle upgrade; a vehicle left empty uses the base rate.",
+              "Per-adult rate for each vehicle. Leave a vehicle empty to use the base price. If you change the base price, update the Sedan rate too, or clear it.",
           },
           fields: [
             { name: "sedan", type: "number", min: 0 },

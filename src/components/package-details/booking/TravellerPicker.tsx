@@ -5,6 +5,9 @@ import { Minus, Plus } from "lucide-react";
 
 import { formatCurrency } from "@/lib/pricing";
 
+/** Oldest age the child age selector offers. */
+const MAX_CHILD_AGE = 10;
+
 type Props = {
   adults: number;
   setAdults: Dispatch<SetStateAction<number>>;
@@ -431,7 +434,7 @@ export default function TravellerPicker({
                 "
               >
                 {Array.from(
-                  { length: 10 },
+                  { length: MAX_CHILD_AGE },
                   (_, index) => index + 1
                 ).map((age) => (
                   <button
@@ -467,7 +470,7 @@ export default function TravellerPicker({
                   text-[#526078]
                 "
               >
-                {`Under ${childFreeUnderAge}: complimentary without an extra bed. Ages ${childFreeUnderAge}–10: ${childPercentOfAdult}% of adult rate.`}
+                {`Under ${childFreeUnderAge}: complimentary without an extra bed. Ages ${childFreeUnderAge}–${MAX_CHILD_AGE}: ${childPercentOfAdult}% of adult rate.`}
               </p>
 
             </div>

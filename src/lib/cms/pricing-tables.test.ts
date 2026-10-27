@@ -38,6 +38,20 @@ describe("mapPricingTables", () => {
     });
   });
 
+  it("trims option labels so padded admin input still matches submitted labels", () => {
+    const tables = mapPricingTables(
+      doc({
+        stayOptions: [{ label: " Premium  ", delta: 2500 }],
+        mealOptions: [{ label: "Breakfast Only (CP) ", delta: -2500 }],
+        vehicleOptions: [{ label: "  Sedan", key: "sedan", perDayUpgrade: 0, perDayUpgradeSpiti: 0 }],
+      })
+    );
+
+    expect(tables.stayOptions[0].label).toBe("Premium");
+    expect(tables.mealOptions[0].label).toBe("Breakfast Only (CP)");
+    expect(tables.vehicleOptions[0].label).toBe("Sedan");
+  });
+
   it("omits an unset Spiti upgrade", () => {
     const tables = mapPricingTables(
       doc({ vehicleOptions: [{ label: "Sedan", key: "sedan", perDayUpgrade: 0, perDayUpgradeSpiti: null }] })

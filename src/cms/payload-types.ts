@@ -155,11 +155,11 @@ export interface Package {
   popular?: boolean | null;
   pricing: {
     /**
-     * Rupees per adult before upgrades and GST. Shown on cards as the starting price.
+     * Rupees per adult before upgrades and GST. Shown on cards as the starting price, and used as the Sedan rate unless a Sedan vehicle rate is set below.
      */
     basePricePerAdult: number;
     /**
-     * Per-adult rate in rupees for each vehicle. Leave all empty to price from the base rate plus the per-day vehicle upgrade; a vehicle left empty uses the base rate.
+     * Per-adult rate for each vehicle. Leave a vehicle empty to use the base price. If you change the base price, update the Sedan rate too, or clear it.
      */
     vehicleRates?: {
       sedan?: number | null;
