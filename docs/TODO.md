@@ -2,25 +2,48 @@
 
 Open items only; each line notes why it is still open.
 
+## Content management
+
+- **Move production to Postgres when ready.** The Postgres `init`
+  migration is committed and rehearsed; the move itself is open because
+  existing SQLite content is not copied automatically (see "Switching to
+  Postgres" in the README). After the move, every schema change needs a
+  migration for each adapter.
+- **Add live preview of drafts.** Editors currently publish to see a
+  change on the site; Payload's live preview needs a preview route and
+  draft-aware reads.
+- **Manage gallery videos in the CMS.** Videos are still code-managed; the
+  Media collection accepts images only.
+- **Move media to S3-compatible storage if the site ever runs on more than
+  one server.** Media is on the server's disk (`MEDIA_DIR`), which only
+  works for a single instance.
+- **Ask before `cms:seed -- --overwrite`.** It reverts editor changes
+  without a confirmation step; a prompt or a `--yes` flag would prevent
+  accidents.
+- **Render without a missing image.** A deleted image that published
+  content still uses makes that page and the build fail; a fallback image
+  would degrade more gracefully.
+
 ## Security
 
 - **Enforce the Content-Security-Policy.** It is currently sent as
-  `Content-Security-Policy-Report-Only` in `next.config.ts` so violations
+  `Content-Security-Policy-Report-Only` from `src/config/headers.ts` so violations
   can be observed first; switch it to an enforcing `Content-Security-Policy`
   header once a monitoring period shows no unexpected blocks.
 - **Move the enquiry rate limiter to an external store (e.g. Redis).**
   `src/lib/enquiry/rate-limit.ts` keeps counters in process memory, so on a
   multi-instance or serverless host each instance has its own counter
-  rather than a global limit.
+  rather than a global limit, and counters reset on restart.
 - **Add a CAPTCHA to the enquiry forms.** The honeypot field in
   `src/lib/enquiry/handler.ts` only deters simple bots; there is no
   challenge against more persistent automated submissions.
 
 ## Testing
 
-- **Add browser/E2E tests.** Only Vitest unit tests exist today (73 tests
-  across `src/**/*.test.ts`); there is no coverage that exercises the app
-  in a real browser (forms, modal focus trapping, navigation).
+- **Add browser/E2E tests.** Only Vitest unit and integration tests exist
+  today (276 tests across `src/**/*.test.ts`); there is no coverage that
+  exercises the app or the admin in a real browser (forms, modal focus
+  trapping, navigation, editing and publishing).
 
 ## Monitoring
 
@@ -51,6 +74,23 @@ Open items only; each line notes why it is still open.
   internally; tightening them would make misuse show up at compile time.
 
 ## Dependencies
+
+- **Remove the `npm audit` overrides in `package.json` when upstream
+  catches up.** They keep `npm audit --omit=dev` clean:
+  - `dompurify` 3.4.17 — `monaco-editor` (the admin's code editor, via
+    `@payloadcms/ui`) pins 3.4.15, which has a critical XSS advisory.
+    Remove when `monaco-editor` ships with a patched `dompurify`.
+  - `sass` 1.106.1 — `@payloadcms/next` pins `sass` 1.77.4, which pulls in
+    chokidar 3 and a `braces` release with a high-severity advisory and no
+    fix; sass 1.79 and later use chokidar 4. A minor-version bump; remove
+    when `@payloadcms/next` depends on sass 1.79 or later.
+  - `esbuild` 0.25.12 under `@esbuild-kit/core-utils` — replaces the old
+    esbuild 0.18 that `drizzle-kit` (via `@payloadcms/db-postgres`) pulls in
+    through `@esbuild-kit/esm-loader`. It is outside the range that package
+    declares, but that loader path is never run by the app or migrations.
+    Remove when `drizzle-kit` drops `@esbuild-kit/esm-loader`.
+  After removing one, run `npm install`, `npm audit --omit=dev` and the
+  full build; keep the override if the audit is no longer clean.
 
 - **Set up Dependabot for `@types/*` and other dependency updates.** There
   is no automated dependency-update process yet; version bumps are

@@ -12,6 +12,7 @@ A modern travel website focused on handcrafted Himalayan journeys. The company l
 ## Tech Stack
 
 - Next.js (App Router)
+- Payload CMS 3 (SQLite by default, Postgres supported)
 - React
 - TypeScript
 - Tailwind CSS
@@ -21,27 +22,46 @@ A modern travel website focused on handcrafted Himalayan journeys. The company l
 
 ---
 
-## Status as of 2026-10-23
+## Status as of 2026-10-27
 
-The rebrand to The Himalayan Compass is complete; there is no remaining
-Pahadi Pathways naming in the app.
+The site's content, images and prices are now managed in Payload CMS,
+which runs inside the Next.js app. The rebrand to The Himalayan Compass is
+complete.
+
+### Content management
+
+- Packages, destinations, testimonials, gallery items, experiences and
+  media are CMS collections; stay, meal and vehicle pricing tables and the
+  site contact details are CMS globals. The public pages read them through
+  the typed data layer in `src/lib/cms/`.
+- Editors manage content, media and prices and read stored enquiries;
+  admins additionally manage users, site settings and enquiry deletion.
+  The admin lives at a private URL known to the owner and is not linked or
+  listed anywhere public.
+- There is no open sign-up: the first admin is created from
+  `PAYLOAD_ADMIN_EMAIL` / `PAYLOAD_ADMIN_PASSWORD` while there are no users.
+- Packages and destinations have drafts; publishing revalidates the
+  affected pages. The build fails if the database has no published
+  packages.
+- `npm run cms:seed` fills empty collections from the bundled content
+  (create-only by default; `--overwrite` resets seeded items).
+  `npm run cms:prune-enquiries` enforces the 24-month enquiry retention.
+- SQLite is the default database; a Postgres `init` migration is committed
+  and was rehearsed end to end (migrate, seed, build) against Postgres 16.
 
 ### Pages and routing
 
-- Home, destinations listing, destination detail, packages listing,
-  package detail, contact, experiences, gallery, reviews and privacy
-  pages are all implemented as server components with page-level
-  `metadata`.
+- Public pages live in the `src/app/(frontend)` route group and the CMS in
+  `src/app/(payload)`. Home, destinations listing, destination detail,
+  packages listing, package detail, contact, experiences, gallery, reviews
+  and privacy pages are server components with page-level `metadata`.
 - Destination detail (`/destinations/[slug]`) and package detail
   (`/packages/[slug]`) pages use `generateStaticParams` and are statically
-  generated at build time. Destination pages are resolved through
-  `src/components/destination-page/registry.ts`, which maps a slug either
-  to a dedicated page (Manali, Shimla, Spiti) or to the shared generic
-  template.
+  generated at build time from the database. `registry.ts` picks a
+  dedicated page (Manali, Shimla, Spiti) or the shared template from each
+  destination's layout field.
 - The packages listing page (`/packages`) reads search params and is
   rendered on demand rather than statically.
-- `error.tsx` and `not-found.tsx` provide error and not-found handling
-  with correct status codes.
 
 ### Enquiry system
 
@@ -49,18 +69,19 @@ Pahadi Pathways naming in the app.
   share a validation and delivery pipeline in `src/lib/enquiry/`: an
   origin check, a 16 KB body-size cap, a honeypot field, an in-memory
   rate limit of 5 requests per 10 minutes per IP, Zod schema validation,
-  and email delivery through Resend.
-- Package pricing is recomputed on the server (`src/lib/pricing.ts`)
-  instead of trusting client-submitted totals.
-- The rate limiter is intentionally per server instance (an accepted
-  trade-off, documented in `src/lib/enquiry/rate-limit.ts`); there is no
-  CAPTCHA.
+  storage in the CMS and email delivery through Resend.
+- Package pricing is recomputed on the server from the prices stored in
+  the CMS instead of trusting client-submitted totals.
+- The rate limiter is per server process; when no client IP header is
+  present it is skipped (and logged) rather than shared. The reverse proxy
+  must forward the real client IP. There is no CAPTCHA.
 
 ### SEO, AEO and GEO
 
-- `sitemap.xml` and `robots.txt` are generated from `src/app/sitemap.ts`
-  and `src/app/robots.ts`; `robots.txt` explicitly allows common AI/answer
-  engine crawlers.
+- `sitemap.xml` and `robots.txt` are generated from
+  `src/app/(frontend)/sitemap.ts` and `src/app/robots.ts`; `robots.txt`
+  explicitly allows common AI/answer engine crawlers and keeps crawlers out
+  of the CMS API.
 - JSON-LD structured data is emitted via `src/components/seo/JsonLd.tsx`
   and `src/lib/structured-data.ts`.
 - `/llms.txt` and `/llms-full.txt` are served for AI crawlers, built from
@@ -70,40 +91,49 @@ Pahadi Pathways naming in the app.
 
 ### Security
 
-- `next.config.ts` sets `X-Frame-Options`, `X-Content-Type-Options`,
+- `src/config/headers.ts` sets `X-Frame-Options`, `X-Content-Type-Options`,
   `Referrer-Policy`, `Permissions-Policy` and `Strict-Transport-Security`
   headers, plus a Content-Security-Policy sent as
   `Content-Security-Policy-Report-Only` (reporting only, not yet enforced).
+  The admin routes get their own policy and a `noindex` header.
+- The CMS requires `PAYLOAD_SECRET`, restricts CORS/CSRF to the site URL,
+  disables GraphQL, uses `httpOnly` session cookies (`secure` in
+  production), locks logins after 5 failures and accepts only image
+  uploads.
+- `npm audit --omit=dev` is clean, with three dependency overrides
+  documented in `docs/TODO.md`.
 - A privacy policy page (`/privacy`) and a consent notice are in place.
 
 ### Images
 
-- Site images were converted to WebP and have capped dimensions
-  (`public/images` is about 13 MB total). A few package/destination hero
-  images remain in the 300–432 KB range. `scripts/optimize-images.mjs`
-  (run via `npm run images:optimize`) re-optimizes images after they are
-  added or replaced.
+- Uploaded images are stored in `MEDIA_DIR` and served by the CMS in
+  several sizes. The bundled images in `public/images` (about 13 MB, WebP)
+  are the seed source; `npm run images:optimize` re-optimizes them.
 
-### Tests and CI
+### Tests, CI and deployment
 
-- 71 Vitest unit tests across 11 files under `src/**/*.test.ts` cover site
-  configuration, SEO helpers, pricing, the enquiry schema/guards/rate
-  limiter/HTML/handler pipeline, structured data, the `llms.txt` builders
-  and the `useTodayIso` hook.
-- `.github/workflows/ci.yml` runs `npm ci`, `npm run lint`,
-  `npm run typecheck`, `npm test` and `npm run build` on every push and
-  pull request.
+- 276 Vitest tests across 31 files cover site configuration, SEO helpers,
+  pricing, the enquiry pipeline, structured data, CMS access control,
+  fields, hooks, mappers, the data layer and the seed (integration tests
+  run against a temporary SQLite database).
+- `.github/workflows/ci.yml` runs `npm ci`, lint, typecheck and tests, then
+  migrates and seeds a throwaway SQLite database and builds against it.
+- `scripts/deploy.sh` is the supported deployment: it refuses to run
+  without the required environment, then installs, migrates, seeds,
+  builds and restarts the server (default `systemctl --user restart thc`,
+  overridable with `APP_RESTART_CMD`). It was rehearsed on a fresh clone.
 - There are no browser or end-to-end tests yet.
 
 ### Intentionally deferred
 
+- Moving production to Postgres (the path is ready; existing SQLite
+  content would have to be re-entered).
+- Live preview of drafts, gallery videos in the CMS, and S3-style media
+  storage for a multi-server setup.
 - Enforcing the Content-Security-Policy (moving off report-only) after a
   monitoring period.
-- An external, shared rate limiter (for example Redis-backed) and a
-  CAPTCHA for the enquiry APIs, to replace the current per-instance
-  in-memory limiter.
-- Browser/end-to-end tests.
-- Analytics.
+- An external, shared rate limiter and a CAPTCHA for the enquiry APIs.
+- Browser/end-to-end tests, analytics, error reporting.
 - Further trimming of the largest remaining images.
 
 See `docs/TODO.md` for the full list of open items.

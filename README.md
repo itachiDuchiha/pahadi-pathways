@@ -3,11 +3,15 @@
 A Next.js travel website for The Himalayan Compass, a Himachal Pradesh-focused
 tour operator. It presents destinations and packages, lets visitors plan a
 trip through a shared planner modal, and routes enquiries by email to the
-operator.
+operator. Content, images and prices are managed in Payload CMS, which runs
+inside the same Next.js process and stores data in SQLite (Postgres is
+supported as a configuration switch).
 
 ## Tech stack
 
 - Next.js (App Router, server components)
+- Payload CMS 3 (admin, content storage, media)
+- SQLite by default, Postgres optional
 - React
 - TypeScript
 - Tailwind CSS
@@ -29,11 +33,15 @@ unsupported Node/npm version.
 git clone <repository-url>
 cd the-himalayan-compass
 npm ci
-cp .env.example .env.local
+cp .env.example .env.local   # then fill in the values, see below
+npm run payload migrate
+npm run cms:seed
 npm run dev
 ```
 
-Open http://localhost:3000 to view the site.
+Open http://localhost:3000 to view the site. For local development set
+`NEXT_PUBLIC_SITE_URL=http://localhost:3000` in `.env.local`; the admin only
+accepts requests from that origin, so the login does not stick otherwise.
 
 ## Environment variables
 
@@ -45,31 +53,115 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `RESEND_API_KEY` | API key used to send enquiry emails through Resend. |
 | `RESEND_FROM_EMAIL` | Verified sender address the enquiry emails are sent from. |
 | `TRIP_ENQUIRY_EMAIL` | Mailbox that receives trip and package enquiry notifications. |
-| `NEXT_PUBLIC_SITE_URL` | Public base URL used for metadata, sitemap and canonical links (defaults to `https://thehimalayancompass.in`). |
+| `NEXT_PUBLIC_SITE_URL` | Public base URL used for metadata, sitemap, canonical links and the CMS origin checks (defaults to `https://thehimalayancompass.in`). Set it to the dev origin, e.g. `http://localhost:3000`, for local development. |
+| `PAYLOAD_SECRET` | Required. Signing secret for CMS sessions, at least 32 random characters (`openssl rand -hex 32`). The server refuses to start without it. |
+| `DATABASE_ADAPTER` | `sqlite` (default) or `postgres`. |
+| `DATABASE_URL` | Required. `file:./data/cms.db` for SQLite, `postgres://user:password@host:5432/db` for Postgres. |
+| `MEDIA_DIR` | Directory where uploaded images are stored (default `media`, relative to the repository root). Use an absolute path outside the checkout in production. |
+| `PAYLOAD_ADMIN_EMAIL` | Email of the first admin account, created only while there are no users. |
+| `PAYLOAD_ADMIN_PASSWORD` | Password of the first admin account, at least 12 characters. Remove it from the environment once the account exists. |
 
 ## Scripts
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the Next.js development server. |
-| `npm run build` | Build the production bundle. |
+| `npm run dev` | Start the Next.js development server (site and CMS). |
+| `npm run build` | Build the production bundle. Reads the database, which must contain published content. |
 | `npm start` | Serve the production build (run `npm run build` first). |
 | `npm run lint` | Run ESLint with zero warnings allowed. |
 | `npm run typecheck` | Run `tsc --noEmit`. |
 | `npm test` | Run the Vitest suite. |
 | `npm run images:optimize` | Re-optimize images in `public/images` (see Images below). |
+| `npm run payload migrate` | Apply the committed database migrations (`src/cms/migrations/<adapter>/`). |
+| `npm run payload migrate:create <name>` | Generate a migration after a collection or field change. |
+| `npm run generate:types` | Regenerate `src/cms/payload-types.ts` from the CMS config. |
+| `npm run generate:importmap` | Regenerate the admin import map after adding admin components. |
+| `npm run cms:seed` | Fill empty collections with the bundled content and create the first admin (see Content management). |
+| `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes. |
+| `npm run cms:prune-enquiries` | Delete stored enquiries older than 24 months (pass a number of months to change it). |
+| `scripts/deploy.sh` | Install, migrate, seed, build and restart on the server (see Deployment). |
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run lint`,
-`npm run typecheck`, `npm test` and `npm run build` on every push and pull
-request.
+`npm run typecheck`, `npm test`, then migrates and seeds a throwaway SQLite
+database and runs `npm run build` against it, on every push and pull
+request. The CI build only proves the code builds; it is not what gets
+deployed.
 
 ## Project structure
 
-The app lives under `src/app` (routes), `src/components`, `src/lib`,
-`src/data`, `src/config` and `src/types`, with images in `public/images` and
-a one-off image script in `scripts/`. See
+Public routes live under `src/app/(frontend)` and the CMS routes under
+`src/app/(payload)`; the CMS configuration is `src/payload.config.ts` plus
+`src/cms` (collections, globals, access rules, migrations and the seed
+content), and the site reads it through the typed data layer in
+`src/lib/cms`. Components are in `src/components`, images in
+`public/images`, and scripts in `scripts/`. See
 [`docs/FOLDER_STRUCTURE.md`](docs/FOLDER_STRUCTURE.md) for the full layout
 and a one-line purpose per directory.
+
+## Content management
+
+The admin interface is served by the site itself at a private admin URL
+that the owner knows; it is deliberately not written in any documentation,
+`robots.txt`, the sitemap or `llms.txt`, and its pages send `noindex`.
+
+### Roles
+
+- **Editors** create, edit, publish and delete packages, destinations,
+  testimonials, gallery items, experiences and media, edit the pricing
+  tables, and read stored enquiries.
+- **Admins** can do everything editors can, and additionally manage user
+  accounts, edit the site settings (phone, WhatsApp, email, social links,
+  tagline) and delete enquiries.
+- New accounts are editors unless an admin chooses otherwise. Logins lock
+  for 15 minutes after 5 failed attempts.
+
+### First admin
+
+There is no public sign-up screen. When the Users collection is empty, the
+server (on start) and `npm run cms:seed` create the first admin from
+`PAYLOAD_ADMIN_EMAIL` and `PAYLOAD_ADMIN_PASSWORD`; until both are set, the
+admin shows a "not initialised" message. The values are never printed.
+Once the account exists, remove the password from the environment and
+change it in the admin.
+
+### What is editable and what is code
+
+- Editable in the CMS: package content, itineraries, prices (base price per
+  adult and per-vehicle rates), destinations (including whether a
+  destination uses its dedicated layout or the shared one), testimonials,
+  gallery images, experiences (text and icon name), the stay, meal and
+  vehicle pricing tables, site contact details, and all images.
+- Code: page layouts, the dedicated Manali, Shimla and Spiti destination
+  pages, gallery videos, the experience icon set, the price calculation
+  rules and the enquiry forms.
+- Packages and destinations have drafts; only published versions appear on
+  the site. Publishing revalidates the affected pages, so changes show up
+  without a rebuild. Enquiries submitted on the site are stored under
+  Leads as well as emailed.
+- Do not delete an image that a package or destination still uses; the
+  page fails to render (and the next build fails) instead of showing it
+  without the image.
+
+### Seeding
+
+- `npm run cms:seed` is create-only: it fills collections and settings that
+  are still empty with the bundled content from `src/cms/seed/` and the
+  images in `public/images`, and skips anything already populated. It is
+  safe to re-run and is part of every deploy.
+- `npm run cms:seed -- --overwrite` resets every seeded item to the bundled
+  content. **It reverts editor changes** to those items and asks for no
+  confirmation; use it only on a fresh or throwaway database, or to
+  complete a seed that was interrupted.
+
+### Backups
+
+Everything editors change lives in the database (`data/` for SQLite, i.e.
+the file named in `DATABASE_URL`) and the media directory (`MEDIA_DIR`,
+default `media/`). Neither is in git. Back up both together, for example
+with a nightly copy to another machine; for SQLite, copy the database file
+while the server is stopped so the copy is consistent. Stored enquiries contain personal data; they
+are kept for 24 months, so schedule `npm run cms:prune-enquiries`
+(for example monthly).
 
 ## Enquiry pipeline
 
@@ -85,11 +177,16 @@ and `contact`) and `POST /api/package-enquiry`. Both share the pipeline in
 4. Answer honeypot submissions (a hidden `website` field) immediately,
    before they consume a rate-limit slot.
 5. Apply an in-memory rate limit of 5 requests per 10 minutes per IP
-   (`src/lib/enquiry/rate-limit.ts`).
+   (`src/lib/enquiry/rate-limit.ts`). The client IP is read from
+   `x-forwarded-for`, then `x-real-ip`, then `cf-connecting-ip`; when none
+   is present the limiter is skipped and a warning is logged.
 6. Validate the payload with a Zod schema (`src/lib/enquiry/schema.ts`).
-7. Recompute package pricing on the server (`src/lib/pricing.ts`) rather
-   than trusting a client-submitted total.
-8. Send the notification email via Resend (`src/lib/enquiry/mail.ts`).
+7. Recompute package pricing on the server (`src/lib/pricing.ts`), using
+   the prices stored in the CMS, rather than trusting a client-submitted
+   total.
+8. Store the enquiry in the CMS (Leads) and send the notification email via
+   Resend (`src/lib/enquiry/mail.ts`). A stored enquiry counts as success
+   for the visitor even if the email fails; the failure is logged.
 
 **Known limitation:** the rate limiter keeps its counters in process
 memory. On a serverless or multi-instance host, each instance has its own
@@ -98,51 +195,111 @@ is no CAPTCHA.
 
 ## SEO, AEO and GEO
 
-- `src/app/sitemap.ts` and `src/app/robots.ts` generate `sitemap.xml` and
+- `src/app/(frontend)/sitemap.ts` and `src/app/robots.ts` generate `sitemap.xml` and
   `robots.txt`; `robots.txt` explicitly allows common AI/answer-engine
   crawlers (GPTBot, ClaudeBot, PerplexityBot and others) alongside general
   search bots.
 - `src/components/seo/JsonLd.tsx` and `src/lib/structured-data.ts` emit
   JSON-LD (organization and page-level structured data).
-- `src/app/llms.txt/route.ts` and `src/app/llms-full.txt/route.ts` serve
+- `src/app/(frontend)/llms.txt/route.ts` and `src/app/(frontend)/llms-full.txt/route.ts` serve
   `/llms.txt` and `/llms-full.txt` for AI crawlers, built from helpers in
   `src/lib/llms.ts`.
 - `src/app/opengraph-image.tsx` provides a default Open Graph image, used
   as a fallback on every page.
-- `src/app/destinations/[slug]/page.tsx` and `src/app/packages/[slug]/page.tsx`
+- `src/app/(frontend)/destinations/[slug]/page.tsx` and `src/app/(frontend)/packages/[slug]/page.tsx`
   use `generateStaticParams` to pre-render destination and package pages;
-  `src/app/packages/page.tsx` reads search params and is rendered on
+  `src/app/(frontend)/packages/page.tsx` reads search params and is rendered on
   demand rather than statically.
 
 ## Images
 
-Images live under `public/images` (about 13 MB total) as WebP files with
-capped dimensions. Run `npm run images:optimize` after adding or replacing
+Images uploaded in the CMS are stored in `MEDIA_DIR`, re-encoded into
+several sizes, and served by the CMS; they are not part of the build. The
+bundled images under `public/images` (about 13 MB total, WebP with capped
+dimensions) are the seed source and the site's fixed artwork. Run `npm run images:optimize` after adding or replacing
 images to re-encode and resize them with `scripts/optimize-images.mjs`. A
 few package/destination hero images are still in the 300–432 KB range and
 are candidates for further trimming (see `docs/TODO.md`).
 
 ## Deployment
 
-The app runs on any Node 24-compatible host, or on Vercel.
+Production is one long-lived Node server (for example a VPS) behind a
+reverse proxy that terminates HTTPS. The build reads the live database, so
+it runs on the server itself.
 
-1. Set the four environment variables listed above on the host.
-2. Build and run: `npm run build && npm start`.
-3. CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
-   `npm run build`) before merging to the default branch.
+**`scripts/deploy.sh` is the only supported way to deploy.** On the server:
+
+1. Clone the repository and create `.env.local` from `.env.example` with
+   real values. Point `DATABASE_URL` and `MEDIA_DIR` at locations outside
+   the checkout (for example `file:/srv/thc/data/cms.db` and
+   `/srv/thc/media`) so they survive a fresh clone and are easy to back up.
+2. Run `scripts/deploy.sh` after every pull. It refuses to run unless
+   `PAYLOAD_SECRET`, `DATABASE_URL` and `NEXT_PUBLIC_SITE_URL` are set
+   (it reads `.env.local` first), then runs `nvm use` when nvm is installed,
+   `npm ci`, `npm run payload migrate`, `npm run cms:seed` (fills only empty
+   collections, creates the first admin only when there are no users),
+   `npm run build`, and restarts the server.
+3. The restart command defaults to `systemctl --user restart thc`, i.e. a
+   systemd user unit named `thc` that runs `npm start` in the checkout.
+   For another process manager set `APP_RESTART_CMD`, for example
+   `APP_RESTART_CMD="pm2 reload thc" scripts/deploy.sh`.
+
+The reverse proxy **must forward the real client IP** in `x-forwarded-for`
+(or `x-real-ip`), overwriting any value sent by the client. Otherwise every
+visitor appears to come from the proxy's address and shares one
+rate-limit bucket, so a single visitor can block enquiries for everyone.
+For nginx: `proxy_set_header X-Forwarded-For $remote_addr;`. Serve the site
+over HTTPS: in production the admin session cookie is `secure`.
+
+CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
+`npm run build`) before merging to the default branch.
+
+## Switching to Postgres
+
+Both database adapters are installed, so switching is configuration only.
+The Postgres schema is a single `init` migration in
+`src/cms/migrations/postgres/`, generated from the current configuration;
+it already contains every change the SQLite history adds step by step
+(optional gallery captions, the pricing fields, enquiries), because no
+Postgres database existed before it.
+
+1. Create an empty Postgres database (16 has been tested).
+2. Set `DATABASE_ADAPTER=postgres` and
+   `DATABASE_URL=postgres://user:password@host:5432/db` in `.env.local`.
+3. Run `npm run payload migrate`.
+4. Run `npm run cms:seed` once on the empty database (or simply run
+   `scripts/deploy.sh`, which does both).
+5. Media files are not stored in the database: keep the same `MEDIA_DIR`,
+   or copy the media directory to the new location. A fresh seed uploads the
+   bundled images again.
+
+Existing SQLite content is **not** migrated automatically, and no
+export/import tool is installed. After seeding, re-apply any edits made
+since the original seed by hand in the admin (or keep the SQLite database
+until they are re-entered). Future schema changes need a migration for
+each adapter: run `npm run payload migrate:create <name>` once with each
+`DATABASE_ADAPTER` against a database of that type.
 
 ## Known limitations
 
-- The enquiry rate limiter is per server instance, not global, on
-  multi-instance/serverless hosts; there is no CAPTCHA.
-- The rate limiter identifies clients by the first `x-forwarded-for`
-  entry, so it relies on a trusted proxy or edge that sets that header
-  (Vercel does); on a bare `next start` host without a proxy the header
-  can be forged.
+- The enquiry rate limiter is per server process and keeps its counters in
+  memory (they reset on restart); there is no CAPTCHA.
+- The rate limiter trusts `x-forwarded-for`; the reverse proxy must
+  overwrite it with the real client IP (see Deployment). On a bare
+  `next start` without a proxy the header can be forged.
+- `npm run cms:seed -- --overwrite` reverts editor changes without a
+  confirmation step.
+- Deleting an image that published content still uses makes that page and
+  the next build fail.
+- Gallery videos and experience icons are managed in code, not the CMS.
+- There is no live preview of drafts in the admin.
+- Media is stored on the server's disk, which suits a single server only.
+- Moving from SQLite to Postgres does not copy existing content.
 - The Content-Security-Policy header is sent as
   `Content-Security-Policy-Report-Only`, so it currently reports violations
   rather than blocking them.
 - `/packages` renders on demand (it reads search params), unlike the
   statically generated destination and package detail pages.
 - A few images are still 300–432 KB.
-- There are no browser/E2E tests yet, only Vitest unit tests.
+- There are no browser/E2E tests yet, only Vitest unit and integration
+  tests.
