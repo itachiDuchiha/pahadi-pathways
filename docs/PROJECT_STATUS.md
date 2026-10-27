@@ -35,7 +35,8 @@ complete.
   site contact details are CMS globals. The public pages read them through
   the typed data layer in `src/lib/cms/`.
 - Editors manage content, media and prices and read stored enquiries;
-  admins additionally manage users, site settings and enquiry deletion.
+  admins additionally manage users, site and legal settings and enquiry
+  deletion.
   The admin lives at a private URL known to the owner and is not linked or
   listed anywhere public.
 - There is no open sign-up: the first admin is created from
@@ -45,7 +46,8 @@ complete.
   packages.
 - `npm run cms:seed` fills empty collections from the bundled content
   (create-only by default; `--overwrite` resets seeded items).
-  `npm run cms:prune-enquiries` enforces the 24-month enquiry retention.
+  `npm run cms:prune-enquiries` is optional, only if the owner adopts a
+  retention limit; enquiries are otherwise kept and deleted on request.
 - SQLite is the default database; a Postgres `init` migration is committed
   and was rehearsed end to end (migrate, seed, build) against Postgres 16.
 
@@ -102,7 +104,10 @@ complete.
   uploads.
 - `npm audit --omit=dev` is clean, with three dependency overrides
   documented in `docs/TODO.md`.
-- A privacy policy page (`/privacy`) and a consent notice are in place.
+- Privacy policy (`/privacy`) and terms (`/terms`) pages are in place; their
+  variable facts (grievance officer, data contact, effective date, deletion
+  window) come from the legal settings, and the consent line under each
+  form links both.
 
 ### Images
 

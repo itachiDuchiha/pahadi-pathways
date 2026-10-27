@@ -35,8 +35,8 @@ of the documentation.
 
 - `scripts/` — operational scripts: `deploy.sh` (install, migrate, seed,
   build, restart on the server), `cms-seed.ts` (content seed),
-  `cms-prune-enquiries.ts` (enquiry retention) and `optimize-images.mjs`
-  (re-encodes `public/images` to WebP).
+  `cms-prune-enquiries.ts` (optional enquiry pruning) and
+  `optimize-images.mjs` (re-encodes `public/images` to WebP).
 
 ## `public/images/`
 
@@ -68,7 +68,8 @@ of the documentation.
 - `src/app/(frontend)/llms.txt/` — `/llms.txt` route for AI crawlers.
 - `src/app/(frontend)/packages/` — packages listing page; rendered on demand because it reads search params.
 - `src/app/(frontend)/packages/[slug]/` — package detail page, statically generated.
-- `src/app/(frontend)/privacy/` — privacy policy page.
+- `src/app/(frontend)/privacy/`, `terms/` — privacy policy and terms pages
+  (prose in `src/lib/legal-copy.ts`).
 - `src/app/(frontend)/reviews/` — reviews page.
 - `src/app/(payload)/` — the CMS route group: its layout and admin styles,
   plus a subdirectory (named after the private admin URL) holding the
@@ -90,7 +91,7 @@ of the documentation.
 - `src/cms/config/` — database adapter selection and security settings,
   with tests.
 - `src/cms/fields/` — reusable fields (slug, image, string list).
-- `src/cms/globals/` — pricing settings and site settings.
+- `src/cms/globals/` — pricing, site and legal settings.
 - `src/cms/hooks/` — revalidation of public pages on publish and the
   anonymous-create guard, with tests.
 - `src/cms/migrations/postgres/` — committed Postgres migrations.
@@ -112,6 +113,7 @@ of the documentation.
   popular packages, testimonials, why-choose-us, call to action).
 - `src/components/home/planner/` — hero planner popups (date, destination,
   traveller pickers) and the `useHeroPlanner` state hook.
+- `src/components/legal/` — shared layout of the privacy and terms pages.
 - `src/components/layout/` — navbar, footer, floating action buttons and
   the shared `PlannerProvider`.
 - `src/components/package-details/` — package detail page sections

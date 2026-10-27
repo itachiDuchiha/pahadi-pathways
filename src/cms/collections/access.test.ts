@@ -373,6 +373,50 @@ describe("global access", () => {
   });
 });
 
+describe("legal settings access", () => {
+  it("lets anyone read legal settings", async () => {
+    const legal = await temp.payload.findGlobal({ slug: "legal-settings", overrideAccess: false });
+
+    expect(legal.deletionWindowMonths).toBe(6);
+  });
+
+  it("forbids anonymous and editor updates", async () => {
+    await expect(
+      temp.payload.updateGlobal({
+        slug: "legal-settings",
+        data: { deletionWindowMonths: 1 },
+        overrideAccess: false,
+        context,
+      })
+    ).rejects.toThrow(/not allowed/i);
+
+    const editor = await makeUser("editor");
+    await expect(
+      temp.payload.updateGlobal({
+        slug: "legal-settings",
+        data: { deletionWindowMonths: 1 },
+        overrideAccess: false,
+        user: editor,
+        context,
+      })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("lets an admin update legal settings", async () => {
+    const admin = await makeUser("admin");
+
+    const legal = await temp.payload.updateGlobal({
+      slug: "legal-settings",
+      data: { grievanceOfficer: { name: "A. Officer", email: "grievance@example.com", phone: "+91 90000 00000" } },
+      overrideAccess: false,
+      user: admin,
+      context,
+    });
+
+    expect(legal.grievanceOfficer?.name).toBe("A. Officer");
+  });
+});
+
 describe("validateUniqueVehicleKeys", () => {
   it("accepts distinct keys and an empty list", () => {
     expect(validateUniqueVehicleKeys([{ key: "sedan" }, { key: "crysta" }])).toBe(true);

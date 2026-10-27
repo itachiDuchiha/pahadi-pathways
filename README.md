@@ -79,7 +79,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `npm run generate:importmap` | Regenerate the admin import map after adding admin components. |
 | `npm run cms:seed` | Fill empty collections with the bundled content and create the first admin (see Content management). |
 | `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes. |
-| `npm run cms:prune-enquiries` | Delete stored enquiries older than 24 months (pass a number of months to change it). |
+| `npm run cms:prune-enquiries` | Optional: delete stored enquiries older than 24 months (pass a number of months); only if the owner adopts a retention limit. |
 | `npm run cms:set-password -- --email <addr>` | Set a user's password from `NEW_PASSWORD` (see "Recovering the admin account"). |
 | `scripts/deploy.sh` | Install, migrate, seed, build and restart on the server (see Deployment). |
 
@@ -114,7 +114,9 @@ that the owner knows; it is deliberately not written in any documentation,
   tables, and read stored enquiries.
 - **Admins** can do everything editors can, and additionally manage user
   accounts, edit the site settings (phone, WhatsApp, email, social links,
-  tagline) and delete enquiries.
+  tagline) and the legal settings (grievance officer, data contact email,
+  effective date, deletion window, retention statement shown on `/privacy`
+  and `/terms`), and delete enquiries.
 - New accounts are editors unless an admin chooses otherwise. Logins lock
   for 15 minutes after 5 failed attempts.
 - Every user can change their own password in the admin; only admins can
@@ -195,8 +197,9 @@ the file named in `DATABASE_URL`) and the media directory (`MEDIA_DIR`,
 default `media/`). Neither is in git. Back up both together, for example
 with a nightly copy to another machine; for SQLite, copy the database file
 while the server is stopped so the copy is consistent. Stored enquiries
-contain personal data; they are kept for 24 months, so schedule
-`npm run cms:prune-enquiries` (for example monthly).
+contain personal data. They are kept to maintain each visitor's enquiry
+history, and deleted on request within the window set in the legal
+settings (six months by default), as the privacy policy states.
 
 ## Enquiry pipeline
 

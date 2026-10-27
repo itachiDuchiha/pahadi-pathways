@@ -14,6 +14,7 @@ import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages, type PackageContent } from "./packages";
 import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
+import { legalSettings } from "./legal";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -29,7 +30,7 @@ export type SeedCollection =
   | "testimonials"
   | "gallery-items"
   | "experiences";
-export type SeedGlobal = "pricing-settings" | "site-settings";
+export type SeedGlobal = "pricing-settings" | "site-settings" | "legal-settings";
 export type SeedTarget = SeedCollection | SeedGlobal;
 
 export type SeedOptions = {
@@ -97,6 +98,7 @@ function emptyCounts(): Record<SeedTarget, number> {
     experiences: 0,
     "pricing-settings": 0,
     "site-settings": 0,
+    "legal-settings": 0,
   };
 }
 
@@ -116,13 +118,14 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
  * Default mode (what deploys run) never touches editor content: a content
  * collection is seeded only while it is empty, media are uploaded only
  * while the Media collection is empty, `pricing-settings` is written only
- * while it has no stay options and `site-settings` only while it has no
- * phone number. Everything else is reported under `skipped`. A deleted or
- * renamed document is therefore never brought back.
+ * while it has no stay options, `site-settings` only while it has no
+ * phone number and `legal-settings` only while it has no effective date.
+ * Everything else is reported under `skipped`. A deleted or renamed
+ * document is therefore never brought back.
  *
  * `overwrite: true` upserts every fixture by its key (slug, name + tour,
- * title, filename), restoring fixture values including alt text and both
- * globals, and recreating deleted documents.
+ * title, filename), restoring fixture values including alt text and every
+ * global, and recreating deleted documents.
  */
 export async function seed(payload: Payload, options: SeedOptions = {}): Promise<SeedResult> {
   try {
@@ -361,6 +364,19 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
     updated["site-settings"]++;
   } else {
     skipped["site-settings"]++;
+  }
+
+  const legalDoc = await payload.findGlobal({ slug: "legal-settings", depth: 0, overrideAccess: true });
+  if (overwrite || !legalDoc.effectiveDate) {
+    await payload.updateGlobal({
+      slug: "legal-settings",
+      data: legalSettings,
+      overrideAccess: true,
+      context,
+    });
+    updated["legal-settings"]++;
+  } else {
+    skipped["legal-settings"]++;
   }
 
   const media = manifest.filter(([publicPath]) => mediaByFilename.has(mediaFilename(publicPath))).length;

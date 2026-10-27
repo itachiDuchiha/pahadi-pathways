@@ -11,6 +11,7 @@ export type RevalidateKind =
   | "experience"
   | "pricing"
   | "site"
+  | "legal"
   | "media";
 
 export type RevalidateTarget = { path: string; type?: "page" | "layout" };
@@ -26,6 +27,7 @@ const TAGS: Record<RevalidateKind, string> = {
   experience: "experiences",
   pricing: "pricing-settings",
   site: "site-settings",
+  legal: "legal-settings",
   media: "media",
 };
 
@@ -37,6 +39,7 @@ const LISTINGS: Record<RevalidateKind, string | null> = {
   experience: "/experiences",
   pricing: "/packages",
   site: null,
+  legal: null,
   media: null,
 };
 
@@ -86,9 +89,14 @@ export function pathsFor(
   }
   if (kind === "pricing") targets.push({ path: "/packages/[slug]", type: "page" });
   // Contact details render in the footer and navbar of every page, so the
-  // whole layout goes; the two pages that list them are named as well.
+  // whole layout goes; the pages that list them are named as well.
   if (kind === "site") {
-    targets.push({ path: "/contact" }, { path: "/privacy" }, { path: "/", type: "layout" });
+    targets.push({ path: "/contact" }, { path: "/privacy" }, { path: "/terms" }, { path: "/", type: "layout" });
+  }
+  // Legal settings print on both legal pages; the layout goes too so any
+  // footer or banner text that cites them stays in step.
+  if (kind === "legal") {
+    targets.push({ path: "/privacy" }, { path: "/terms" }, { path: "/", type: "layout" });
   }
   // An image (or its alt text) can appear on any page, so the whole
   // layout goes.

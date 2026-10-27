@@ -102,10 +102,12 @@ export interface Config {
   globals: {
     'pricing-settings': PricingSetting;
     'site-settings': SiteSetting;
+    'legal-settings': LegalSetting;
   };
   globalsSelect: {
     'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'legal-settings': LegalSettingsSelect<false> | LegalSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -990,6 +992,44 @@ export interface SiteSetting {
   createdAt?: string | null;
 }
 /**
+ * Details shown on the Privacy Policy and Terms and Conditions pages.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-settings".
+ */
+export interface LegalSetting {
+  id: number;
+  /**
+   * Required by the Digital Personal Data Protection Act, 2023. The privacy page shows the officer once name, email and phone are all filled in.
+   */
+  grievanceOfficer?: {
+    name?: string | null;
+    email?: string | null;
+    /**
+     * For example +91 75596 97919
+     */
+    phone?: string | null;
+  };
+  /**
+   * Where visitors send data and deletion requests. Leave empty to use the site email.
+   */
+  dataContactEmail?: string | null;
+  /**
+   * The date the current privacy policy and terms took effect.
+   */
+  effectiveDate?: string | null;
+  /**
+   * How many months a deletion request may take, between 1 and 12.
+   */
+  deletionWindowMonths: number;
+  /**
+   * One or two sentences on how long enquiry records are kept.
+   */
+  retentionStatement: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing-settings_select".
  */
@@ -1036,6 +1076,26 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   instagram?: T;
   facebook?: T;
   tagline?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-settings_select".
+ */
+export interface LegalSettingsSelect<T extends boolean = true> {
+  grievanceOfficer?:
+    | T
+    | {
+        name?: T;
+        email?: T;
+        phone?: T;
+      };
+  dataContactEmail?: T;
+  effectiveDate?: T;
+  deletionWindowMonths?: T;
+  retentionStatement?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

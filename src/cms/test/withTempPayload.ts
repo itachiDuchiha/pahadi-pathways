@@ -7,6 +7,7 @@ import {
   getPayload,
   type CollectionSlug,
   type Config,
+  type Field,
   type GlobalSlug,
   type Payload,
   type SanitizedConfig,
@@ -28,6 +29,23 @@ export type TempPayload = {
   /** Absolute path of the throwaway directory holding the db and media. */
   readonly dir: string;
 };
+
+/** Each named field's default, or empty value; a group resets field by field. */
+function resetValues(fields: readonly Field[]): Record<string, unknown> {
+  const data: Record<string, unknown> = {};
+  for (const field of fields) {
+    if (!("name" in field) || field.name === "createdAt" || field.name === "updatedAt") continue;
+    data[field.name] =
+      field.type === "group"
+        ? resetValues(field.fields)
+        : "defaultValue" in field && field.defaultValue !== undefined
+          ? field.defaultValue
+          : field.type === "array"
+            ? []
+            : null;
+  }
+  return data;
+}
 
 /**
  * Boots one Payload instance per test file against a throwaway SQLite
@@ -83,22 +101,12 @@ export function withTempPayload(): TempPayload {
       }
     }
 
-    // Globals are single rows, so put every top-level field back to its
-    // default (or empty) value instead of deleting.
+    // Globals are single rows, so put every field back to its default (or
+    // empty) value instead of deleting.
     for (const global of payload.globals.config) {
-      const data: Record<string, unknown> = {};
-      for (const field of global.fields) {
-        if (!("name" in field) || field.name === "createdAt" || field.name === "updatedAt") continue;
-        data[field.name] =
-          "defaultValue" in field && field.defaultValue !== undefined
-            ? field.defaultValue
-            : field.type === "array"
-              ? []
-              : null;
-      }
       await payload.updateGlobal({
         slug: global.slug as GlobalSlug,
-        data,
+        data: resetValues(global.fields),
         overrideAccess: true,
         context: { skipRevalidate: true },
       });

@@ -227,6 +227,10 @@ export default function EnquiryModal({
                 By submitting you agree to our{" "}
                 <Link href="/privacy" className="underline hover:text-[#10264A]">
                   privacy policy
+                </Link>{" "}
+                and{" "}
+                <Link href="/terms" className="underline hover:text-[#10264A]">
+                  terms
                 </Link>
                 .
               </p>

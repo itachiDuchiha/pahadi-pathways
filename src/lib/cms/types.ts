@@ -114,3 +114,16 @@ export type Site = {
   social: { instagram: string; facebook: string };
   address: { region: string; country: string };
 };
+
+export type GrievanceOfficer = { name: string; email: string; phone: string };
+
+/** The `legal-settings` global merged over its defaults. */
+export type Legal = {
+  /** Present only once name, email and phone are all set. */
+  grievanceOfficer?: GrievanceOfficer;
+  dataContactEmail: string;
+  /** ISO date or timestamp. */
+  effectiveDate: string;
+  deletionWindowMonths: number;
+  retentionStatement: string;
+};

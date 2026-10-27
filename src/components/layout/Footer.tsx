@@ -80,6 +80,11 @@ export default function Footer() {
                   Privacy
                 </Link>
               </li>
+              <li>
+                <Link href="/terms" className="transition-colors duration-300 hover:text-[#C89A3D]">
+                  Terms
+                </Link>
+              </li>
             </ul>
           </div>
 

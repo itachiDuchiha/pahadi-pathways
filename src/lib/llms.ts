@@ -47,6 +47,7 @@ function footer(site: Site): string[] {
     "## Policies",
     "",
     `- [Privacy policy](${absoluteUrl("/privacy")})`,
+    `- [Terms and conditions](${absoluteUrl("/terms")})`,
   ];
 }
 

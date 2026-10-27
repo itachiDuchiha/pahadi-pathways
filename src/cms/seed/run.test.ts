@@ -13,6 +13,7 @@ import { mediaManifest } from "./media-manifest";
 import { packages } from "./packages";
 import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
+import { site } from "@/config/site";
 
 const temp = withTempPayload();
 
@@ -125,9 +126,10 @@ describe("seed", () => {
 
       const first = await run();
 
-      expect(first.created).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 0, "site-settings": 0 });
+      expect(first.created).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 0, "site-settings": 0, "legal-settings": 0 });
       expect(first.updated["pricing-settings"]).toBe(1);
       expect(first.updated["site-settings"]).toBe(1);
+      expect(first.updated["legal-settings"]).toBe(1);
       expect(Object.values(first.skipped).every((n) => n === 0)).toBe(true);
       expect(first.media).toBe(FIXTURE_COUNTS.media);
       expect(first.admin).toBe("skipped");
@@ -217,6 +219,10 @@ describe("seed", () => {
       const siteSettings = await payload.findGlobal({ slug: "site-settings" });
       expect(siteSettings).toMatchObject({ phoneE164: "+917559697919", whatsapp: "917559697919" });
 
+      const legal = await payload.findGlobal({ slug: "legal-settings" });
+      expect(legal).toMatchObject({ dataContactEmail: site.email, deletionWindowMonths: 6 });
+      expect(legal.effectiveDate).toMatch(/^2026-10-27/);
+
       const revalidationWarnings = warn.mock.calls.filter(([message]) => String(message).includes("Revalidation"));
       expect(revalidationWarnings).toEqual([]);
       warn.mockRestore();
@@ -250,7 +256,7 @@ describe("seed", () => {
 
       expect(Object.values(second.created).every((n) => n === 0)).toBe(true);
       expect(Object.values(second.updated).every((n) => n === 0)).toBe(true);
-      expect(second.skipped).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 1, "site-settings": 1 });
+      expect(second.skipped).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 1, "site-settings": 1, "legal-settings": 1 });
 
       const after = await packageBySlug("shimla-manali-getaway");
       expect(after.title).toBe("Edited title");
@@ -316,6 +322,7 @@ describe("seed", () => {
         testimonials: testimonials.length - 1,
         "pricing-settings": 1,
         "site-settings": 1,
+        "legal-settings": 1,
       });
 
       const after = await packageBySlug("shimla-manali-getaway");

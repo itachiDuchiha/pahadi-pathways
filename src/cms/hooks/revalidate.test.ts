@@ -84,7 +84,16 @@ describe("pathsFor", () => {
     const targets = pathsFor("site", {}, {});
 
     expect(targets.map((target) => target.path)).toEqual(
-      expect.arrayContaining(["/contact", "/privacy", ...COMMON])
+      expect.arrayContaining(["/contact", "/privacy", "/terms", ...COMMON])
+    );
+    expect(targets).toContainEqual({ path: "/", type: "layout" });
+  });
+
+  it("revalidates both legal pages, the layout and the shared routes for legal settings", () => {
+    const targets = pathsFor("legal", {}, {});
+
+    expect(targets.map((target) => target.path)).toEqual(
+      expect.arrayContaining(["/privacy", "/terms", ...COMMON])
     );
     expect(targets).toContainEqual({ path: "/", type: "layout" });
   });
@@ -111,6 +120,7 @@ describe("tagFor", () => {
     expect(tagFor("experience")).toBe("experiences");
     expect(tagFor("pricing")).toBe("pricing-settings");
     expect(tagFor("site")).toBe("site-settings");
+    expect(tagFor("legal")).toBe("legal-settings");
     expect(tagFor("media")).toBe("media");
   });
 });

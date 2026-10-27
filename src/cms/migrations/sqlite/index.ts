@@ -5,6 +5,7 @@ import * as migration_20261027_081908_enquiries from './20261027_081908_enquirie
 import * as migration_20261027_082751_enquiries_package_text from './20261027_082751_enquiries_package_text';
 import * as migration_20261027_093704_clear_sedan_equal_to_base from './20261027_093704_clear_sedan_equal_to_base';
 import * as migration_20261027_104808_stay_meal_per_night from './20261027_104808_stay_meal_per_night';
+import * as migration_20261027_114014_legal_settings from './20261027_114014_legal_settings';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20261027_104808_stay_meal_per_night.up,
     down: migration_20261027_104808_stay_meal_per_night.down,
-    name: '20261027_104808_stay_meal_per_night'
+    name: '20261027_104808_stay_meal_per_night',
+  },
+  {
+    up: migration_20261027_114014_legal_settings.up,
+    down: migration_20261027_114014_legal_settings.down,
+    name: '20261027_114014_legal_settings'
   },
 ];

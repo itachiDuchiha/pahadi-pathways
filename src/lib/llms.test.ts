@@ -24,12 +24,13 @@ describe("buildLlmsTxt", () => {
     }
   });
 
-  it("lists every destination and the privacy policy", () => {
+  it("lists every destination and both policies", () => {
     for (const destination of allDestinations) {
       expect(text).toContain(absoluteUrl(`/destinations/${destination.slug}`));
     }
 
     expect(text).toContain(absoluteUrl("/privacy"));
+    expect(text).toContain(`[Terms and conditions](${absoluteUrl("/terms")})`);
   });
 });
 
