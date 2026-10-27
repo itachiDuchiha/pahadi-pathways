@@ -2,12 +2,7 @@ import PlannerButton from "@/components/layout/PlannerButton";
 import DestinationsHero from "@/components/destinations/DestinationsHero";
 import DestinationSection from "@/components/destinations/DestinationSection";
 
-import {
-  featuredJourneys,
-  alongTheWay,
-  hiddenHimachal,
-  cultureAndSoul,
-} from "@/data/destinations";
+import { destinationsInCategory, getDestinations } from "@/lib/cms/destinations";
 
 import { site } from "@/config/site";
 import { pageMetadata } from "@/lib/seo";
@@ -19,7 +14,13 @@ export const metadata = pageMetadata({
   path: "/destinations",
 });
 
-export default function DestinationsPage() {
+export default async function DestinationsPage() {
+  const destinations = await getDestinations();
+  const featuredJourneys = destinationsInCategory(destinations, "Featured Journeys");
+  const alongTheWay = destinationsInCategory(destinations, "Along the Way");
+  const hiddenHimachal = destinationsInCategory(destinations, "Hidden Himachal");
+  const cultureAndSoul = destinationsInCategory(destinations, "Culture & Soul");
+
   return (
     <>
       {/* ================= HERO ================= */}

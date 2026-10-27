@@ -14,7 +14,7 @@ import {
   Images,
 } from "lucide-react";
 
-import { galleryItems } from "@/cms/seed/gallery";
+import type { GalleryItem } from "@/lib/cms/types";
 
 const categories = [
   "All Moments",
@@ -61,7 +61,11 @@ const videoItems = [
   },
 ];
 
-export default function GalleryExplorer() {
+type GalleryExplorerProps = {
+  items: GalleryItem[];
+};
+
+export default function GalleryExplorer({ items: galleryItems }: GalleryExplorerProps) {
   const [activeCategory, setActiveCategory] = useState("All Moments");
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);

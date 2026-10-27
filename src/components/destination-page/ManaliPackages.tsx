@@ -1,9 +1,13 @@
 import Link from "next/link";
 
-import { packages } from "@/data/packages";
 import PackageCard from "@/components/packages/PackageCard";
+import type { Package } from "@/lib/cms/types";
 
-export default function ManaliPackages() {
+type ManaliPackagesProps = {
+  packages: Package[];
+};
+
+export default function ManaliPackages({ packages }: ManaliPackagesProps) {
   const manaliPackages = packages.filter((pkg) =>
     pkg.itinerary.some((stop) =>
       stop.toLowerCase().includes("manali")

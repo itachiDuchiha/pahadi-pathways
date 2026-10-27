@@ -1,6 +1,5 @@
 import { site } from "@/config/site";
-import type { Destination } from "@/data/destinations";
-import type { Package } from "@/data/packages";
+import type { Destination, Package } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
 import { absoluteUrl } from "@/lib/seo";
 

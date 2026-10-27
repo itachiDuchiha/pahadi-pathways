@@ -1,6 +1,5 @@
 import { site, whatsappUrl } from "@/config/site";
-import { allDestinations } from "@/data/destinations";
-import { packages, type Package } from "@/data/packages";
+import type { Destination, Package } from "@/lib/cms/types";
 import { absoluteUrl } from "@/lib/seo";
 
 function packageUrl(pkg: Package): string {
@@ -21,8 +20,14 @@ function packageLine(pkg: Package): string {
   return `- [${pkg.title}](${packageUrl(pkg)}): ${pkg.duration}, from ${pkg.price} per adult, pickup from ${pkg.pickup}`;
 }
 
-function destinationLines(): string[] {
-  return allDestinations.map(
+/** The published content the llms.txt files describe. */
+export type LlmsContent = {
+  packages: readonly Package[];
+  destinations: readonly Destination[];
+};
+
+function destinationLines(destinations: readonly Destination[]): string[] {
+  return destinations.map(
     (destination) =>
       `- [${destination.name}](${absoluteUrl(`/destinations/${destination.slug}`)}): ${destination.description}`
   );
@@ -81,7 +86,7 @@ function join(lines: string[]): string {
   return `${lines.join("\n").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`;
 }
 
-export function buildLlmsTxt(): string {
+export function buildLlmsTxt({ packages, destinations }: LlmsContent): string {
   return join([
     ...header(),
     "",
@@ -91,13 +96,13 @@ export function buildLlmsTxt(): string {
     "",
     "## Destinations",
     "",
-    ...destinationLines(),
+    ...destinationLines(destinations),
     "",
     ...footer(),
   ]);
 }
 
-export function buildLlmsFullTxt(): string {
+export function buildLlmsFullTxt({ packages, destinations }: LlmsContent): string {
   return join([
     ...header(),
     "",
@@ -107,7 +112,7 @@ export function buildLlmsFullTxt(): string {
     "",
     "## Destinations",
     "",
-    ...destinationLines(),
+    ...destinationLines(destinations),
     "",
     ...footer(),
   ]);

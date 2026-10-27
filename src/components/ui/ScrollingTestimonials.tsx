@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { testimonials } from "@/data/testimonials";
 import ReviewCard from "@/components/ui/ReviewCard";
+import type { Testimonial } from "@/lib/cms/types";
 
-export default function ScrollingTestimonials() {
+type ScrollingTestimonialsProps = {
+  testimonials: Testimonial[];
+};
+
+export default function ScrollingTestimonials({
+  testimonials,
+}: ScrollingTestimonialsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
 

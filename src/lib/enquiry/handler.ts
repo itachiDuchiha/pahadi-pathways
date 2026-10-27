@@ -17,7 +17,15 @@ type HandlerConfig<S extends EnquirySource> = {
   routeKey: string;
   sources: readonly S[];
   successMessage: Record<S, string>;
-  buildEmail: (enquiry: Extract<Enquiry, { source: S }>) => EnquiryEmail;
+  /**
+   * Builds the notification email. Returning `null` means the enquiry
+   * refers to something that does not exist (for example an unknown
+   * package), which is answered with 400 and `invalidMessage`.
+   */
+  buildEmail: (
+    enquiry: Extract<Enquiry, { source: S }>
+  ) => EnquiryEmail | null | Promise<EnquiryEmail | null>;
+  invalidMessage?: string;
 };
 
 function respond(
@@ -106,6 +114,12 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(400, false, "Invalid enquiry details.");
       }
 
+      const email = await config.buildEmail(enquiry as Extract<Enquiry, { source: S }>);
+
+      if (!email) {
+        return respond(400, false, config.invalidMessage ?? "Invalid enquiry details.");
+      }
+
       if (!getMailConfig()) {
         console.error("Enquiry email configuration is incomplete.");
         return respond(
@@ -114,8 +128,6 @@ export function createEnquiryHandler<S extends EnquirySource>(
           "Our enquiry service is being configured. Please try again shortly."
         );
       }
-
-      const email = config.buildEmail(enquiry as Extract<Enquiry, { source: S }>);
 
       const sent = await sendEnquiryEmail({ ...email, replyTo: enquiry.email });
 

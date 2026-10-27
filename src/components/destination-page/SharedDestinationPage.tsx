@@ -23,7 +23,7 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
  * Manikaran
  *
  * Only destinations with an explicit `gallery` array of four images
- * (set on the destination entry in src/data/destinations.ts) render
+ * (set on the destination in the CMS) render
  * the four-image photo grid below. Everything else falls back to a
  * single full-width image using `destination.image`.
  *

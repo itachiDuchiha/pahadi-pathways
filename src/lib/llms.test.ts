@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import { site } from "@/config/site";
-import { allDestinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { allDestinations } from "@/cms/seed/destinations";
+import { packages } from "@/cms/seed/packages";
 
 import { buildLlmsFullTxt, buildLlmsTxt } from "./llms";
 import { absoluteUrl } from "./seo";
 
+const content = { packages, destinations: allDestinations };
+
 describe("buildLlmsTxt", () => {
-  const text = buildLlmsTxt();
+  const text = buildLlmsTxt(content);
 
   it("starts with the site name as the H1", () => {
     expect(text.split("\n")[0]).toBe(`# ${site.name}`);
@@ -32,7 +34,7 @@ describe("buildLlmsTxt", () => {
 });
 
 describe("buildLlmsFullTxt", () => {
-  const text = buildLlmsFullTxt();
+  const text = buildLlmsFullTxt(content);
 
   it("starts with the site name as the H1", () => {
     expect(text.split("\n")[0]).toBe(`# ${site.name}`);

@@ -1,4 +1,4 @@
-import { packages } from "@/data/packages";
+import { getPackageBySlug } from "@/lib/cms/packages";
 import { createEnquiryHandler, type EnquiryEmail } from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
 import type { PackageEnquiry } from "@/lib/enquiry/schema";
@@ -10,10 +10,10 @@ import {
 
 export const runtime = "nodejs";
 
-function packageEmail(enquiry: PackageEnquiry): EnquiryEmail {
-  // The schema guarantees the slug exists.
-  const pkg = packages.find((item) => item.slug === enquiry.slug);
-  if (!pkg) throw new Error("Validated package slug not found.");
+async function packageEmail(enquiry: PackageEnquiry): Promise<EnquiryEmail | null> {
+  // The schema checks the slug's shape only; only a published package counts.
+  const pkg = await getPackageBySlug(enquiry.slug);
+  if (!pkg) return null;
 
   const price = computePackagePrice({
     ...packagePricingContext(pkg),
@@ -58,4 +58,5 @@ export const POST = createEnquiryHandler({
     package: "Your package enquiry has been sent successfully.",
   },
   buildEmail: packageEmail,
+  invalidMessage: "Please choose a valid package.",
 });

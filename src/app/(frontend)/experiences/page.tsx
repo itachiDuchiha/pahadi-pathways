@@ -14,7 +14,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { experiences, type ExperienceSeedItem } from "@/cms/seed/experiences";
+import { getExperiences } from "@/lib/cms/experiences";
+import type { ExperienceIcon } from "@/lib/cms/types";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -24,7 +25,7 @@ export const metadata = pageMetadata({
   path: "/experiences",
 });
 
-const experienceIcons: Record<ExperienceSeedItem["icon"], LucideIcon> = {
+const experienceIcons: Record<ExperienceIcon, LucideIcon> = {
   Camera,
   Compass,
   Footprints,
@@ -35,7 +36,9 @@ const experienceIcons: Record<ExperienceSeedItem["icon"], LucideIcon> = {
   Utensils,
 };
 
-export default function ExperiencesPage() {
+export default async function ExperiencesPage() {
+  const experiences = await getExperiences();
+
   return (
     <div className="bg-[#F7F3E9] text-[#10264A]">
       {/* Hero */}

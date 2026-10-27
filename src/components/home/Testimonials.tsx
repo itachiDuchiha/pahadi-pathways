@@ -1,7 +1,12 @@
 import Link from "next/link";
 import ScrollingTestimonials from "@/components/ui/ScrollingTestimonials";
+import type { Testimonial } from "@/lib/cms/types";
 
-export default function Testimonials() {
+type TestimonialsProps = {
+  testimonials: Testimonial[];
+};
+
+export default function Testimonials({ testimonials }: TestimonialsProps) {
   return (
     <section
       className="
@@ -294,7 +299,7 @@ export default function Testimonials() {
               "
             />
 
-            <ScrollingTestimonials />
+            <ScrollingTestimonials testimonials={testimonials} />
 
           </div>
 

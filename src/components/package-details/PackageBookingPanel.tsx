@@ -8,7 +8,7 @@ import {
   Check,
 } from "lucide-react";
 
-import type { Package } from "@/data/packages";
+import type { Package } from "@/lib/cms/types";
 import { telUrl, whatsappUrl } from "@/config/site";
 import EnquiryModal from "@/components/package-details/booking/EnquiryModal";
 import MealSelector from "@/components/package-details/booking/MealSelector";

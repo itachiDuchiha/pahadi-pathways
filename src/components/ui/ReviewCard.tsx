@@ -1,4 +1,4 @@
-import type { Testimonial } from "@/types/testimonial";
+import type { Testimonial } from "@/lib/cms/types";
 import { Star, Quote } from "lucide-react";
 
 type ReviewCardProps = {

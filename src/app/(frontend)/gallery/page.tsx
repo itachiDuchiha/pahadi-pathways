@@ -4,6 +4,7 @@ import { Camera, Mountain, ArrowRight } from "lucide-react";
 
 import GalleryExplorer from "@/components/gallery/GalleryExplorer";
 
+import { getGalleryItems } from "@/lib/cms/gallery";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -13,7 +14,9 @@ export const metadata = pageMetadata({
   path: "/gallery",
 });
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const galleryItems = await getGalleryItems();
+
   return (
     <>
       {/* ================================================== */}
@@ -116,7 +119,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      <GalleryExplorer />
+      <GalleryExplorer items={galleryItems} />
 
       {/* ================================================== */}
       {/* CLOSING CTA */}

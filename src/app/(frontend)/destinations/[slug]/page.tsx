@@ -4,8 +4,9 @@ import { createElement } from "react";
 
 import { getDestinationPage } from "@/components/destination-page/registry";
 import JsonLd from "@/components/seo/JsonLd";
-import { allDestinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { getDestinationBySlug, getDestinations } from "@/lib/cms/destinations";
+import { assertContentPresent } from "@/lib/cms/guard";
+import { getPackages } from "@/lib/cms/packages";
 import { pageMetadata, truncate } from "@/lib/seo";
 import { breadcrumbJsonLd, destinationJsonLd } from "@/lib/structured-data";
 
@@ -15,12 +16,11 @@ type Props = {
   }>;
 };
 
-function findDestination(slug: string) {
-  return allDestinations.find((item) => item.slug === slug);
-}
+export async function generateStaticParams() {
+  const destinations = await getDestinations();
+  assertContentPresent(destinations.length, "destinations");
 
-export function generateStaticParams() {
-  return allDestinations.map((destination) => ({
+  return destinations.map((destination) => ({
     slug: destination.slug,
   }));
 }
@@ -29,7 +29,7 @@ export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const destination = findDestination(slug);
+  const destination = await getDestinationBySlug(slug);
 
   if (!destination) {
     return { title: "Not found" };
@@ -45,7 +45,7 @@ export async function generateMetadata({
 
 export default async function DestinationPage({ params }: Props) {
   const { slug } = await params;
-  const destination = findDestination(slug);
+  const [destination, packages] = await Promise.all([getDestinationBySlug(slug), getPackages()]);
 
   if (!destination) {
     notFound();
@@ -65,7 +65,7 @@ export default async function DestinationPage({ params }: Props) {
         ])}
       />
 
-      {createElement(getDestinationPage(destination.slug), {
+      {createElement(getDestinationPage(destination), {
         destination,
         packages,
       })}

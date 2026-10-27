@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { packages } from "@/data/packages";
 import { mealOptions, stayOptions, vehicleOptions } from "@/lib/pricing";
 
 export const DESTINATIONS = {
@@ -111,16 +110,16 @@ export const contactEnquirySchema = z.object({
   message,
 });
 
-const packageSlugs = new Set(packages.map((pkg) => pkg.slug));
+/** Same shape as the CMS slug field; the handler checks the package exists. */
+const PACKAGE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export const packageEnquirySchema = z.object({
   source: z.literal("package"),
   ...shared,
   slug: z
     .string({ error: "Please choose a valid package." })
-    .refine((value) => packageSlugs.has(value), {
-      error: "Please choose a valid package.",
-    }),
+    .max(200, { error: "Please choose a valid package." })
+    .regex(PACKAGE_SLUG, { error: "Please choose a valid package." }),
   travelDate,
   adults: z
     .number({ error: "Please select 1 to 10 adults." })

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { Package } from "@/data/packages";
+import type { Package } from "@/lib/cms/types";
 import {
   computePackagePrice,
   packagePricingContext,

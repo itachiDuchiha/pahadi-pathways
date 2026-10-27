@@ -19,7 +19,8 @@ import PackageFaq from "@/components/package-details/PackageFaq";
 
 import JsonLd from "@/components/seo/JsonLd";
 
-import { packages } from "@/data/packages";
+import { assertContentPresent } from "@/lib/cms/guard";
+import { getPackageBySlug, getPackages } from "@/lib/cms/packages";
 
 import { pageMetadata, truncate } from "@/lib/seo";
 import {
@@ -34,7 +35,10 @@ type Props = {
   }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const packages = await getPackages();
+  assertContentPresent(packages.length, "packages");
+
   return packages.map((pkg) => ({ slug: pkg.slug }));
 }
 
@@ -43,7 +47,7 @@ export async function generateMetadata({
 }: Props): Promise<Metadata> {
   const { slug } = await params;
 
-  const pkg = packages.find((item) => item.slug === slug);
+  const pkg = await getPackageBySlug(slug);
 
   if (!pkg) {
     return { title: "Not found" };
@@ -62,7 +66,7 @@ export default async function PackageDetailsPage({
 }: Props) {
   const { slug } = await params;
 
-  const pkg = packages.find((item) => item.slug === slug);
+  const pkg = await getPackageBySlug(slug);
 
   if (!pkg) {
     notFound();

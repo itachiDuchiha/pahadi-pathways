@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
-import type { Package } from "@/data/packages";
+import type { Package } from "@/lib/cms/types";
 import { site, whatsappUrl } from "@/config/site";
 import { useTodayIso } from "@/lib/hooks/useTodayIso";
 import { formatCurrency } from "@/lib/pricing";

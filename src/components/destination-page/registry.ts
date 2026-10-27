@@ -1,8 +1,6 @@
 import type { ComponentType } from "react";
 
-import { allDestinations, type Destination } from "@/data/destinations";
-
-import type { Package } from "@/data/packages";
+import type { Destination, Package } from "@/lib/cms/types";
 
 import ManaliPage from "@/components/destination-page/ManaliPage";
 
@@ -23,16 +21,15 @@ const dedicatedPages: Record<string, ComponentType<DestinationPageProps>> = {
   "spiti-valley": SpitiPage,
 };
 
-// Every destination without a dedicated page uses the shared layout, so a
-// new entry in `allDestinations` gets a page automatically.
-export const sharedDestinationSlugs: string[] = allDestinations
-  .map((destination) => destination.slug)
-  .filter((slug) => !Object.hasOwn(dedicatedPages, slug));
-
+/**
+ * Destinations marked `dedicated` in the CMS render their own component
+ * when one exists for the slug; every other destination, including a
+ * dedicated one without a component, uses the shared layout.
+ */
 export function getDestinationPage(
-  slug: string
+  destination: Pick<Destination, "slug" | "layout">
 ): ComponentType<DestinationPageProps> {
-  return Object.hasOwn(dedicatedPages, slug)
-    ? dedicatedPages[slug]
+  return destination.layout === "dedicated" && Object.hasOwn(dedicatedPages, destination.slug)
+    ? dedicatedPages[destination.slug]
     : SharedDestinationPage;
 }

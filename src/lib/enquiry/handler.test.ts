@@ -13,6 +13,15 @@ vi.mock("./mail", async (importOriginal) => {
   };
 });
 
+// The package route reads the CMS; serve the seed fixtures instead.
+vi.mock("@/lib/cms/packages", async () => {
+  const { packages } = await import("@/cms/seed/packages");
+  return {
+    getPackages: vi.fn(async () => packages),
+    getPackageBySlug: vi.fn(async (slug: string) => packages.find((item) => item.slug === slug) ?? null),
+  };
+});
+
 import { POST as packagePOST } from "@/app/(frontend)/api/package-enquiry/route";
 import { POST as tripPOST } from "@/app/(frontend)/api/trip-enquiry/route";
 
@@ -157,5 +166,15 @@ describe("enquiry handler pipeline", () => {
     expect(rows["Package Cost"]).toBe("₹48,654");
     expect(rows["GST (5%)"]).toBe("₹2,433");
     expect(rows["Estimated Total"]).toBe("₹51,087");
+  });
+
+  it("rejects a well-formed slug that matches no published package with 400", async () => {
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, slug: "no-such-trip" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, message: "Please choose a valid package." });
+    expect(sendMock).not.toHaveBeenCalled();
   });
 });

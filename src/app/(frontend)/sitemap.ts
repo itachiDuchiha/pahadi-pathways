@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
-import { allDestinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { getDestinations } from "@/lib/cms/destinations";
+import { getPackages } from "@/lib/cms/packages";
 import { absoluteUrl } from "@/lib/seo";
 
 // Evaluated once, so every entry carries the build time.
@@ -17,7 +17,9 @@ const staticRoutes = [
   "/privacy",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [packages, destinations] = await Promise.all([getPackages(), getDestinations()]);
+
   return [
     {
       url: absoluteUrl("/"),
@@ -37,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    ...allDestinations.map((destination) => ({
+    ...destinations.map((destination) => ({
       url: absoluteUrl(`/destinations/${destination.slug}`),
       lastModified,
       changeFrequency: "monthly" as const,

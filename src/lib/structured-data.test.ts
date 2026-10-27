@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { site } from "@/config/site";
-import { allDestinations } from "@/data/destinations";
-import { packages } from "@/data/packages";
+import { allDestinations } from "@/cms/seed/destinations";
+import { packages } from "@/cms/seed/packages";
 
 import { absoluteUrl } from "./seo";
 import {

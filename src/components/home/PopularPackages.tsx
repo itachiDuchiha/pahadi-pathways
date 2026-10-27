@@ -1,9 +1,13 @@
 import Link from "next/link";
 
-import { packages } from "@/data/packages";
 import PackageCard from "@/components/packages/PackageCard";
+import type { Package } from "@/lib/cms/types";
 
-export default function PopularPackages() {
+type PopularPackagesProps = {
+  packages: Package[];
+};
+
+export default function PopularPackages({ packages }: PopularPackagesProps) {
   return (
     <section
       className="

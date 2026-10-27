@@ -66,8 +66,14 @@ describe("enquirySchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects an unknown package slug", () => {
-    expect(enquirySchema.safeParse({ ...pkg, slug: "nope" }).success).toBe(false);
+  it("rejects a malformed package slug", () => {
+    for (const slug of ["", "Not A Slug", "../etc/passwd", "a--b", "x".repeat(201)]) {
+      expect(enquirySchema.safeParse({ ...pkg, slug }).success).toBe(false);
+    }
+  });
+
+  it("checks only the slug's shape; the handler checks that the package exists", () => {
+    expect(enquirySchema.safeParse({ ...pkg, slug: "unknown-trip" }).success).toBe(true);
   });
 
   it("rejects a stay label that is not in the option table", () => {

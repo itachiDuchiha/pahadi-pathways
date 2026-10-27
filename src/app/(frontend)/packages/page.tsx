@@ -4,7 +4,8 @@ import PackageCard from "@/components/packages/PackageCard";
 
 import CustomJourneyCTA from "@/components/packages/CustomJourneyCTA";
 
-import { packages } from "@/data/packages";
+import { getPackages } from "@/lib/cms/packages";
+import type { Package } from "@/lib/cms/types";
 
 import { pageMetadata } from "@/lib/seo";
 
@@ -76,7 +77,7 @@ function getSearchKeyword(destination: string) {
 ========================================================= */
 
 function getPackageSearchText(
-  pkg: (typeof packages)[number]
+  pkg: Package
 ) {
   const itineraryText =
     pkg.itinerary?.join(" ") ?? "";
@@ -117,7 +118,7 @@ function getPackageSearchText(
 ========================================================= */
 
 function packageMatchesDestination(
-  pkg: (typeof packages)[number],
+  pkg: Package,
   destination: string
 ) {
   const keyword = getSearchKeyword(destination);
@@ -136,7 +137,7 @@ function packageMatchesDestination(
 export default async function PackagesPage({
   searchParams,
 }: PackagesPageProps) {
-  const params = await searchParams;
+  const [params, packages] = await Promise.all([searchParams, getPackages()]);
 
   const destination =
     params.destination?.trim() ?? "";

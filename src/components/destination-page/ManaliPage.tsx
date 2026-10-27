@@ -12,6 +12,7 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
 
 export default function ManaliPage({
   destination,
+  packages,
 }: DestinationPageProps) {
   const galleryImages =
     "gallery" in destination && destination.gallery
@@ -316,7 +317,7 @@ export default function ManaliPage({
 
           <section className="pt-5 md:pt-6">
 
-            <ManaliPackages />
+            <ManaliPackages packages={packages} />
 
           </section>
 

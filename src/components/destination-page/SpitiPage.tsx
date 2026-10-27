@@ -12,6 +12,7 @@ import type { DestinationPageProps } from "@/components/destination-page/registr
 
 export default function SpitiPage({
   destination,
+  packages,
 }: DestinationPageProps) {
   const spitiGallery = [
     "/images/destinations/spiti-1.webp",
@@ -150,7 +151,7 @@ export default function SpitiPage({
 
           <section className="pt-5 md:pt-6">
 
-            <SpitiPackages />
+            <SpitiPackages packages={packages} />
 
           </section>
 

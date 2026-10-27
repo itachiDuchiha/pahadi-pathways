@@ -7,6 +7,8 @@ import CallToAction from "@/components/home/CallToAction";
 
 import JsonLd from "@/components/seo/JsonLd";
 
+import { getPackages } from "@/lib/cms/packages";
+import { getTestimonials } from "@/lib/cms/testimonials";
 import { defaultDescription, pageMetadata } from "@/lib/seo";
 import { websiteJsonLd } from "@/lib/structured-data";
 
@@ -15,18 +17,20 @@ export const metadata = pageMetadata({
   path: "/",
 });
 
-export default function Home() {
+export default async function Home() {
+  const [packages, testimonials] = await Promise.all([getPackages(), getTestimonials()]);
+
   return (
     <>
       <JsonLd data={websiteJsonLd()} />
 
       <Hero />
 
-      <PopularPackages />
+      <PopularPackages packages={packages} />
 
       <FeaturedDestinations />
 
-      <Testimonials />
+      <Testimonials testimonials={testimonials} />
 
       <WhyChooseUs />
 
