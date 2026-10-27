@@ -6,6 +6,15 @@
 
 export type Consent = "accepted" | "declined";
 
+/**
+ * The server render (and the hydration pass) cannot read the stored
+ * choice, so it reports this instead of `null` ("no choice yet").
+ */
+export const UNKNOWN_CONSENT = "unknown";
+
+/** What the consent store reports: a choice, no choice (`null`), or not yet known. */
+export type ConsentSnapshot = Consent | null | typeof UNKNOWN_CONSENT;
+
 /** The `localStorage` key and cookie name holding the visitor's choice. */
 export const CONSENT_KEY = "thc-consent";
 
@@ -28,12 +37,20 @@ export function parseConsent(value: unknown): Consent | null {
 
 /** A vendor loads only once the visitor accepted and its ID is set. */
 export function shouldLoadAnalytics(
-  consent: Consent | null,
+  consent: ConsentSnapshot,
   ids: { ga: string | null; clarity: string | null }
 ): { ga: boolean; clarity: boolean } {
   const accepted = consent === "accepted";
 
   return { ga: accepted && Boolean(ids.ga), clarity: accepted && Boolean(ids.clarity) };
+}
+
+/**
+ * The banner asks only while analytics is configured and the client has
+ * read the stored choice and found none; never while it is unknown.
+ */
+export function shouldShowConsentBanner(consent: ConsentSnapshot, enabled: boolean): boolean {
+  return enabled && consent === null;
 }
 
 function cookieAttributes(maxAge: number, secure: boolean): string {

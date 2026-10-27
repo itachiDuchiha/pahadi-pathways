@@ -54,7 +54,12 @@ describe("site CSP (report-only)", () => {
 
   it("allows the analytics script hosts", () => {
     expect(directive(csp, "script-src")).toEqual(
-      expect.arrayContaining(["'self'", "https://www.googletagmanager.com", "https://www.clarity.ms"])
+      expect.arrayContaining([
+        "'self'",
+        "https://www.googletagmanager.com",
+        "https://www.clarity.ms",
+        "https://scripts.clarity.ms",
+      ])
     );
   });
 

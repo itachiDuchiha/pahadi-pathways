@@ -72,6 +72,25 @@ describe("getNotificationPolicy", () => {
     expect(String(warn.mock.calls[0][0])).toContain("trip.recipients");
   });
 
+  it("keeps at most the first ten valid unique addresses", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    // Stored rows may exceed the admin cap if saved before it existed.
+    const emails = Array.from({ length: 12 }, (_, i) => `r${i}@example.com`);
+    const stored: NotificationSetting = {
+      id: 1,
+      trip: {
+        sendEmail: true,
+        recipients: [{ email: "bad" }, { email: "R0@example.com" }, ...emails.map((email) => ({ email }))],
+      },
+    };
+    vi.spyOn(temp.payload, "findGlobal").mockResolvedValueOnce(stored);
+
+    expect((await getNotificationPolicy("trip")).recipients).toEqual([
+      "R0@example.com",
+      ...emails.slice(1, 10),
+    ]);
+  });
+
   it("returns no recipients when the list is empty and no server address is set", async () => {
     vi.stubEnv("TRIP_ENQUIRY_EMAIL", "");
 

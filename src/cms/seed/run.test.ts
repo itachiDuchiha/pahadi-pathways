@@ -16,7 +16,6 @@ import { analyticsFill, analyticsSettings } from "./analytics";
 import { notificationFill, notificationSettings } from "./notifications";
 import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
-import { site } from "@/config/site";
 import { DEFAULT_CONSENT_BANNER_TEXT } from "@/lib/consent";
 
 const temp = withTempPayload();
@@ -74,11 +73,26 @@ describe("assertSeedEnv", () => {
 });
 
 describe("legalFill", () => {
-  it("fills every seeded field of an empty global", () => {
-    expect(legalFill({})).toEqual(legalSettings);
+  it("fills every seeded field of an empty global except the contact email", () => {
+    expect(legalFill({})).toEqual({
+      effectiveDate: legalSettings.effectiveDate,
+      deletionWindowMonths: legalSettings.deletionWindowMonths,
+      retentionStatement: legalSettings.retentionStatement,
+    });
   });
 
   it("fills only the empty fields and keeps the owner's values", () => {
+    expect(
+      legalFill({
+        dataContactEmail: "privacy@example.com",
+        effectiveDate: "",
+        deletionWindowMonths: 3,
+        retentionStatement: "We keep records for two years.",
+      })
+    ).toEqual({ effectiveDate: legalSettings.effectiveDate });
+  });
+
+  it("leaves a cleared contact email empty so the site email is used live", () => {
     expect(
       legalFill({
         dataContactEmail: "",
@@ -86,7 +100,7 @@ describe("legalFill", () => {
         deletionWindowMonths: 3,
         retentionStatement: "We keep records for two years.",
       })
-    ).toEqual({ dataContactEmail: legalSettings.dataContactEmail });
+    ).toBeNull();
   });
 
   it("returns null when every seeded field is set", () => {
@@ -199,9 +213,10 @@ describe("seed", () => {
       });
       expect(first.updated["pricing-settings"]).toBe(1);
       expect(first.updated["site-settings"]).toBe(1);
-      expect(first.updated["legal-settings"]).toBe(1);
-      // The test reset already wrote the field defaults (email on, banner text), so there is nothing to fill.
+      // The test reset already wrote the field defaults (legal dates and wording, email on, banner text),
+      // and the legal contact email is never filled, so there is nothing to fill.
       expect(Object.entries(first.skipped).filter(([, n]) => n !== 0)).toEqual([
+        ["legal-settings", 1],
         ["notification-settings", 1],
         ["analytics-settings", 1],
       ]);
@@ -294,7 +309,9 @@ describe("seed", () => {
       expect(siteSettings).toMatchObject({ phoneE164: "+917559697919", whatsapp: "917559697919" });
 
       const legal = await payload.findGlobal({ slug: "legal-settings" });
-      expect(legal).toMatchObject({ dataContactEmail: site.email, deletionWindowMonths: 6 });
+      // The contact email stays empty: the live read falls back to the site email.
+      expect(legal.dataContactEmail ?? "").toBe("");
+      expect(legal).toMatchObject({ deletionWindowMonths: 6 });
       expect(legal.effectiveDate).toMatch(/^2026-10-27/);
 
       const revalidationWarnings = warn.mock.calls.filter(([message]) => String(message).includes("Revalidation"));
@@ -389,10 +406,10 @@ describe("seed", () => {
 
       const second = await run();
 
-      expect(second.updated["legal-settings"]).toBe(1);
+      expect(second.skipped["legal-settings"]).toBe(1);
       const legal = await payload.findGlobal({ slug: "legal-settings" });
+      expect(legal.dataContactEmail ?? "").toBe("");
       expect(legal).toMatchObject({
-        dataContactEmail: site.email,
         deletionWindowMonths: 3,
         retentionStatement: "We keep records for two years.",
       });

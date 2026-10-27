@@ -4,24 +4,24 @@ import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, 
 
 import {
   CONSENT_KEY,
-  expireConsentCookie,
   parseConsent,
   readConsentCookie,
   serializeConsentCookie,
+  UNKNOWN_CONSENT,
   type Consent,
+  type ConsentSnapshot,
 } from "@/lib/consent";
 
 /**
  * The visitor's analytics choice, mirrored in `localStorage` and a
  * same-named cookie (one year). The server never knows the choice, so
- * every page renders as "no choice" and the stored value is read on the
+ * every page renders as "unknown" and the stored value is read on the
  * client after hydration.
  */
 type ConsentState = {
-  consent: Consent | null;
+  consent: ConsentSnapshot;
   accept(): void;
   decline(): void;
-  reset(): void;
 };
 
 const ConsentContext = createContext<ConsentState | null>(null);
@@ -39,16 +39,15 @@ function readStored(): Consent | null {
   return readConsentCookie(document.cookie);
 }
 
-function store(value: Consent | null): void {
+function store(value: Consent): void {
   const secure = window.location.protocol === "https:";
 
   try {
-    if (value) window.localStorage.setItem(CONSENT_KEY, value);
-    else window.localStorage.removeItem(CONSENT_KEY);
+    window.localStorage.setItem(CONSENT_KEY, value);
   } catch {
     // See readStored.
   }
-  document.cookie = value ? serializeConsentCookie(value, secure) : expireConsentCookie(secure);
+  document.cookie = serializeConsentCookie(value, secure);
 
   for (const listener of listeners) listener();
 }
@@ -67,10 +66,10 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
-const noChoice = (): Consent | null => null;
+const unknownOnServer = (): ConsentSnapshot => UNKNOWN_CONSENT;
 
 export default function ConsentProvider({ children }: { children: ReactNode }) {
-  const consent = useSyncExternalStore(subscribe, readStored, noChoice);
+  const consent = useSyncExternalStore<ConsentSnapshot>(subscribe, readStored, unknownOnServer);
 
   const accept = useCallback(() => store("accepted"), []);
   const decline = useCallback(() => {
@@ -79,9 +78,8 @@ export default function ConsentProvider({ children }: { children: ReactNode }) {
     // Vendor scripts cannot be unloaded, so a reload drops any that ran.
     if (wasAccepted) window.location.reload();
   }, []);
-  const reset = useCallback(() => store(null), []);
 
-  const value = useMemo(() => ({ consent, accept, decline, reset }), [consent, accept, decline, reset]);
+  const value = useMemo(() => ({ consent, accept, decline }), [consent, accept, decline]);
 
   return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>;
 }

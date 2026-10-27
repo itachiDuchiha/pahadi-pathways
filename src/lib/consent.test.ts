@@ -9,7 +9,9 @@ import {
   parseConsent,
   readConsentCookie,
   serializeConsentCookie,
+  UNKNOWN_CONSENT,
   shouldLoadAnalytics,
+  shouldShowConsentBanner,
 } from "./consent";
 
 describe("parseConsent", () => {
@@ -50,6 +52,29 @@ describe("shouldLoadAnalytics", () => {
 
   it("treats an empty ID as unset", () => {
     expect(shouldLoadAnalytics("accepted", { ga: "", clarity: "" })).toEqual({ ga: false, clarity: false });
+  });
+
+  it("loads nothing while the stored choice is not yet known (server render, before hydration)", () => {
+    expect(shouldLoadAnalytics(UNKNOWN_CONSENT, both)).toEqual({ ga: false, clarity: false });
+  });
+});
+
+describe("shouldShowConsentBanner", () => {
+  it("shows only when analytics is configured and the client found no choice", () => {
+    expect(shouldShowConsentBanner(null, true)).toBe(true);
+  });
+
+  it("hides while the choice is unknown, so returning visitors never see a flash", () => {
+    expect(UNKNOWN_CONSENT).toBe("unknown");
+    expect(shouldShowConsentBanner(UNKNOWN_CONSENT, true)).toBe(false);
+  });
+
+  it.each(["accepted", "declined"] as const)("hides once the visitor has %s", (consent) => {
+    expect(shouldShowConsentBanner(consent, true)).toBe(false);
+  });
+
+  it("hides when analytics is not configured", () => {
+    expect(shouldShowConsentBanner(null, false)).toBe(false);
   });
 });
 

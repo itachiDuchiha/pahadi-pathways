@@ -1,17 +1,21 @@
 import type { NotificationSetting } from "@/cms/payload-types";
-import { fallbackRecipients, isRecipientEmail } from "@/lib/enquiry/recipients";
+import { fallbackRecipients, isRecipientEmail, MAX_RECIPIENTS } from "@/lib/enquiry/recipients";
 import type { EnquirySource } from "@/lib/enquiry/schema";
 
 import { getPayloadClient } from "./client";
 
 export type NotificationPolicy = { sendEmail: boolean; recipients: string[] };
 
-/** The admin's addresses for one source, re-checked before use (the stored data may predate validation). */
+/**
+ * The admin's addresses for one source, re-checked before use (the stored
+ * data may predate validation): the first `MAX_RECIPIENTS` valid unique ones.
+ */
 function savedRecipients(group: NotificationSetting[EnquirySource], source: EnquirySource): string[] {
   const seen = new Set<string>();
   const recipients: string[] = [];
 
   for (const row of group?.recipients ?? []) {
+    if (recipients.length >= MAX_RECIPIENTS) break;
     const email = row.email?.trim() ?? "";
     if (!isRecipientEmail(email)) {
       console.warn(`Notification settings: ignoring an invalid address in ${source}.recipients.`);

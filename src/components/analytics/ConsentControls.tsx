@@ -6,6 +6,7 @@ const LABELS = {
   accepted: "You have accepted analytics cookies.",
   declined: "You have declined analytics cookies.",
   none: "You have not made a choice yet, so no analytics scripts run.",
+  unknown: "Checking your analytics choice.",
 } as const;
 
 const BUTTON =
@@ -14,6 +15,8 @@ const BUTTON =
 /** "Change your choice" on the privacy page. */
 export default function ConsentControls() {
   const { consent, accept, decline } = useConsent();
+  // Until the stored choice is read after hydration, neither button applies.
+  const unknown = consent === "unknown";
 
   return (
     <div className="mt-4 rounded-2xl border border-[#10264A]/10 bg-[#F8F7F3] p-5">
@@ -22,7 +25,7 @@ export default function ConsentControls() {
         <button
           type="button"
           onClick={accept}
-          disabled={consent === "accepted"}
+          disabled={unknown || consent === "accepted"}
           className={`${BUTTON} border-[#C89A3D] bg-[#C89A3D] text-[#10264A] hover:bg-[#D7AE57]`}
         >
           Accept analytics
@@ -30,7 +33,7 @@ export default function ConsentControls() {
         <button
           type="button"
           onClick={decline}
-          disabled={consent === "declined"}
+          disabled={unknown || consent === "declined"}
           className={`${BUTTON} border-[#10264A]/20 bg-white text-[#10264A] hover:border-[#C89A3D]`}
         >
           Decline analytics

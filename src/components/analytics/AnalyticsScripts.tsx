@@ -19,8 +19,9 @@ function literal(id: string): string {
 /**
  * Google Analytics and Microsoft Clarity, mounted only on the client once
  * the visitor has accepted and the vendor's ID is set. The server render
- * never includes them. The vendors' standard snippets are the only inline
- * scripts on the site and live only here.
+ * never includes them. The vendors' standard snippets are the only
+ * executable inline scripts on the site and live only here (the JSON-LD
+ * blocks are inline too, but data the browser never runs).
  */
 export default function AnalyticsScripts({ gaMeasurementId, clarityProjectId }: Props) {
   const { consent } = useConsent();

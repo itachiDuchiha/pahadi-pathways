@@ -2,18 +2,22 @@
 
 import Link from "next/link";
 
+import { shouldShowConsentBanner } from "@/lib/consent";
+
 import { useConsent } from "./ConsentProvider";
 
 type Props = { text: string; enabled: boolean };
 
 /**
  * Asks once, only while analytics is configured and no choice is stored.
+ * Not part of the server render: it appears after hydration, once the
+ * stored choice is known, so a returning visitor never sees it flash.
  * Fixed to the bottom of the viewport, so the page itself never shifts.
  */
 export default function ConsentBanner({ text, enabled }: Props) {
   const { consent, accept, decline } = useConsent();
 
-  if (!enabled || consent !== null) return null;
+  if (!shouldShowConsentBanner(consent, enabled)) return null;
 
   return (
     <div
