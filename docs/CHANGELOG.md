@@ -4,27 +4,28 @@
 
 ### Added
 - Added Payload CMS 3 inside the Next.js app, with a private admin, required signing secret, secure session cookies and a first-admin bootstrap from the environment instead of an open sign-up screen (c64685a).
-- Added CMS collections for packages, destinations, testimonials, gallery items, experiences and media, plus pricing and site settings globals, with role-based access control (97c6db9).
-- Added an idempotent content seed from the bundled content and images, and a script that prunes stored enquiries after 24 months (e78d3e8).
-- Stored every enquiry in the CMS alongside the notification email; a stored enquiry counts as success even if the email fails (813e211).
-- Made the site contact details editable through site settings (df5d371).
-- Added a deploy script, the Postgres migration, CI seeding and CMS documentation (1b08ea4).
+- Added CMS collections for packages, destinations, testimonials, gallery items, experiences and media, plus pricing and site settings globals, with role-based access control (f20738d).
+- Added an idempotent content seed from the bundled content and images, and a script that prunes stored enquiries after 24 months (2153255).
+- Stored every enquiry in the CMS alongside the notification email; a stored enquiry counts as success even if the email fails (e13d72b).
+- Made the site contact details editable through site settings (4d01ac7).
+- Added a deploy script, the Postgres migration, CI seeding and CMS documentation (f8f24ee).
 
 ### Changed
-- Read all site content from Payload through a typed data layer, with a build guard against an empty database (4f718e9).
-- Moved the stay, meal and vehicle pricing tables into the CMS while keeping quotes computed on the server (bbba484).
+- Read all site content from Payload through a typed data layer, with a build guard against an empty database (a220936).
+- Moved the stay, meal and vehicle pricing tables into the CMS while keeping quotes computed on the server (b2ff325).
+- Refresh changelog commit references after a history rewrite (this commit)
 
 ### Fixed
-- Made gallery captions optional, tested draft isolation and extended package pricing fields (46e3f69).
-- Made the content seed skip populated collections by default, with `--overwrite` to reset them (d026e84).
-- Explained the base price versus vehicle rates in the admin and trimmed option labels (4832e15).
-- Kept the package slug and title on stored leads (8cb56cb).
+- Made gallery captions optional, tested draft isolation and extended package pricing fields (44931a3).
+- Made the content seed skip populated collections by default, with `--overwrite` to reset them (e10acb7).
+- Explained the base price versus vehicle rates in the admin and trimmed option labels (a27e0ad).
+- Kept the package slug and title on stored leads (c4e316b).
 
 ### Security
 - Restricted unlocking locked user accounts to admins and tested the authentication seams (9a69e3c).
-- Hardened the admin routes and robots rules, and skipped the rate limiter instead of sharing one bucket when the client IP is unknown (ef5f290).
-- Kept CMS media indexable and closed a bypass through an empty `x-forwarded-for` header (6b3779e).
-- Made the deploy script create the database and media directories and back up the SQLite file before migrating, and corrected the reverse-proxy guidance to require `X-Forwarded-For` (this commit).
+- Hardened the admin routes and robots rules, and skipped the rate limiter instead of sharing one bucket when the client IP is unknown (ff47d7b).
+- Kept CMS media indexable and closed a bypass through an empty `x-forwarded-for` header (4e4bcda).
+- Made the deploy script create the database and media directories and back up the SQLite file before migrating, and corrected the reverse-proxy guidance to require `X-Forwarded-For` (6734f5e).
 
 ## 2026-10-23
 
