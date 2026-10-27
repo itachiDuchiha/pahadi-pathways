@@ -17,6 +17,7 @@ import { adminGraphics, adminMeta } from "./cms/config/admin";
 import { buildDbAdapter } from "./cms/config/db";
 import { securityConfig } from "./cms/config/security";
 import { LegalSettings } from "./cms/globals/LegalSettings";
+import { NotificationSettings } from "./cms/globals/NotificationSettings";
 import { PricingSettings } from "./cms/globals/PricingSettings";
 import { SiteSettings } from "./cms/globals/SiteSettings";
 
@@ -43,7 +44,7 @@ export default buildConfig({
   },
   routes: { admin: "/ramram" },
   collections: [Packages, Destinations, Testimonials, GalleryItems, Experiences, Enquiries, Media, Users],
-  globals: [PricingSettings, SiteSettings, LegalSettings],
+  globals: [PricingSettings, SiteSettings, LegalSettings, NotificationSettings],
   db: buildDbAdapter(process.env),
   sharp,
   typescript: {

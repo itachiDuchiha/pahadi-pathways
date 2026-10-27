@@ -15,6 +15,7 @@ import { mediaManifest } from "./media-manifest";
 import { packages, type PackageContent } from "./packages";
 import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
 import { legalFill, legalSettings } from "./legal";
+import { notificationFill, notificationSettings } from "./notifications";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -30,7 +31,7 @@ export type SeedCollection =
   | "testimonials"
   | "gallery-items"
   | "experiences";
-export type SeedGlobal = "pricing-settings" | "site-settings" | "legal-settings";
+export type SeedGlobal = "pricing-settings" | "site-settings" | "legal-settings" | "notification-settings";
 export type SeedTarget = SeedCollection | SeedGlobal;
 
 export type SeedOptions = {
@@ -99,6 +100,7 @@ function emptyCounts(): Record<SeedTarget, number> {
     "pricing-settings": 0,
     "site-settings": 0,
     "legal-settings": 0,
+    "notification-settings": 0,
   };
 }
 
@@ -119,7 +121,8 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
  * collection is seeded only while it is empty, media are uploaded only
  * while the Media collection is empty, `pricing-settings` is written only
  * while it has no stay options, `site-settings` only while it has no
- * phone number; `legal-settings` only gets its still-empty fields filled.
+ * phone number; `legal-settings` only gets its still-empty fields filled,
+ * and `notification-settings` only a never-set email switch (turned on).
  * Everything else is reported under `skipped`. A deleted or renamed
  * document is therefore never brought back.
  *
@@ -378,6 +381,20 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
     updated["legal-settings"]++;
   } else {
     skipped["legal-settings"]++;
+  }
+
+  const notificationDoc = await payload.findGlobal({ slug: "notification-settings", depth: 0, overrideAccess: true });
+  const notificationData = overwrite ? notificationSettings : notificationFill(notificationDoc);
+  if (notificationData) {
+    await payload.updateGlobal({
+      slug: "notification-settings",
+      data: notificationData,
+      overrideAccess: true,
+      context,
+    });
+    updated["notification-settings"]++;
+  } else {
+    skipped["notification-settings"]++;
   }
 
   const media = manifest.filter(([publicPath]) => mediaByFilename.has(mediaFilename(publicPath))).length;

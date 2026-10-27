@@ -7,6 +7,7 @@ import * as migration_20261027_093704_clear_sedan_equal_to_base from './20261027
 import * as migration_20261027_104808_stay_meal_per_night from './20261027_104808_stay_meal_per_night';
 import * as migration_20261027_114014_legal_settings from './20261027_114014_legal_settings';
 import * as migration_20261027_115006_legal_effective_date_required from './20261027_115006_legal_effective_date_required';
+import * as migration_20261027_115708_notification_settings from './20261027_115708_notification_settings';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261027_115006_legal_effective_date_required.up,
     down: migration_20261027_115006_legal_effective_date_required.down,
-    name: '20261027_115006_legal_effective_date_required'
+    name: '20261027_115006_legal_effective_date_required',
+  },
+  {
+    up: migration_20261027_115708_notification_settings.up,
+    down: migration_20261027_115708_notification_settings.down,
+    name: '20261027_115708_notification_settings'
   },
 ];

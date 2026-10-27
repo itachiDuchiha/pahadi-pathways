@@ -51,9 +51,9 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 
 | Variable | Purpose |
 | --- | --- |
-| `RESEND_API_KEY` | API key used to send enquiry emails through Resend. |
+| `RESEND_API_KEY` | API key used to send enquiry emails through Resend. Without it (or the sender) no email is sent; enquiries are still stored. |
 | `RESEND_FROM_EMAIL` | Verified sender address the enquiry emails are sent from. |
-| `TRIP_ENQUIRY_EMAIL` | Mailbox that receives trip and package enquiry notifications. |
+| `TRIP_ENQUIRY_EMAIL` | Fallback recipient when the admin's notification settings have no addresses for a source (see Notifications). |
 | `NEXT_PUBLIC_SITE_URL` | Public base URL used for metadata, sitemap, canonical links and the CMS origin checks (defaults to `https://thehimalayancompass.in`). Set it to the dev origin, e.g. `http://localhost:3000`, for local development. |
 | `PAYLOAD_SECRET` | Required. Signing secret for CMS sessions, at least 32 random characters (`openssl rand -hex 32`). The server refuses to start without it. |
 | `DATABASE_ADAPTER` | `sqlite` (default) or `postgres`. |
@@ -114,9 +114,10 @@ that the owner knows; it is deliberately not written in any documentation,
   tables, and read stored enquiries.
 - **Admins** can do everything editors can, and additionally manage user
   accounts, edit the site settings (phone, WhatsApp, email, social links,
-  tagline) and the legal settings (grievance officer, data contact email,
+  tagline), the legal settings (grievance officer, data contact email,
   effective date, deletion window, retention statement shown on `/privacy`
-  and `/terms`), and delete enquiries.
+  and `/terms`) and the notification settings (see Notifications), and
+  delete enquiries.
 - New accounts are editors unless an admin chooses otherwise. Logins lock
   for 15 minutes after 5 failed attempts.
 - Every user can change their own password in the admin; only admins can
@@ -178,6 +179,26 @@ clear the shell history afterwards so the password is not kept there.
   too.
 - Replacing or editing an image revalidates every page, since an image can
   appear anywhere on the site.
+
+### Notifications
+
+The notification settings decide, separately for trip planner, contact
+form and package enquiries, whether an email is sent and to whom.
+
+- **Admins** can turn the email for a source on or off and list up to 10
+  recipient addresses for it (each a valid address, no repeats). Editors
+  can see the settings but not change them; visitors cannot read them.
+- **Email off:** the enquiry is still stored under Enquiries and the
+  visitor is told it was received; no email is sent.
+- **No addresses listed:** the email goes to `TRIP_ENQUIRY_EMAIL` from the
+  server environment, so an unconfigured screen never silently drops
+  mail. If that is not set either, the enquiry is stored and the server
+  logs "no recipients configured".
+- The Resend API key and sender address stay in the environment
+  (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`); they are not editable in the
+  admin.
+- The seed turns email on for every source and leaves the lists empty;
+  re-running it never changes an admin's choices.
 
 ### Seeding
 

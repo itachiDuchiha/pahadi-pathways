@@ -12,6 +12,7 @@ import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages } from "./packages";
 import { legalFill, legalSettings } from "./legal";
+import { notificationFill, notificationSettings } from "./notifications";
 import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
 import { site } from "@/config/site";
@@ -91,6 +92,26 @@ describe("legalFill", () => {
   });
 });
 
+describe("notificationFill", () => {
+  it("turns email on for every source of an empty global", () => {
+    expect(notificationFill({})).toEqual(notificationSettings);
+  });
+
+  it("keeps an admin's off switch and recipients", () => {
+    expect(
+      notificationFill({
+        trip: { sendEmail: false, recipients: [{ email: "owner@example.com" }] },
+        contact: { sendEmail: true, recipients: [] },
+        package: { sendEmail: null, recipients: [{ email: "sales@example.com" }] },
+      })
+    ).toEqual({ package: { sendEmail: true, recipients: [{ email: "sales@example.com" }] } });
+  });
+
+  it("returns null when every switch is set", () => {
+    expect(notificationFill({ ...notificationSettings, contact: { sendEmail: false, recipients: [] } })).toBeNull();
+  });
+});
+
 /** Fixture counts per target, as the first seed into an empty database creates them. */
 const FIXTURE_COUNTS = {
   media: Object.keys(mediaManifest).length,
@@ -148,11 +169,18 @@ describe("seed", () => {
 
       const first = await run();
 
-      expect(first.created).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 0, "site-settings": 0, "legal-settings": 0 });
+      expect(first.created).toEqual({
+        ...FIXTURE_COUNTS,
+        "pricing-settings": 0,
+        "site-settings": 0,
+        "legal-settings": 0,
+        "notification-settings": 0,
+      });
       expect(first.updated["pricing-settings"]).toBe(1);
       expect(first.updated["site-settings"]).toBe(1);
       expect(first.updated["legal-settings"]).toBe(1);
-      expect(Object.values(first.skipped).every((n) => n === 0)).toBe(true);
+      // The test reset already wrote the field defaults (email on), so there is nothing to fill.
+      expect(Object.entries(first.skipped).filter(([, n]) => n !== 0)).toEqual([["notification-settings", 1]]);
       expect(first.media).toBe(FIXTURE_COUNTS.media);
       expect(first.admin).toBe("skipped");
 
@@ -278,7 +306,13 @@ describe("seed", () => {
 
       expect(Object.values(second.created).every((n) => n === 0)).toBe(true);
       expect(Object.values(second.updated).every((n) => n === 0)).toBe(true);
-      expect(second.skipped).toEqual({ ...FIXTURE_COUNTS, "pricing-settings": 1, "site-settings": 1, "legal-settings": 1 });
+      expect(second.skipped).toEqual({
+        ...FIXTURE_COUNTS,
+        "pricing-settings": 1,
+        "site-settings": 1,
+        "legal-settings": 1,
+        "notification-settings": 1,
+      });
 
       const after = await packageBySlug("shimla-manali-getaway");
       expect(after.title).toBe("Edited title");
@@ -286,6 +320,30 @@ describe("seed", () => {
       expect((await payload.findGlobal({ slug: "pricing-settings" })).gstPercent).toBe(12);
       expect((await payload.findGlobal({ slug: "site-settings" })).tagline).toBe("Edited tagline");
       expect((await payload.findByID({ collection: "media", id: media.id })).alt).toBe("Edited alt");
+    },
+    120_000
+  );
+
+  it(
+    "turns on a never-set email switch and keeps an admin's notification choices",
+    async () => {
+      const { payload } = temp;
+      await payload.updateGlobal({
+        slug: "notification-settings",
+        data: {
+          trip: { sendEmail: false, recipients: [{ email: "owner@example.com" }] },
+          contact: { sendEmail: null, recipients: [] },
+        },
+        context: quiet,
+      });
+
+      const first = await run();
+
+      expect(first.updated["notification-settings"]).toBe(1);
+      const settings = await payload.findGlobal({ slug: "notification-settings" });
+      expect(settings.trip).toMatchObject({ sendEmail: false, recipients: [{ email: "owner@example.com" }] });
+      expect(settings.contact?.sendEmail).toBe(true);
+      expect(settings.package?.sendEmail).toBe(true);
     },
     120_000
   );
@@ -373,6 +431,7 @@ describe("seed", () => {
         "pricing-settings": 1,
         "site-settings": 1,
         "legal-settings": 1,
+        "notification-settings": 1,
       });
 
       const after = await packageBySlug("shimla-manali-getaway");

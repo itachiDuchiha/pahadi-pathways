@@ -10,8 +10,10 @@ import { parsePackagePrice } from "@/lib/pricing";
 const MAIL_CONFIG = {
   apiKey: "test-key",
   fromEmail: "from@example.com",
-  toEmail: "to@example.com",
 };
+
+/** The server's fallback recipient (`TRIP_ENQUIRY_EMAIL`). */
+const ENV_RECIPIENT = "to@example.com";
 
 vi.mock("./mail", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./mail")>();
@@ -123,6 +125,7 @@ async function seedPackage(
 beforeEach(async () => {
   sendMock.mockClear();
   mailConfigMock.mockReturnValue(MAIL_CONFIG);
+  vi.stubEnv("TRIP_ENQUIRY_EMAIL", ENV_RECIPIENT);
   await temp.payload.updateGlobal({
     slug: "pricing-settings",
     data: pricingSettings,
@@ -130,6 +133,10 @@ beforeEach(async () => {
     context: quiet,
   });
   await seedPackage(SLUG);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("enquiry handler pipeline", () => {
@@ -586,5 +593,123 @@ describe("enquiry storage alongside email", () => {
       },
       computedPrice: { packageCost: 48654, gst: 2433, gstPercent: 5, estimatedTotal: 51087 },
     });
+  });
+});
+
+describe("notification settings", () => {
+  const trip = {
+    source: "trip",
+    name: "Asha",
+    phone: "9876543210",
+    adults: 2,
+    children: 0,
+    budgetPerPerson: 25000,
+    website: "",
+  };
+
+  let errorSpy: MockInstance<typeof console.error>;
+
+  beforeEach(() => {
+    errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  async function setNotifications(data: Record<string, unknown>) {
+    await temp.payload.updateGlobal({ slug: "notification-settings", data, overrideAccess: true, context: quiet });
+  }
+
+  async function enquiries() {
+    return (await temp.payload.find({ collection: "enquiries", depth: 0, overrideAccess: true })).docs;
+  }
+
+  it("stores a contact enquiry and answers 200 without sending when its email is off", async () => {
+    await setNotifications({ contact: { sendEmail: false, recipients: [] } });
+
+    const response = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, message: "Your message was sent successfully." });
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+    const docs = await enquiries();
+    expect(docs).toHaveLength(1);
+    expect(docs[0]).toMatchObject({ source: "contact", name: "Asha" });
+  });
+
+  it("answers 200 without sending even when mail is not configured, if its email is off", async () => {
+    await setNotifications({ contact: { sendEmail: false, recipients: [] } });
+    mailConfigMock.mockReturnValue(null);
+
+    const response = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
+
+  it("keeps sending trip enquiries when only the contact email is off", async () => {
+    await setNotifications({ contact: { sendEmail: false, recipients: [] } });
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][0].to).toEqual([ENV_RECIPIENT]);
+  });
+
+  it("sends to the configured list", async () => {
+    await setNotifications({
+      package: { sendEmail: true, recipients: [{ email: "owner@example.com" }, { email: "sales@example.com" }] },
+    });
+
+    const response = await packagePOST(post(PACKAGE_URL, pkg, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][0].to).toEqual(["owner@example.com", "sales@example.com"]);
+  });
+
+  it("sends to the server address when the list is empty", async () => {
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock.mock.calls[0][0].to).toEqual([ENV_RECIPIENT]);
+  });
+
+  it("answers 200 with one error log when no recipient exists anywhere but the lead was stored", async () => {
+    vi.stubEnv("TRIP_ENQUIRY_EMAIL", "");
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    expect(String(errorSpy.mock.calls[0][0])).toMatch(/no recipients configured/i);
+    expect(await enquiries()).toHaveLength(1);
+  });
+
+  it("answers 503 when no recipient exists and storage failed", async () => {
+    vi.stubEnv("TRIP_ENQUIRY_EMAIL", "");
+    vi.spyOn(temp.payload, "create").mockRejectedValueOnce(new Error("database is locked"));
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(503);
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("answers 502 when its email is off and storage failed, so the lead is not silently lost", async () => {
+    await setNotifications({ trip: { sendEmail: false, recipients: [] } });
+    vi.spyOn(temp.payload, "create").mockRejectedValueOnce(new Error("database is locked"));
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(502);
+    expect((await response.json()).ok).toBe(false);
+    expect(sendMock).not.toHaveBeenCalled();
   });
 });

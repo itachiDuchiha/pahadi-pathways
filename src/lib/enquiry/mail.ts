@@ -2,16 +2,20 @@ import { Resend } from "resend";
 
 import { renderEnquiryHtml, renderEnquiryText, type EnquiryContent } from "./html";
 
-export type MailConfig = { apiKey: string; fromEmail: string; toEmail: string };
+export type MailConfig = { apiKey: string; fromEmail: string };
 
+/**
+ * The Resend credentials, or `null` when mail is not configured. The
+ * recipients come from the notification settings (`getNotificationPolicy`),
+ * which fall back to `TRIP_ENQUIRY_EMAIL`.
+ */
 export function getMailConfig(): MailConfig | null {
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL;
-  const toEmail = process.env.TRIP_ENQUIRY_EMAIL;
 
-  if (!apiKey || !fromEmail || !toEmail) return null;
+  if (!apiKey || !fromEmail) return null;
 
-  return { apiKey, fromEmail, toEmail };
+  return { apiKey, fromEmail };
 }
 
 const MAX_SUBJECT_LENGTH = 120;
@@ -37,11 +41,14 @@ export async function sendEnquiryEmail(
     rows: [string, string][];
     replyTo?: string;
     intro: string;
+    /** Server-side addresses only; never a value the visitor sent. */
+    to: string[];
   } & Partial<Pick<EnquiryContent, "heading" | "kind">>
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const config = getMailConfig();
 
   if (!config) return { ok: false, error: "Mail is not configured." };
+  if (input.to.length === 0) return { ok: false, error: "No recipients." };
 
   const content: EnquiryContent = {
     heading: input.heading ?? "New Enquiry",
@@ -56,7 +63,7 @@ export async function sendEnquiryEmail(
 
     const { error } = await resend.emails.send({
       from: config.fromEmail,
-      to: [config.toEmail],
+      to: input.to,
       subject: sanitizeSubject(input.subject),
       ...(input.replyTo ? { replyTo: input.replyTo } : {}),
       html: renderEnquiryHtml(content),

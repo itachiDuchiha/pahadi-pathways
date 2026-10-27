@@ -1,5 +1,6 @@
 import { site } from "@/config/site";
 import type { StoredEnquiryInput, StoreEnquiryResult } from "@/lib/cms/enquiries";
+import { getNotificationPolicy } from "@/lib/cms/notifications";
 
 import { checkOrigin, rateLimitKey, readJson } from "./guards";
 import type { EnquiryContent } from "./html";
@@ -74,7 +75,9 @@ function honeypotFilled(body: unknown): boolean {
  * A stored lead counts as success: when the email cannot be sent the
  * visitor still gets 200, because the lead is in the admin and a retry
  * would only create a duplicate. Storage failure never blocks the email;
- * only when both fail does the visitor get 502 or 503.
+ * only when both fail does the visitor get 502 or 503. Whether to email,
+ * and to whom, comes from the notification settings for the source; with
+ * email off a stored lead is answered 200 without sending.
  */
 export function createEnquiryHandler<S extends EnquirySource>(
   config: HandlerConfig<S>
@@ -150,12 +153,34 @@ export function createEnquiryHandler<S extends EnquirySource>(
         console.error("Enquiry storage failed:", stored.error);
       }
 
-      if (!getMailConfig()) {
+      const policy = await getNotificationPolicy(accepted);
+
+      if (!policy.sendEmail) {
         if (stored.ok) {
-          console.error("Enquiry stored; mail is not configured.");
+          console.info(`Enquiry stored; email is off for ${accepted} enquiries.`);
           return success();
         }
-        console.error("Enquiry email configuration is incomplete.");
+        // Neither stored nor mailed: the visitor must not be told it arrived.
+        return respond(
+          502,
+          false,
+          "We couldn't send your enquiry right now. Please try again shortly."
+        );
+      }
+
+      const unconfigured =
+        policy.recipients.length === 0
+          ? "no recipients configured"
+          : getMailConfig()
+            ? null
+            : "mail is not configured";
+
+      if (unconfigured) {
+        if (stored.ok) {
+          console.error(`Enquiry stored; ${unconfigured}.`);
+          return success();
+        }
+        console.error(`Enquiry email not sent: ${unconfigured}.`);
         return respond(
           503,
           false,
@@ -163,7 +188,11 @@ export function createEnquiryHandler<S extends EnquirySource>(
         );
       }
 
-      const sent = await sendEnquiryEmail({ ...built.email, replyTo: enquiry.email }).catch(
+      const sent = await sendEnquiryEmail({
+        ...built.email,
+        replyTo: enquiry.email,
+        to: policy.recipients,
+      }).catch(
         (error: unknown) => ({ ok: false as const, error: errorMessage(error) })
       );
 

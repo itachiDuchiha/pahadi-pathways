@@ -417,6 +417,60 @@ describe("legal settings access", () => {
   });
 });
 
+describe("notification settings access", () => {
+  const data = { contact: { sendEmail: false, recipients: [{ email: "owner@example.com" }] } };
+
+  it("forbids anonymous reads", async () => {
+    await expect(
+      temp.payload.findGlobal({ slug: "notification-settings", overrideAccess: false })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("lets an editor read but not update", async () => {
+    const editor = await makeUser("editor");
+
+    const settings = await temp.payload.findGlobal({
+      slug: "notification-settings",
+      overrideAccess: false,
+      user: editor,
+    });
+    expect(settings.contact?.sendEmail).toBe(true);
+
+    await expect(
+      temp.payload.updateGlobal({
+        slug: "notification-settings",
+        data,
+        overrideAccess: false,
+        user: editor,
+        context,
+      })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("lets an admin update and rejects an invalid recipient list", async () => {
+    const admin = await makeUser("admin");
+
+    const settings = await temp.payload.updateGlobal({
+      slug: "notification-settings",
+      data,
+      overrideAccess: false,
+      user: admin,
+      context,
+    });
+    expect(settings.contact).toMatchObject({ sendEmail: false, recipients: [{ email: "owner@example.com" }] });
+
+    await expect(
+      temp.payload.updateGlobal({
+        slug: "notification-settings",
+        data: { trip: { recipients: [{ email: "a@example.com" }, { email: "A@example.com" }] } },
+        overrideAccess: false,
+        user: admin,
+        context,
+      })
+    ).rejects.toThrow();
+  });
+});
+
 describe("validateUniqueVehicleKeys", () => {
   it("accepts distinct keys and an empty list", () => {
     expect(validateUniqueVehicleKeys([{ key: "sedan" }, { key: "crysta" }])).toBe(true);

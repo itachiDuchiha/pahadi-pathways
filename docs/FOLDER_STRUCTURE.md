@@ -91,7 +91,7 @@ of the documentation.
 - `src/cms/config/` — database adapter selection and security settings,
   with tests.
 - `src/cms/fields/` — reusable fields (slug, image, string list).
-- `src/cms/globals/` — pricing, site and legal settings.
+- `src/cms/globals/` — pricing, site, legal and notification settings.
 - `src/cms/hooks/` — revalidation of public pages on publish and the
   anonymous-create guard, with tests.
 - `src/cms/migrations/postgres/` — committed Postgres migrations.

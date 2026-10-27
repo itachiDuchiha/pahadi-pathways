@@ -103,11 +103,13 @@ export interface Config {
     'pricing-settings': PricingSetting;
     'site-settings': SiteSetting;
     'legal-settings': LegalSetting;
+    'notification-settings': NotificationSetting;
   };
   globalsSelect: {
     'pricing-settings': PricingSettingsSelect<false> | PricingSettingsSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     'legal-settings': LegalSettingsSelect<false> | LegalSettingsSelect<true>;
+    'notification-settings': NotificationSettingsSelect<false> | NotificationSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1030,6 +1032,62 @@ export interface LegalSetting {
   createdAt?: string | null;
 }
 /**
+ * Who receives an email when a visitor sends an enquiry.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-settings".
+ */
+export interface NotificationSetting {
+  id: number;
+  trip?: {
+    /**
+     * When off, enquiries are still saved under Enquiries but no email is sent.
+     */
+    sendEmail?: boolean | null;
+    /**
+     * Leave empty to send to the address configured on the server (TRIP_ENQUIRY_EMAIL).
+     */
+    recipients?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  contact?: {
+    /**
+     * When off, enquiries are still saved under Enquiries but no email is sent.
+     */
+    sendEmail?: boolean | null;
+    /**
+     * Leave empty to send to the address configured on the server (TRIP_ENQUIRY_EMAIL).
+     */
+    recipients?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  package?: {
+    /**
+     * When off, enquiries are still saved under Enquiries but no email is sent.
+     */
+    sendEmail?: boolean | null;
+    /**
+     * Leave empty to send to the address configured on the server (TRIP_ENQUIRY_EMAIL).
+     */
+    recipients?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing-settings_select".
  */
@@ -1096,6 +1154,48 @@ export interface LegalSettingsSelect<T extends boolean = true> {
   effectiveDate?: T;
   deletionWindowMonths?: T;
   retentionStatement?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notification-settings_select".
+ */
+export interface NotificationSettingsSelect<T extends boolean = true> {
+  trip?:
+    | T
+    | {
+        sendEmail?: T;
+        recipients?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+      };
+  contact?:
+    | T
+    | {
+        sendEmail?: T;
+        recipients?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+      };
+  package?:
+    | T
+    | {
+        sendEmail?: T;
+        recipients?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
