@@ -2,9 +2,9 @@
  * Domain types the frontend renders. Payload documents are mapped into
  * these shapes in `mappers.ts`, so components never see CMS documents.
  */
-import type { VehicleKey } from "@/lib/pricing";
+import type { PackageContent } from "@/cms/seed/packages";
 
-export type { Package } from "@/cms/seed/packages";
+export type { PackageContent };
 export type { Testimonial } from "@/types/testimonial";
 
 export type DestinationCategory =
@@ -63,13 +63,29 @@ export type Experience = {
   icon: ExperienceIcon;
 };
 
+export type VehicleKey = "sedan" | "ertiga" | "crysta";
+
+/** A package's own pricing, from its `pricing` group in the CMS. */
+export type PackagePricing = {
+  /** Rupees per adult before upgrades and GST. */
+  basePricePerAdult: number;
+  /** Fixed per-adult rate for each vehicle; absent when the package has none. */
+  vehicleRates?: Record<VehicleKey, number>;
+};
+
+/**
+ * A published package. `price` is the display string derived from
+ * `pricing.basePricePerAdult`; it is never stored.
+ */
+export type Package = PackageContent & { pricing: PackagePricing };
+
 export type PriceOption = { label: string; delta: number };
 
 export type VehiclePriceOption = {
   label: string;
   key: VehicleKey;
   perDayUpgrade: number;
-  /** Per-day upgrade on Spiti routes; absent when it equals `perDayUpgrade`. */
+  /** Per-day upgrade on Spiti routes; omitted when unset, so `perDayUpgrade` applies. */
   perDayUpgradeSpiti?: number;
 };
 

@@ -1,5 +1,11 @@
 import { getPackageBySlug } from "@/lib/cms/packages";
-import { createEnquiryHandler, type EnquiryEmail } from "@/lib/enquiry/handler";
+import { getPricingTables } from "@/lib/cms/pricing-tables";
+import type { PricingTables } from "@/lib/cms/types";
+import {
+  createEnquiryHandler,
+  type EnquiryEmail,
+  type InvalidEnquiry,
+} from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
 import type { PackageEnquiry } from "@/lib/enquiry/schema";
 import {
@@ -10,19 +16,40 @@ import {
 
 export const runtime = "nodejs";
 
-async function packageEmail(enquiry: PackageEnquiry): Promise<EnquiryEmail | null> {
+/** The schema checks only the labels' shape; they must be options editors have published. */
+function unknownOption(enquiry: PackageEnquiry, tables: PricingTables): string | null {
+  const has = (options: { label: string }[], label: string) =>
+    options.some((option) => option.label === label);
+
+  if (!has(tables.stayOptions, enquiry.stay)) return "Please choose a valid stay.";
+  if (!has(tables.mealOptions, enquiry.meals)) return "Please choose a valid meal plan.";
+  if (!has(tables.vehicleOptions, enquiry.vehicle)) return "Please choose a valid vehicle.";
+  return null;
+}
+
+async function packageEmail(
+  enquiry: PackageEnquiry
+): Promise<EnquiryEmail | InvalidEnquiry | null> {
   // The schema checks the slug's shape only; only a published package counts.
+  // Prices come from the CMS on every enquiry; client totals are never used.
   const pkg = await getPackageBySlug(enquiry.slug);
   if (!pkg) return null;
 
-  const price = computePackagePrice({
-    ...packagePricingContext(pkg),
-    stay: enquiry.stay,
-    meals: enquiry.meals,
-    vehicle: enquiry.vehicle,
-    adults: enquiry.adults,
-    childAges: enquiry.childAges,
-  });
+  const tables = await getPricingTables();
+  const invalid = unknownOption(enquiry, tables);
+  if (invalid) return { invalid };
+
+  const price = computePackagePrice(
+    {
+      package: packagePricingContext(pkg),
+      stay: enquiry.stay,
+      meals: enquiry.meals,
+      vehicle: enquiry.vehicle,
+      adults: enquiry.adults,
+      childAges: enquiry.childAges,
+    },
+    tables
+  );
 
   const children = enquiry.childAges.length
     ? `${enquiry.childAges.length} (${enquiry.childAges.map((age) => `Age ${age}`).join(", ")})`
@@ -45,7 +72,7 @@ async function packageEmail(enquiry: PackageEnquiry): Promise<EnquiryEmail | nul
       ["Meal Preference", enquiry.meals],
       ["Vehicle Preference", enquiry.vehicle],
       ["Package Cost", formatCurrency(price.packageCost)],
-      ["GST (5%)", formatCurrency(price.gst)],
+      [`GST (${price.gstPercent}%)`, formatCurrency(price.gst)],
       ["Estimated Total", formatCurrency(price.estimatedTotal)],
     ],
   };

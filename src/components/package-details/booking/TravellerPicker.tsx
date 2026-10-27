@@ -3,10 +3,7 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { Minus, Plus } from "lucide-react";
 
-import {
-  COMPLIMENTARY_CHILD_MAX_AGE,
-  formatCurrency,
-} from "@/lib/pricing";
+import { formatCurrency } from "@/lib/pricing";
 
 type Props = {
   adults: number;
@@ -15,6 +12,10 @@ type Props = {
   setChildAges: Dispatch<SetStateAction<number[]>>;
   totalTravellers: number;
   childRate: number;
+  /** Children younger than this travel free. */
+  childFreeUnderAge: number;
+  /** Paying children's share of the adult rate, in percent. */
+  childPercentOfAdult: number;
 };
 
 export default function TravellerPicker({
@@ -24,6 +25,8 @@ export default function TravellerPicker({
   setChildAges: setChildren,
   totalTravellers,
   childRate,
+  childFreeUnderAge,
+  childPercentOfAdult,
 }: Props) {
   const [isChildAgeOpen, setIsChildAgeOpen] =
     useState(false);
@@ -77,11 +80,11 @@ export default function TravellerPicker({
   const getChildPricingLabel = (
     age: number
   ) => {
-    if (age < COMPLIMENTARY_CHILD_MAX_AGE) {
+    if (age < childFreeUnderAge) {
       return "Complimentary · No extra bed";
     }
 
-    return `25% adult rate · ${formatCurrency(childRate)}`;
+    return `${childPercentOfAdult}% adult rate · ${formatCurrency(childRate)}`;
   };
 
   return (
@@ -464,10 +467,7 @@ export default function TravellerPicker({
                   text-[#526078]
                 "
               >
-                Under 5: complimentary
-                without an extra bed.
-                Ages 5–10: 25% of adult
-                rate.
+                {`Under ${childFreeUnderAge}: complimentary without an extra bed. Ages ${childFreeUnderAge}–10: ${childPercentOfAdult}% of adult rate.`}
               </p>
 
             </div>

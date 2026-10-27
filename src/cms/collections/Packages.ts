@@ -12,7 +12,7 @@ export const Packages: CollectionConfig = {
   slug: "packages",
   admin: {
     useAsTitle: "title",
-    defaultColumns: ["title", "slug", "duration", "price", "_status"],
+    defaultColumns: ["title", "slug", "duration", "_status"],
   },
   versions: { drafts: true },
   access: {
@@ -34,13 +34,6 @@ export const Packages: CollectionConfig = {
     { name: "duration", type: "text", required: true, admin: { description: "For example 9N / 10D" } },
     { name: "rating", type: "number", required: true, min: 0, max: 5 },
     { name: "pickup", type: "text", required: true },
-    {
-      name: "price",
-      type: "number",
-      required: true,
-      min: 0,
-      admin: { description: "Starting price per adult in rupees, shown on cards." },
-    },
     { name: "popular", type: "checkbox", defaultValue: false },
     {
       name: "pricing",
@@ -49,13 +42,19 @@ export const Packages: CollectionConfig = {
         {
           name: "basePricePerAdult",
           type: "number",
+          required: true,
           min: 0,
-          admin: { description: "Rupees per adult before upgrades and GST." },
+          admin: {
+            description: "Rupees per adult before upgrades and GST. Shown on cards as the starting price.",
+          },
         },
         {
           name: "vehicleRates",
           type: "group",
-          admin: { description: "Per-adult rate in rupees for each vehicle, if it differs." },
+          admin: {
+            description:
+              "Per-adult rate in rupees for each vehicle. Leave all empty to price from the base rate plus the per-day vehicle upgrade; a vehicle left empty uses the base rate.",
+          },
           fields: [
             { name: "sedan", type: "number", min: 0 },
             { name: "ertiga", type: "number", min: 0 },

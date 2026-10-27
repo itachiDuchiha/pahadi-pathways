@@ -11,7 +11,7 @@ import { allDestinations, type Destination } from "./destinations";
 import { experiences } from "./experiences";
 import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
-import { packages, type Package } from "./packages";
+import { packages, type PackageContent } from "./packages";
 import { packageVehicleRates, pricingSettings } from "./pricing";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
@@ -381,7 +381,7 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
 }
 
 function packageData(
-  pkg: Package,
+  pkg: PackageContent,
   mediaId: (publicPath: string) => number
 ): RequiredDataFromCollectionSlug<"packages"> {
   return {
@@ -392,7 +392,6 @@ function packageData(
     duration: pkg.duration,
     rating: pkg.rating,
     pickup: pkg.pickup,
-    price: parsePackagePrice(pkg.price),
     popular: pkg.popular ?? false,
     pricing: {
       basePricePerAdult: parsePackagePrice(pkg.price),

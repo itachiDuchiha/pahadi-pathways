@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { Package } from "@/lib/cms/types";
+import type { Package, PricingTables } from "@/lib/cms/types";
 import {
   computePackagePrice,
   packagePricingContext,
@@ -15,19 +15,19 @@ export type BookingPrice = ReturnType<typeof computePackagePrice>;
    from them.
 ========================================================= */
 
-export function useBookingState(pkg: Package) {
+export function useBookingState(pkg: Package, tables: PricingTables) {
   /* =======================================================
      STATE
   ======================================================= */
 
-  const [stay, setStay] = useState("Deluxe");
+  const [stay, setStay] = useState(tables.stayOptions[0].label);
 
   const [meals, setMeals] = useState(
-    "Breakfast + Dinner (MAP)"
+    tables.mealOptions[0].label
   );
 
   const [vehicle, setVehicle] = useState(
-    "Sedan"
+    tables.vehicleOptions[0].label
   );
 
   const [adults, setAdults] = useState(2);
@@ -60,14 +60,17 @@ export function useBookingState(pkg: Package) {
   const pricingContext = packagePricingContext(pkg);
   const tourDays = pricingContext.tourDays;
 
-  const price = computePackagePrice({
-    ...pricingContext,
-    stay,
-    meals,
-    vehicle,
-    adults,
-    childAges: children,
-  });
+  const price = computePackagePrice(
+    {
+      package: pricingContext,
+      stay,
+      meals,
+      vehicle,
+      adults,
+      childAges: children,
+    },
+    tables
+  );
 
   return {
     stay,

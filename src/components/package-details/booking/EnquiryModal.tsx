@@ -35,7 +35,7 @@ export default function EnquiryModal({
   childAges: children,
   price,
 }: Props) {
-  const { packageCost, gst, estimatedTotal } = price;
+  const { packageCost, gst, gstPercent, estimatedTotal } = price;
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -88,7 +88,7 @@ export default function EnquiryModal({
     `Meals: ${meals}`,
     `Vehicle: ${vehicle}`,
     `Estimated package cost: ${formatCurrency(packageCost)}`,
-    `GST (5%): ${formatCurrency(gst)}`,
+    `GST (${gstPercent}%): ${formatCurrency(gst)}`,
     `Estimated total: ${formatCurrency(estimatedTotal)}`,
     "",
     "Please confirm availability and final pricing. Thank you.",

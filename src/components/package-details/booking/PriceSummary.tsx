@@ -17,6 +17,7 @@ export default function PriceSummary({
   const {
     packageCost,
     gst,
+    gstPercent,
     estimatedTotal,
     hasVehicleRates,
     adultRate,
@@ -416,7 +417,7 @@ export default function PriceSummary({
                     text-[#526078]
                   "
                 >
-                  5%
+                  {`${gstPercent}%`}
                 </span>
               </div>
 

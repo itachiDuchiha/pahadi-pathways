@@ -12,6 +12,11 @@ export type EnquiryEmail = Required<Pick<EnquiryContent, "heading" | "kind">> & 
   rows: [string, string][];
 };
 
+/** The enquiry is well formed but refers to something that does not exist. */
+export type InvalidEnquiry = { invalid: string };
+
+type BuildResult = EnquiryEmail | InvalidEnquiry | null;
+
 type HandlerConfig<S extends EnquirySource> = {
   /** Distinguishes this route's rate-limit buckets from other routes'. */
   routeKey: string;
@@ -20,11 +25,12 @@ type HandlerConfig<S extends EnquirySource> = {
   /**
    * Builds the notification email. Returning `null` means the enquiry
    * refers to something that does not exist (for example an unknown
-   * package), which is answered with 400 and `invalidMessage`.
+   * package), which is answered with 400 and `invalidMessage`; returning
+   * `{ invalid }` answers 400 with that message instead.
    */
   buildEmail: (
     enquiry: Extract<Enquiry, { source: S }>
-  ) => EnquiryEmail | null | Promise<EnquiryEmail | null>;
+  ) => BuildResult | Promise<BuildResult>;
   invalidMessage?: string;
 };
 
@@ -118,6 +124,10 @@ export function createEnquiryHandler<S extends EnquirySource>(
 
       if (!email) {
         return respond(400, false, config.invalidMessage ?? "Invalid enquiry details.");
+      }
+
+      if ("invalid" in email) {
+        return respond(400, false, email.invalid);
       }
 
       if (!getMailConfig()) {

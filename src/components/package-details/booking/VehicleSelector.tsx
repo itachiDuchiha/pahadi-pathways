@@ -1,18 +1,21 @@
 import { ChevronDown } from "lucide-react";
 
-import { formatCurrency, vehicleOptions } from "@/lib/pricing";
+import type { VehiclePriceOption } from "@/lib/cms/types";
+import { formatCurrency } from "@/lib/pricing";
 import type { BookingPrice } from "@/components/package-details/booking/useBookingState";
 
 type Props = {
   vehicle: string;
   setVehicle: (value: string) => void;
   price: BookingPrice;
+  options: VehiclePriceOption[];
 };
 
 export default function VehicleSelector({
   vehicle,
   setVehicle,
   price,
+  options,
 }: Props) {
   const {
     hasVehicleRates,
@@ -94,7 +97,7 @@ export default function VehicleSelector({
                 focus:ring-[#C89A3D]/15
               "
             >
-              {vehicleOptions.map(
+              {options.map(
                 (option) => (
                   <option
                     key={option.label}

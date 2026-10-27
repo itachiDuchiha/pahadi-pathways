@@ -56,7 +56,6 @@ function packageDoc(overrides: Partial<PackageDoc> = {}): PackageDoc {
     duration: fixture.duration,
     rating: fixture.rating,
     pickup: fixture.pickup,
-    price: 32249,
     popular: true,
     pricing: { basePricePerAdult: 32249, vehicleRates: { sedan: 32249, ertiga: 38749, crysta: 54999 } },
     summary: fixture.summary,
@@ -121,6 +120,29 @@ describe("mapPackage", () => {
   it("formats the base price for display", () => {
     expect(pkg.price).toBe("₹32,249");
     expect(pkg.price).toBe(fixture.price);
+  });
+
+  it("keeps the pricing group so the booking panel and the server read the same rates", () => {
+    expect(pkg.pricing).toEqual({
+      basePricePerAdult: 32249,
+      vehicleRates: { sedan: 32249, ertiga: 38749, crysta: 54999 },
+    });
+  });
+
+  it("drops vehicle rates when none is set and fills an empty one from the base rate", () => {
+    const empty = { sedan: null, ertiga: null, crysta: null };
+    expect(mapPackage(packageDoc({ pricing: { basePricePerAdult: 20000, vehicleRates: empty } })).pricing).toEqual({
+      basePricePerAdult: 20000,
+    });
+    expect(mapPackage(packageDoc({ pricing: { basePricePerAdult: 20000 } })).pricing).toEqual({
+      basePricePerAdult: 20000,
+    });
+
+    const partial = mapPackage(
+      packageDoc({ pricing: { basePricePerAdult: 20000, vehicleRates: { ...empty, crysta: 30000 } } })
+    );
+    expect(partial.pricing.vehicleRates).toEqual({ sedan: 20000, ertiga: 20000, crysta: 30000 });
+    expect(partial.price).toBe("₹20,000");
   });
 
   it("flattens string lists and keeps every itinerary day", () => {

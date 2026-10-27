@@ -1,8 +1,8 @@
 import { site, whatsappUrl } from "@/config/site";
-import type { Destination, Package } from "@/lib/cms/types";
+import type { Destination, PackageContent } from "@/lib/cms/types";
 import { absoluteUrl } from "@/lib/seo";
 
-function packageUrl(pkg: Package): string {
+function packageUrl(pkg: PackageContent): string {
   return absoluteUrl(`/packages/${pkg.slug}`);
 }
 
@@ -16,13 +16,13 @@ function header(): string[] {
   ];
 }
 
-function packageLine(pkg: Package): string {
+function packageLine(pkg: PackageContent): string {
   return `- [${pkg.title}](${packageUrl(pkg)}): ${pkg.duration}, from ${pkg.price} per adult, pickup from ${pkg.pickup}`;
 }
 
 /** The published content the llms.txt files describe. */
 export type LlmsContent = {
-  packages: readonly Package[];
+  packages: readonly PackageContent[];
   destinations: readonly Destination[];
 };
 
@@ -48,7 +48,7 @@ function footer(): string[] {
   ];
 }
 
-function packageDetail(pkg: Package): string[] {
+function packageDetail(pkg: PackageContent): string[] {
   const days =
     pkg.itineraryDays?.map((day) => `- Day ${day.day}: ${day.title}`) ??
     pkg.itinerary.map((stop) => `- ${stop}`);

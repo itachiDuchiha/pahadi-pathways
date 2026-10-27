@@ -45,7 +45,6 @@ function packageData(slug: string, title: string, popular = false) {
     duration: "2N / 3D",
     rating: 5,
     pickup: "Chandigarh",
-    price: 10000,
     popular,
     pricing: { basePricePerAdult: 12000 },
     itinerary: [{ item: "2N Shimla" }],
@@ -121,6 +120,7 @@ describe("getPackages", () => {
     const pkg = await getPackageBySlug("priced-trip");
 
     expect(pkg?.price).toBe("₹12,000");
+    expect(pkg?.pricing).toEqual({ basePricePerAdult: 12000 });
     expect(pkg?.image).toMatch(/^\/api\/media\/file\/test-image[^/]*\.webp$/);
   });
 

@@ -152,18 +152,14 @@ export interface Package {
   duration: string;
   rating: number;
   pickup: string;
-  /**
-   * Starting price per adult in rupees, shown on cards.
-   */
-  price: number;
   popular?: boolean | null;
-  pricing?: {
+  pricing: {
     /**
-     * Rupees per adult before upgrades and GST.
+     * Rupees per adult before upgrades and GST. Shown on cards as the starting price.
      */
-    basePricePerAdult?: number | null;
+    basePricePerAdult: number;
     /**
-     * Per-adult rate in rupees for each vehicle, if it differs.
+     * Per-adult rate in rupees for each vehicle. Leave all empty to price from the base rate plus the per-day vehicle upgrade; a vehicle left empty uses the base rate.
      */
     vehicleRates?: {
       sedan?: number | null;
@@ -504,7 +500,6 @@ export interface PackagesSelect<T extends boolean = true> {
   duration?: T;
   rating?: T;
   pickup?: T;
-  price?: T;
   popular?: T;
   pricing?:
     | T

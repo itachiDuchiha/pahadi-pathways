@@ -1,15 +1,17 @@
 import { ChevronDown } from "lucide-react";
 
-import { stayOptions } from "@/lib/pricing";
+import type { PriceOption } from "@/lib/cms/types";
 
 type Props = {
   stay: string;
   setStay: (value: string) => void;
+  options: PriceOption[];
 };
 
 export default function StaySelector({
   stay,
   setStay,
+  options,
 }: Props) {
   return (
         <div>
@@ -55,7 +57,7 @@ export default function StaySelector({
                 focus:ring-[#C89A3D]/15
               "
             >
-              {stayOptions.map(
+              {options.map(
                 (option) => (
                   <option
                     key={option.label}

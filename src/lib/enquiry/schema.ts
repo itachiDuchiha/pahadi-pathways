@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-import { mealOptions, stayOptions, vehicleOptions } from "@/lib/pricing";
-
 export const DESTINATIONS = {
   shimla: "Shimla",
   manali: "Manali",
@@ -21,11 +19,13 @@ const destinationKeys = Object.keys(DESTINATIONS) as [
   ...DestinationKey[],
 ];
 
-function labels<T extends { label: string }>(options: T[]) {
-  return options.map((option) => option.label) as [
-    T["label"],
-    ...T["label"][],
-  ];
+/**
+ * An option label. The labels live in the CMS pricing tables, so the
+ * package route checks them against the tables it loads; here only the
+ * shape is checked.
+ */
+function optionLabel(error: string) {
+  return z.string({ error }).trim().min(1, { error }).max(100, { error });
 }
 
 /* Shared fields ------------------------------------------------------- */
@@ -136,11 +136,9 @@ export const packageEnquirySchema = z.object({
       { error: "Please check the children's ages." }
     )
     .max(10, { error: "Please add no more than 10 children." }),
-  stay: z.enum(labels(stayOptions), { error: "Please choose a valid stay." }),
-  meals: z.enum(labels(mealOptions), { error: "Please choose a valid meal plan." }),
-  vehicle: z.enum(labels(vehicleOptions), {
-    error: "Please choose a valid vehicle.",
-  }),
+  stay: optionLabel("Please choose a valid stay."),
+  meals: optionLabel("Please choose a valid meal plan."),
+  vehicle: optionLabel("Please choose a valid vehicle."),
 });
 
 export const enquirySchema = z.discriminatedUnion(

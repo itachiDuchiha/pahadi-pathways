@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getPayloadClient } from "./client";
 import { mapPackage } from "./mappers";
 import { PUBLIC_READ } from "./query";
@@ -15,7 +17,11 @@ export async function getPackages(): Promise<Package[]> {
   return docs.map(mapPackage);
 }
 
-export async function getPackageBySlug(slug: string): Promise<Package | null> {
+/**
+ * Request-scoped (React `cache`), so `generateMetadata` and the page
+ * share one read per slug.
+ */
+export const getPackageBySlug = cache(async (slug: string): Promise<Package | null> => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "packages",
@@ -25,4 +31,4 @@ export async function getPackageBySlug(slug: string): Promise<Package | null> {
   });
 
   return docs[0] ? mapPackage(docs[0]) : null;
-}
+});

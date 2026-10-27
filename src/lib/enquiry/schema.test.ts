@@ -76,8 +76,13 @@ describe("enquirySchema", () => {
     expect(enquirySchema.safeParse({ ...pkg, slug: "unknown-trip" }).success).toBe(true);
   });
 
-  it("rejects a stay label that is not in the option table", () => {
-    expect(enquirySchema.safeParse({ ...pkg, stay: "Palace" }).success).toBe(false);
+  it("checks only the option labels' shape; the route checks them against the CMS tables", () => {
+    expect(enquirySchema.safeParse({ ...pkg, stay: "Palace" }).success).toBe(true);
+    for (const field of ["stay", "meals", "vehicle"]) {
+      for (const value of ["", "   ", "x".repeat(101), 5]) {
+        expect(enquirySchema.safeParse({ ...pkg, [field]: value }).success).toBe(false);
+      }
+    }
   });
 
   it("rejects a filled honeypot", () => {

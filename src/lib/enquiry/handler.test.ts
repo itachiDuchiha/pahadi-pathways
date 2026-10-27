@@ -1,34 +1,39 @@
+import sharp from "sharp";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { withTempPayload } from "@/cms/test/withTempPayload";
+import { packages } from "@/cms/seed/packages";
+import { packageVehicleRates, pricingSettings } from "@/cms/seed/pricing";
+import type { VehicleKey } from "@/lib/cms/types";
+import { parsePackagePrice } from "@/lib/pricing";
+
+const MAIL_CONFIG = {
+  apiKey: "test-key",
+  fromEmail: "from@example.com",
+  toEmail: "to@example.com",
+};
 
 vi.mock("./mail", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./mail")>();
   return {
     ...actual,
-    getMailConfig: vi.fn(() => ({
-      apiKey: "test-key",
-      fromEmail: "from@example.com",
-      toEmail: "to@example.com",
-    })),
+    getMailConfig: vi.fn(),
     sendEnquiryEmail: vi.fn(async () => ({ ok: true as const })),
   };
 });
 
-// The package route reads the CMS; serve the seed fixtures instead.
-vi.mock("@/lib/cms/packages", async () => {
-  const { packages } = await import("@/cms/seed/packages");
-  return {
-    getPackages: vi.fn(async () => packages),
-    getPackageBySlug: vi.fn(async (slug: string) => packages.find((item) => item.slug === slug) ?? null),
-  };
-});
+// The package route reads packages and pricing through the CMS read layer;
+// point it at a throwaway Payload instance.
+const temp = withTempPayload();
+vi.mock("@/lib/cms/client", () => ({ getPayloadClient: async () => temp.payload }));
 
-import { POST as packagePOST } from "@/app/(frontend)/api/package-enquiry/route";
-import { POST as tripPOST } from "@/app/(frontend)/api/trip-enquiry/route";
-
-import { MAX_BODY_BYTES } from "./guards";
-import { sendEnquiryEmail } from "./mail";
+const { POST: packagePOST } = await import("@/app/(frontend)/api/package-enquiry/route");
+const { POST: tripPOST } = await import("@/app/(frontend)/api/trip-enquiry/route");
+const { MAX_BODY_BYTES } = await import("./guards");
+const { getMailConfig, sendEnquiryEmail } = await import("./mail");
 
 const sendMock = vi.mocked(sendEnquiryEmail);
+const mailConfigMock = vi.mocked(getMailConfig);
 
 let ipCounter = 0;
 function freshIp(): string {
@@ -73,8 +78,54 @@ const pkg = {
   estimatedTotal: 1,
 };
 
-beforeEach(() => {
+const quiet = { skipRevalidate: true } as const;
+const SLUG = "shimla-manali-getaway";
+
+/** Publishes the fixture package with its seeded rates, like `npm run cms:seed`. */
+async function seedPackage(slug: string, vehicleRates: Partial<Record<VehicleKey, number>> = packageVehicleRates[slug]) {
+  const fixture = packages.find((item) => item.slug === slug);
+  if (!fixture) throw new Error(`No package fixture ${slug}`);
+
+  const data = await sharp({ create: { width: 4, height: 4, channels: 3, background: "#336699" } })
+    .png()
+    .toBuffer();
+  const image = await temp.payload.create({
+    collection: "media",
+    data: { alt: "Test image" },
+    file: { data, mimetype: "image/png", name: `${slug}.png`, size: data.length },
+    overrideAccess: true,
+    context: quiet,
+  });
+
+  return temp.payload.create({
+    collection: "packages",
+    data: {
+      slug: fixture.slug,
+      title: fixture.title,
+      image: image.id,
+      duration: fixture.duration,
+      rating: fixture.rating,
+      pickup: fixture.pickup,
+      pricing: { basePricePerAdult: parsePackagePrice(fixture.price), vehicleRates },
+      itinerary: fixture.itinerary.map((item) => ({ item })),
+      includes: fixture.includes.map((item) => ({ item })),
+      _status: "published",
+    },
+    overrideAccess: true,
+    context: quiet,
+  });
+}
+
+beforeEach(async () => {
   sendMock.mockClear();
+  mailConfigMock.mockReturnValue(MAIL_CONFIG);
+  await temp.payload.updateGlobal({
+    slug: "pricing-settings",
+    data: pricingSettings,
+    overrideAccess: true,
+    context: quiet,
+  });
+  await seedPackage(SLUG);
 });
 
 describe("enquiry handler pipeline", () => {
@@ -177,4 +228,133 @@ describe("enquiry handler pipeline", () => {
     expect(await response.json()).toEqual({ ok: false, message: "Please choose a valid package." });
     expect(sendMock).not.toHaveBeenCalled();
   });
+
+  it("answers an unknown slug with 400 even when mail is not configured", async () => {
+    mailConfigMock.mockReturnValue(null);
+
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, slug: "no-such-trip" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, message: "Please choose a valid package." });
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects an option label that is not in the pricing tables with 400", async () => {
+    for (const [field, message] of [
+      ["stay", "Please choose a valid stay."],
+      ["meals", "Please choose a valid meal plan."],
+      ["vehicle", "Please choose a valid vehicle."],
+    ] as const) {
+      const response = await packagePOST(
+        post(PACKAGE_URL, { ...pkg, [field]: "Palace" }, { "x-forwarded-for": freshIp() })
+      );
+
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ ok: false, message });
+    }
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("accepts an option an editor added to the pricing tables without a deploy", async () => {
+    await temp.payload.updateGlobal({
+      slug: "pricing-settings",
+      data: { stayOptions: [...(pricingSettings.stayOptions ?? []), { label: "Boutique", delta: 4000 }] },
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, stay: "Boutique" }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    // 48654 with Premium (+2500) becomes 50154 with Boutique (+4000).
+    expect(Object.fromEntries(sendMock.mock.calls[0][0].rows)["Package Cost"]).toBe("₹50,154");
+  });
 });
+
+describe("package quotes follow the published CMS price", () => {
+  const SPITI = "shimla-kinnaur-spiti-chandratal";
+  // Sedan, MAP, Deluxe: base price per adult only, so the base price drives the quote.
+  const sedan = {
+    ...pkg,
+    slug: SPITI,
+    adults: 2,
+    childAges: [],
+    stay: "Deluxe",
+    meals: "Breakfast + Dinner (MAP)",
+    vehicle: "Sedan",
+    estimatedTotal: 1,
+    packageCost: 1,
+    gst: 1,
+  };
+
+  async function quote(body: Record<string, unknown>) {
+    sendMock.mockClear();
+    const response = await packagePOST(post(PACKAGE_URL, body, { "x-forwarded-for": freshIp() }));
+    expect(response.status).toBe(200);
+    return Object.fromEntries(sendMock.mock.calls[0][0].rows);
+  }
+
+  it("uses an editor's new base price once it is published, ignoring client totals", async () => {
+    // A package priced from its base rate alone (no per-vehicle rates).
+    const doc = await seedPackage(SPITI, {});
+
+    expect((await quote(sedan))["Estimated Total"]).toBe("₹67,723"); // (32249 * 2) * 1.05
+
+    // A saved draft is not live yet.
+    await temp.payload.update({
+      collection: "packages",
+      id: doc.id,
+      data: { pricing: { basePricePerAdult: 40000 } },
+      draft: true,
+      overrideAccess: true,
+      context: quiet,
+    });
+    expect((await quote(sedan))["Estimated Total"]).toBe("₹67,723");
+
+    // Publishing makes the next quote use it.
+    await temp.payload.update({
+      collection: "packages",
+      id: doc.id,
+      data: { pricing: { basePricePerAdult: 40000 }, _status: "published" },
+      overrideAccess: true,
+      context: quiet,
+    });
+    const rows = await quote(sedan);
+    expect(rows["Package Cost"]).toBe("₹80,000");
+    expect(rows["GST (5%)"]).toBe("₹4,000");
+    expect(rows["Estimated Total"]).toBe("₹84,000");
+  });
+
+  it("uses an editor's new per-vehicle rate once it is published", async () => {
+    const doc = await seedPackage(SPITI);
+
+    await temp.payload.update({
+      collection: "packages",
+      id: doc.id,
+      data: { pricing: { basePricePerAdult: 32249, vehicleRates: { sedan: 30000, ertiga: 38749, crysta: 54999 } } },
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    expect((await quote(sedan))["Estimated Total"]).toBe("₹63,000"); // (30000 * 2) * 1.05
+  });
+
+  it("uses an editor's new GST rate from the pricing settings", async () => {
+    await seedPackage(SPITI, {});
+    await temp.payload.updateGlobal({
+      slug: "pricing-settings",
+      data: { gstPercent: 12 },
+      overrideAccess: true,
+      context: quiet,
+    });
+
+    const rows = await quote(sedan);
+    expect(rows["GST (12%)"]).toBe("₹7,740"); // round(64498 * 0.12)
+    expect(rows["Estimated Total"]).toBe("₹72,238");
+  });
+});
+

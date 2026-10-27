@@ -1,15 +1,17 @@
 import { ChevronDown } from "lucide-react";
 
-import { mealOptions } from "@/lib/pricing";
+import type { PriceOption } from "@/lib/cms/types";
 
 type Props = {
   meals: string;
   setMeals: (value: string) => void;
+  options: PriceOption[];
 };
 
 export default function MealSelector({
   meals,
   setMeals,
+  options,
 }: Props) {
   return (
         <div>
@@ -55,7 +57,7 @@ export default function MealSelector({
                 focus:ring-[#C89A3D]/15
               "
             >
-              {mealOptions.map(
+              {options.map(
                 (option) => (
                   <option
                     key={option.label}

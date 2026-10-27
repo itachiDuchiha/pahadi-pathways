@@ -8,7 +8,7 @@ import {
   Check,
 } from "lucide-react";
 
-import type { Package } from "@/lib/cms/types";
+import type { Package, PricingTables } from "@/lib/cms/types";
 import { telUrl, whatsappUrl } from "@/config/site";
 import EnquiryModal from "@/components/package-details/booking/EnquiryModal";
 import MealSelector from "@/components/package-details/booking/MealSelector";
@@ -19,7 +19,10 @@ import VehicleSelector from "@/components/package-details/booking/VehicleSelecto
 import { useBookingState } from "@/components/package-details/booking/useBookingState";
 
 type Props = {
+  /** The package, including its own `pricing` group. */
   pkg: Package;
+  /** Option tables, GST and child rule from the pricing settings. */
+  pricing: PricingTables;
 };
 
 /* =========================================================
@@ -28,6 +31,7 @@ type Props = {
 
 export default function PackageBookingPanel({
   pkg,
+  pricing,
 }: Props) {
   /* =======================================================
      STATE
@@ -46,7 +50,7 @@ export default function PackageBookingPanel({
     setChildAges,
     tourDays,
     price,
-  } = useBookingState(pkg);
+  } = useBookingState(pkg, pricing);
 
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
 
@@ -167,6 +171,7 @@ export default function PackageBookingPanel({
         <StaySelector
           stay={stay}
           setStay={setStay}
+          options={pricing.stayOptions}
         />
 
         {/* =================================================
@@ -176,6 +181,7 @@ export default function PackageBookingPanel({
         <MealSelector
           meals={meals}
           setMeals={setMeals}
+          options={pricing.mealOptions}
         />
 
         {/* =================================================
@@ -186,6 +192,7 @@ export default function PackageBookingPanel({
           vehicle={vehicle}
           setVehicle={setVehicle}
           price={price}
+          options={pricing.vehicleOptions}
         />
 
         {/* =================================================
@@ -199,6 +206,8 @@ export default function PackageBookingPanel({
           setChildAges={setChildAges}
           totalTravellers={totalTravellers}
           childRate={price.childRate}
+          childFreeUnderAge={pricing.childFreeUnderAge}
+          childPercentOfAdult={pricing.childPercentOfAdult}
         />
 
         {/* =================================================

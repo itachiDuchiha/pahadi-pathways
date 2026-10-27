@@ -53,7 +53,7 @@ async function makePackage(slug: string, status: "draft" | "published") {
       duration: "5 Nights / 6 Days",
       rating: 4.8,
       pickup: "Chandigarh",
-      price: 18999,
+      pricing: { basePricePerAdult: 18999 },
       itinerary: [{ item: "Shimla" }],
       includes: [{ item: "Hotels" }],
       _status: status,

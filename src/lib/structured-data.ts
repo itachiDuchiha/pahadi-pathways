@@ -1,5 +1,5 @@
 import { site } from "@/config/site";
-import type { Destination, Package } from "@/lib/cms/types";
+import type { Destination, PackageContent } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -70,7 +70,7 @@ export function contactPageJsonLd(): JsonLdObject {
   };
 }
 
-export function packageJsonLd(pkg: Package): JsonLdObject {
+export function packageJsonLd(pkg: PackageContent): JsonLdObject {
   const url = absoluteUrl(`/packages/${pkg.slug}`);
   const stops = pkg.itineraryDays?.map((day) => day.title) ?? pkg.itinerary;
 

@@ -7,7 +7,17 @@ import type {
   Testimonial as TestimonialDoc,
 } from "@/cms/payload-types";
 
-import type { Destination, Experience, GalleryItem, Package, Testimonial } from "./types";
+import { formatCurrency } from "@/lib/pricing";
+
+import type {
+  Destination,
+  Experience,
+  GalleryItem,
+  Package,
+  PackagePricing,
+  Testimonial,
+  VehicleKey,
+} from "./types";
 
 /**
  * Payload builds media URLs from `serverURL`. The site serves media from
@@ -46,8 +56,26 @@ function list(rows: { item: string }[] | null | undefined): string[] | undefined
   return rows ? rows.map((row) => row.item) : undefined;
 }
 
-export function formatPrice(rupees: number): string {
-  return `₹${rupees.toLocaleString("en-IN")}`;
+const VEHICLE_KEYS: readonly VehicleKey[] = ["sedan", "ertiga", "crysta"];
+
+/**
+ * The package's `pricing` group. Vehicle rates are kept only when at
+ * least one is set; a vehicle left empty then uses the base rate.
+ */
+export function mapPackagePricing(pricing: PackageDoc["pricing"]): PackagePricing {
+  const { basePricePerAdult } = pricing;
+  const rates = pricing.vehicleRates;
+
+  if (!rates || VEHICLE_KEYS.every((key) => rates[key] == null)) return { basePricePerAdult };
+
+  return {
+    basePricePerAdult,
+    vehicleRates: {
+      sedan: rates.sedan ?? basePricePerAdult,
+      ertiga: rates.ertiga ?? basePricePerAdult,
+      crysta: rates.crysta ?? basePricePerAdult,
+    },
+  };
 }
 
 export function mapPackage(doc: PackageDoc): Package {
@@ -61,7 +89,8 @@ export function mapPackage(doc: PackageDoc): Package {
     duration: doc.duration,
     rating: doc.rating,
     pickup: doc.pickup,
-    price: formatPrice(doc.pricing?.basePricePerAdult ?? doc.price),
+    price: formatCurrency(doc.pricing.basePricePerAdult),
+    pricing: mapPackagePricing(doc.pricing),
     popular: opt(doc.popular),
     itinerary: list(doc.itinerary) ?? [],
     hiddenItinerary: list(doc.hiddenItinerary),

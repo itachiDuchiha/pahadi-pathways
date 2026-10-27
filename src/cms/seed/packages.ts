@@ -1,4 +1,5 @@
-export type Package = {
+/** Package content as authored; the domain `Package` in `src/lib/cms/types.ts` adds its pricing. */
+export type PackageContent = {
   slug: string;
   title: string;
   image: string;
@@ -46,7 +47,7 @@ export type Package = {
   }[];
 };
 
-export const packages: Package[] = [
+export const packages: PackageContent[] = [
   // ============================================================
   // 1. SHIMLA → SANGLA → KALPA → TABO → KAZA → CHANDRATAL
   // ============================================================

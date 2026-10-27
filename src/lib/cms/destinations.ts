@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { getPayloadClient } from "./client";
 import { mapDestination } from "./mappers";
 import { PUBLIC_READ } from "./query";
@@ -21,7 +23,11 @@ export async function getDestinations(): Promise<Destination[]> {
   return docs.map(mapDestination).sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
 }
 
-export async function getDestinationBySlug(slug: string): Promise<Destination | null> {
+/**
+ * Request-scoped (React `cache`), so `generateMetadata` and the page
+ * share one read per slug.
+ */
+export const getDestinationBySlug = cache(async (slug: string): Promise<Destination | null> => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "destinations",
@@ -31,7 +37,7 @@ export async function getDestinationBySlug(slug: string): Promise<Destination | 
   });
 
   return docs[0] ? mapDestination(docs[0]) : null;
-}
+});
 
 export function destinationsInCategory(
   destinations: readonly Destination[],
