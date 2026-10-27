@@ -11,6 +11,7 @@ import { experiences } from "./experiences";
 import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages } from "./packages";
+import { legalFill, legalSettings } from "./legal";
 import { assertSeedEnv, isMissingSchemaError, mediaFilename, pruneEnquiries, seed } from "./run";
 import { testimonials } from "./testimonials";
 import { site } from "@/config/site";
@@ -66,6 +67,27 @@ describe("assertSeedEnv", () => {
 
   it("accepts a complete environment", () => {
     expect(() => assertSeedEnv({ PAYLOAD_SECRET: secret, DATABASE_URL: "file:./x.db" })).not.toThrow();
+  });
+});
+
+describe("legalFill", () => {
+  it("fills every seeded field of an empty global", () => {
+    expect(legalFill({})).toEqual(legalSettings);
+  });
+
+  it("fills only the empty fields and keeps the owner's values", () => {
+    expect(
+      legalFill({
+        dataContactEmail: "",
+        effectiveDate: "2026-11-01T00:00:00.000Z",
+        deletionWindowMonths: 3,
+        retentionStatement: "We keep records for two years.",
+      })
+    ).toEqual({ dataContactEmail: legalSettings.dataContactEmail });
+  });
+
+  it("returns null when every seeded field is set", () => {
+    expect(legalFill({ ...legalSettings, retentionStatement: "Edited." })).toBeNull();
   });
 });
 
@@ -264,6 +286,34 @@ describe("seed", () => {
       expect((await payload.findGlobal({ slug: "pricing-settings" })).gstPercent).toBe(12);
       expect((await payload.findGlobal({ slug: "site-settings" })).tagline).toBe("Edited tagline");
       expect((await payload.findByID({ collection: "media", id: media.id })).alt).toBe("Edited alt");
+    },
+    120_000
+  );
+
+  it(
+    "never overwrites edited legal settings and refuses a cleared effective date",
+    async () => {
+      const { payload } = temp;
+      await run();
+      await payload.updateGlobal({
+        slug: "legal-settings",
+        data: { dataContactEmail: "", deletionWindowMonths: 3, retentionStatement: "We keep records for two years." },
+        context: quiet,
+      });
+      await expect(
+        payload.updateGlobal({ slug: "legal-settings", data: { effectiveDate: "" }, context: quiet })
+      ).rejects.toThrow();
+
+      const second = await run();
+
+      expect(second.updated["legal-settings"]).toBe(1);
+      const legal = await payload.findGlobal({ slug: "legal-settings" });
+      expect(legal).toMatchObject({
+        dataContactEmail: site.email,
+        deletionWindowMonths: 3,
+        retentionStatement: "We keep records for two years.",
+      });
+      expect(legal.effectiveDate).toMatch(/^2026-10-27/);
     },
     120_000
   );

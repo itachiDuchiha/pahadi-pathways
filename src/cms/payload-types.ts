@@ -1017,7 +1017,7 @@ export interface LegalSetting {
   /**
    * The date the current privacy policy and terms took effect.
    */
-  effectiveDate?: string | null;
+  effectiveDate: string;
   /**
    * How many months a deletion request may take, between 1 and 12.
    */

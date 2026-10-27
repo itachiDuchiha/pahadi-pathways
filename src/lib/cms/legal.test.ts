@@ -17,7 +17,8 @@ describe("getLegalSettings", () => {
   it("returns the defaults when the global is empty", async () => {
     expect(await getLegalSettings()).toEqual({
       dataContactEmail: site.email,
-      effectiveDate: DEFAULT_EFFECTIVE_DATE,
+      // The field's default value, stored as a timestamp.
+      effectiveDate: `${DEFAULT_EFFECTIVE_DATE}T00:00:00.000Z`,
       deletionWindowMonths: 6,
       retentionStatement: DEFAULT_RETENTION_STATEMENT,
     });

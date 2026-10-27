@@ -1,6 +1,10 @@
 import type { GlobalConfig } from "payload";
 
-import { DEFAULT_DELETION_WINDOW_MONTHS, DEFAULT_RETENTION_STATEMENT } from "@/lib/legal-copy";
+import {
+  DEFAULT_DELETION_WINDOW_MONTHS,
+  DEFAULT_EFFECTIVE_DATE,
+  DEFAULT_RETENTION_STATEMENT,
+} from "@/lib/legal-copy";
 
 import { isAdmin } from "../access";
 import { revalidateHooks } from "../hooks/revalidate";
@@ -50,6 +54,8 @@ export const LegalSettings: GlobalConfig = {
     {
       name: "effectiveDate",
       type: "date",
+      required: true,
+      defaultValue: `${DEFAULT_EFFECTIVE_DATE}T00:00:00.000Z`,
       admin: {
         description: "The date the current privacy policy and terms took effect.",
         date: { pickerAppearance: "dayOnly", displayFormat: "d MMMM yyyy" },

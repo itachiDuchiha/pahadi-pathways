@@ -100,9 +100,10 @@ describe("termsSections", () => {
 
   it("covers enquiries, prices, package terms, travel conditions and the law", () => {
     expect(terms).toMatch(/not a confirmed booking/);
-    expect(terms).toMatch(/indicative/);
-    expect(terms).toMatch(/per adult/);
-    expect(terms).toMatch(/confirmed[^.]*in writing before any payment/);
+    expect(terms).toContain(
+      "Prices shown on this website are indicative. The final price is confirmed to you in writing before any payment is made."
+    );
+    expect(terms).not.toContain("per adult");
     expect(terms).toMatch(/cancellation terms/);
     expect(terms).toMatch(/weather/);
     expect(terms).toMatch(/laws of India/);

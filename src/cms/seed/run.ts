@@ -14,7 +14,7 @@ import { galleryItems } from "./gallery";
 import { mediaManifest } from "./media-manifest";
 import { packages, type PackageContent } from "./packages";
 import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
-import { legalSettings } from "./legal";
+import { legalFill, legalSettings } from "./legal";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -119,7 +119,7 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
  * collection is seeded only while it is empty, media are uploaded only
  * while the Media collection is empty, `pricing-settings` is written only
  * while it has no stay options, `site-settings` only while it has no
- * phone number and `legal-settings` only while it has no effective date.
+ * phone number; `legal-settings` only gets its still-empty fields filled.
  * Everything else is reported under `skipped`. A deleted or renamed
  * document is therefore never brought back.
  *
@@ -367,10 +367,11 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
   }
 
   const legalDoc = await payload.findGlobal({ slug: "legal-settings", depth: 0, overrideAccess: true });
-  if (overwrite || !legalDoc.effectiveDate) {
+  const legalData = overwrite ? legalSettings : legalFill(legalDoc);
+  if (legalData) {
     await payload.updateGlobal({
       slug: "legal-settings",
-      data: legalSettings,
+      data: legalData,
       overrideAccess: true,
       context,
     });

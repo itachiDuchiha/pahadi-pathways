@@ -15,3 +15,19 @@ export const legalSettings: LegalSeed = {
   deletionWindowMonths: DEFAULT_DELETION_WINDOW_MONTHS,
   retentionStatement: DEFAULT_RETENTION_STATEMENT,
 };
+
+/**
+ * What the default (non-overwrite) seed writes into an existing global:
+ * only the seeded fields that are still empty, so an owner's edits are
+ * never replaced. `null` when there is nothing to fill.
+ */
+export function legalFill(current: Partial<LegalSeed>): Partial<LegalSeed> | null {
+  const fill: Partial<LegalSeed> = {};
+
+  if (!current.dataContactEmail?.trim()) fill.dataContactEmail = legalSettings.dataContactEmail;
+  if (!current.effectiveDate?.trim()) fill.effectiveDate = legalSettings.effectiveDate;
+  if (current.deletionWindowMonths == null) fill.deletionWindowMonths = legalSettings.deletionWindowMonths;
+  if (!current.retentionStatement?.trim()) fill.retentionStatement = legalSettings.retentionStatement;
+
+  return Object.keys(fill).length > 0 ? fill : null;
+}

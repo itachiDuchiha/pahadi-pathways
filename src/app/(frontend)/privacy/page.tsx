@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     {
       title: "Privacy Policy",
       description:
-        `How ${settings.name} collects, uses and protects the personal data you share when you enquire.`,
+        `How ${settings.name} collects, uses and protects the information you share when you plan a trip with us.`,
       path: "/privacy",
     },
     settings

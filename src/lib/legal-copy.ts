@@ -126,7 +126,7 @@ export function termsSections(legal: Legal, contactEmail: string = legal.dataCon
     {
       heading: "Prices",
       paragraphs: [
-        "Prices shown on this website are indicative and quoted per adult. The final price is confirmed to you in writing before any payment is made.",
+        "Prices shown on this website are indicative. The final price is confirmed to you in writing before any payment is made.",
       ],
     },
     {
