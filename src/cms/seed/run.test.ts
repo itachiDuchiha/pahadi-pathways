@@ -462,6 +462,16 @@ describe("seed", () => {
       const victim = (await payload.find({ collection: "testimonials", limit: 1 })).docs[0];
       if (!victim) throw new Error("testimonial not found");
       await payload.delete({ collection: "testimonials", id: victim.id, context: quiet });
+      await payload.updateGlobal({
+        slug: "analytics-settings",
+        data: { gaMeasurementId: "G-TEST1234", clarityProjectId: "abcde12345", consentBannerText: "Edited banner" },
+        context: quiet,
+      });
+      await payload.updateGlobal({
+        slug: "notification-settings",
+        data: { contact: { sendEmail: false, recipients: [{ email: "sales@example.com" }] } },
+        context: quiet,
+      });
 
       const result = await run(true);
 
@@ -473,9 +483,21 @@ describe("seed", () => {
         "pricing-settings": 1,
         "site-settings": 1,
         "legal-settings": 1,
-        "notification-settings": 1,
+        "notification-settings": 0,
         "analytics-settings": 1,
       });
+      expect(result.skipped["notification-settings"]).toBe(1);
+
+      // Owner configuration survives an overwrite; only the banner text is restored.
+      const analytics = await payload.findGlobal({ slug: "analytics-settings" });
+      expect(analytics).toMatchObject({
+        gaMeasurementId: "G-TEST1234",
+        clarityProjectId: "abcde12345",
+        consentBannerText: DEFAULT_CONSENT_BANNER_TEXT,
+      });
+      const notifications = await payload.findGlobal({ slug: "notification-settings" });
+      expect(notifications.contact?.sendEmail).toBe(false);
+      expect(notifications.contact?.recipients?.map((r) => r.email)).toEqual(["sales@example.com"]);
 
       const after = await packageBySlug("shimla-manali-getaway");
       expect(after.title).toBe("Shimla & Manali Getaway");

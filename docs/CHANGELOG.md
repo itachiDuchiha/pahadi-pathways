@@ -28,6 +28,7 @@
 - Closed editor workflow gaps: media changes revalidate the site, base-price changes reach Sedan quotes (seeded and stored Sedan rates equal to the base price are cleared by a migration), users can change their own password while role and email stay admin-only, `npm run cms:set-password` recovers an account, in-use images cannot be deleted, and a missing schema at startup says which commands to run (6998267).
 - Described stay and meal upgrades as per booking per night across the site and admin (52d44c5).
 - Removed the per-adult price claim from the terms, made the legal effective date required with a default, and made the seed fill only empty legal fields (5dd94db).
+- Kept the owner's data contact email, analytics IDs and notification choices out of the `--overwrite` seed, which now only restores the consent banner text (cd40be1 and its follow-up).
 
 ### Security
 - Restricted unlocking locked user accounts to admins and tested the authentication seams (9a69e3c).

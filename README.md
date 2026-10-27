@@ -116,8 +116,8 @@ that the owner knows; it is deliberately not written in any documentation,
   accounts, edit the site settings (phone, WhatsApp, email, social links,
   tagline), the legal settings (grievance officer, data contact email,
   effective date, deletion window, retention statement shown on `/privacy`
-  and `/terms`) and the notification settings (see Notifications), and
-  delete enquiries.
+  and `/terms`), the notification settings (see Notifications) and the
+  analytics settings (see Analytics and consent), and delete enquiries.
 - New accounts are editors unless an admin chooses otherwise. Logins lock
   for 15 minutes after 5 failed attempts.
 - Every user can change their own password in the admin; only admins can
@@ -203,8 +203,8 @@ The privacy policy (`/privacy`) and terms (`/terms`) are built from fixed
 prose in `src/lib/legal-copy.ts` and the variable facts in the legal
 settings, which only admins can change:
 
-- **Grievance officer:** name and contact. Until it is filled in, both
-  pages show "Grievance officer details will be published here."
+- **Grievance officer:** name and contact. Until it is filled in, the
+  privacy page shows "Grievance officer details will be published here."
 - **Data contact email:** where visitors send data and deletion requests.
   Left empty, the site email from the site settings is used.
 - **Effective date** (required), **deletion window** in months (six by
@@ -242,7 +242,7 @@ form and package enquiries, whether an email is sent and to whom.
   (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`); they are not editable in the
   admin.
 - The seed turns email on for every source and leaves the lists empty;
-  re-running it never changes an admin's choices.
+  re-running it, even with `--overwrite`, never changes an admin's choices.
 
 ### Analytics and consent
 
@@ -274,7 +274,8 @@ are empty the site loads no analytics and shows no banner.
   removed (see `docs/TODO.md`).
 - The site's report-only Content-Security-Policy (`src/config/headers.ts`)
   lists the Google and Clarity hosts the scripts use.
-- The seed leaves both IDs empty and only fills in a missing banner text.
+- The seed leaves both IDs empty and only fills in a missing banner text;
+  `--overwrite` restores the banner text but keeps the IDs.
 
 ### Seeding
 
@@ -285,7 +286,8 @@ are empty the site loads no analytics and shows no banner.
 - `npm run cms:seed -- --overwrite` resets every seeded item to the bundled
   content. **It reverts editor changes** to those items and asks for no
   confirmation; use it only on a fresh or throwaway database, or to
-  complete a seed that was interrupted.
+  complete a seed that was interrupted. It keeps the owner's analytics IDs,
+  notification choices and data contact email.
 
 ### Backups
 

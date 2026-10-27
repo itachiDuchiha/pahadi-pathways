@@ -16,7 +16,7 @@ import { packages, type PackageContent } from "./packages";
 import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./pricing";
 import { legalFill, legalSettings } from "./legal";
 import { analyticsFill, analyticsSettings } from "./analytics";
-import { notificationFill, notificationSettings } from "./notifications";
+import { notificationFill } from "./notifications";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -132,7 +132,9 @@ function isDestinationCategory(value: string): value is DestinationDoc["category
  * `notification-settings` only a never-set email switch (turned on), and
  * `analytics-settings` only an empty banner text (the IDs are never written).
  * Everything else is reported under `skipped`. A deleted or renamed
- * document is therefore never brought back.
+ * document is therefore never brought back. Even `overwrite: true` leaves
+ * the owner's analytics IDs and notification choices alone: it only
+ * restores the consent banner text.
  *
  * `overwrite: true` upserts every fixture by its key (slug, name + tour,
  * title, filename), restoring fixture values including alt text and every
@@ -392,7 +394,8 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
   }
 
   const notificationDoc = await payload.findGlobal({ slug: "notification-settings", depth: 0, overrideAccess: true });
-  const notificationData = overwrite ? notificationSettings : notificationFill(notificationDoc);
+  // Owner configuration: never overwritten, only a never-set switch is filled.
+  const notificationData = notificationFill(notificationDoc);
   if (notificationData) {
     await payload.updateGlobal({
       slug: "notification-settings",
@@ -406,7 +409,10 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
   }
 
   const analyticsDoc = await payload.findGlobal({ slug: "analytics-settings", depth: 0, overrideAccess: true });
-  const analyticsData = overwrite ? analyticsSettings : analyticsFill(analyticsDoc);
+  // Overwrite restores the banner text; the IDs are the owner's and are never written.
+  const analyticsData = overwrite
+    ? { consentBannerText: analyticsSettings.consentBannerText }
+    : analyticsFill(analyticsDoc);
   if (analyticsData) {
     await payload.updateGlobal({
       slug: "analytics-settings",
