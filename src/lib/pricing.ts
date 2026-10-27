@@ -82,6 +82,20 @@ export const packageVehicleRates: Record<string, Record<VehicleKey, number>> = {
   "shimla-kinnaur-spiti-kalpa": { sedan: 29549, ertiga: 34799, crysta: 49499 },
 };
 
+/** Daily vehicle cost, used for the upgrade on packages without vehicle rates. */
+export const standardDailyVehicleRates: Record<VehicleKey, number> = {
+  sedan: 3500,
+  ertiga: 4500,
+  crysta: 6000,
+};
+
+/** Daily vehicle cost on Spiti routes. */
+export const spitiDailyVehicleRates: Record<VehicleKey, number> = {
+  sedan: 4500,
+  ertiga: 5500,
+  crysta: 8000,
+};
+
 export const GST_RATE = 0.05;
 
 /** Children younger than this travel free with no extra bed. */
@@ -192,9 +206,9 @@ export function computePackagePrice(input: PackagePriceInput): PackagePrice {
   const packageRates =
     input.slug !== undefined ? packageVehicleRates[input.slug] : undefined;
 
-  const dailyVehicleRates: Record<VehicleKey, number> = input.isSpitiRoute
-    ? { sedan: 4500, ertiga: 5500, crysta: 8000 }
-    : { sedan: 3500, ertiga: 4500, crysta: 6000 };
+  const dailyVehicleRates = input.isSpitiRoute
+    ? spitiDailyVehicleRates
+    : standardDailyVehicleRates;
 
   const vehicleUpgradePerDay =
     dailyVehicleRates[selectedVehicle.key] - dailyVehicleRates.sedan;

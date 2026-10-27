@@ -18,7 +18,9 @@
     "images:optimize": "node scripts/optimize-images.mjs",
     "payload": "payload",
     "generate:types": "payload generate:types",
-    "generate:importmap": "payload generate:importmap"
+    "generate:importmap": "payload generate:importmap",
+    "cms:seed": "tsx scripts/cms-seed.ts",
+    "cms:prune-enquiries": "tsx scripts/cms-prune-enquiries.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.92.0",
@@ -43,6 +45,7 @@
     "eslint": "^9",
     "eslint-config-next": "^16.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.5"
   },

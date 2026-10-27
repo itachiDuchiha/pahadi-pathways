@@ -17,4 +17,14 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Seed a throwaway CMS database
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "PAYLOAD_SECRET=$secret" >> "$GITHUB_ENV"
+          echo "DATABASE_URL=file:./data/ci.db" >> "$GITHUB_ENV"
+          export PAYLOAD_SECRET="$secret" DATABASE_URL=file:./data/ci.db
+          mkdir -p data
+          npm run payload migrate
+          npm run cms:seed
       - run: npm run build
