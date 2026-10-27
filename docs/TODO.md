@@ -51,9 +51,10 @@ Open items only; each line notes why it is still open.
 ## Testing
 
 - **Add browser/E2E tests.** Only Vitest unit and integration tests exist
-  today (295 tests across `src/**/*.test.ts`); there is no coverage that
+  today (456 tests across `src/**/*.test.ts`); there is no coverage that
   exercises the app or the admin in a real browser (forms, modal focus
-  trapping, navigation, editing and publishing).
+  trapping, navigation, editing and publishing, the consent banner and
+  the analytics scripts it gates).
 
 ## Monitoring
 
@@ -61,9 +62,15 @@ Open items only; each line notes why it is still open.
 
 ## Analytics
 
-- **Add analytics.** There is currently no visitor or conversion tracking
-  on the site, so there is no data-driven view of which pages or packages
-  convert enquiries.
+- **Delete vendor cookies on decline.** Declining after accepting reloads
+  the page so the scripts stop, but cookies Google Analytics (`_ga*`) and
+  Clarity (`_clck`, `_clsk`) already set stay until they expire.
+- **Stop running scripts when another tab declines.** A decline in one tab
+  updates the choice in the others, but a tab that already loaded the
+  vendor scripts keeps them until it is reloaded.
+- **Confirm the Clarity image hosts.** Clarity's documentation may also
+  require `https://*.clarity.ms` and `https://c.bing.com` in `img-src` of
+  the Content-Security-Policy; check before enforcing it.
 
 ## Performance
 

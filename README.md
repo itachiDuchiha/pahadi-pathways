@@ -79,7 +79,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `npm run generate:importmap` | Regenerate the admin import map after adding admin components. |
 | `npm run cms:seed` | Fill empty collections with the bundled content and create the first admin (see Content management). |
 | `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes. |
-| `npm run cms:prune-enquiries` | Optional: delete stored enquiries older than 24 months (pass a number of months); only if the owner adopts a retention limit. |
+| `npm run cms:prune-enquiries` | Optional, not part of the retention policy: delete stored enquiries older than a number of months (24 if none is passed). Enquiries are otherwise kept and deleted on request (see Backups). |
 | `npm run cms:set-password -- --email <addr>` | Set a user's password from `NEW_PASSWORD` (see "Recovering the admin account"). |
 | `scripts/deploy.sh` | Install, migrate, seed, build and restart on the server (see Deployment). |
 
@@ -180,6 +180,40 @@ clear the shell history afterwards so the password is not kept there.
 - Replacing or editing an image revalidates every page, since an image can
   appear anywhere on the site.
 
+### Branding
+
+The admin carries the site's brand: the full logo on the login screen, the
+icon logo in the navigation, the site favicon, and page titles ending in
+`· The Himalayan Compass`; Payload's generated Open Graph images are off
+and the site's own image is used instead.
+
+- The name and tagline come from `src/config/site.ts`; the admin title,
+  favicon and Open Graph settings are in `src/cms/config/admin.ts`.
+- The logo components are `src/cms/admin/Logo.tsx` and
+  `src/cms/admin/Icon.tsx` (images in `public/images/logo/`). After adding
+  or renaming an admin component, run `npm run generate:importmap`.
+- The colours (navy, gold, sand, for light and dark mode) are CSS
+  variables in `src/app/(payload)/custom.scss`.
+
+None of this is editable in the admin; change it in code and redeploy.
+
+### Legal pages
+
+The privacy policy (`/privacy`) and terms (`/terms`) are built from fixed
+prose in `src/lib/legal-copy.ts` and the variable facts in the legal
+settings, which only admins can change:
+
+- **Grievance officer:** name and contact. Until it is filled in, both
+  pages show "Grievance officer details will be published here."
+- **Data contact email:** where visitors send data and deletion requests.
+  Left empty, the site email from the site settings is used.
+- **Effective date** (required), **deletion window** in months (six by
+  default) and the **retention statement**.
+
+Saving the legal settings revalidates both pages. The seed fills only the
+fields that are still empty and never the data contact email, so an
+admin's edits are kept. Changing the prose itself is a code change.
+
 ### Notifications
 
 The notification settings decide, separately for trip planner, contact
@@ -189,11 +223,21 @@ form and package enquiries, whether an email is sent and to whom.
   recipient addresses for it (each a valid address, no repeats). Editors
   can see the settings but not change them; visitors cannot read them.
 - **Email off:** the enquiry is still stored under Enquiries and the
-  visitor is told it was received; no email is sent.
+  visitor is told it was received; no email is sent. If storing it also
+  fails, nothing was kept, so the visitor gets an error (HTTP 502) asking
+  them to try again shortly.
 - **No addresses listed:** the email goes to `TRIP_ENQUIRY_EMAIL` from the
   server environment, so an unconfigured screen never silently drops
-  mail. If that is not set either, the enquiry is stored and the server
-  logs "no recipients configured".
+  mail. If that is not set either (or the Resend settings are missing),
+  the enquiry is stored, the visitor is told it was received and the
+  server logs "no recipients configured" (or "mail is not configured").
+  If storing it also fails, the visitor gets an error (HTTP 503) saying
+  the enquiry service is being configured.
+- **Email fails to send:** a stored enquiry still counts as received; if
+  it was not stored either, the visitor gets an error (HTTP 502).
+- Only the first 10 valid, distinct addresses are used, even if older
+  saved data holds more. If the settings cannot be read, the email goes
+  to `TRIP_ENQUIRY_EMAIL`.
 - The Resend API key and sender address stay in the environment
   (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`); they are not editable in the
   admin.
@@ -214,18 +258,22 @@ are empty the site loads no analytics and shows no banner.
   letters and digits, for example `k2l9x8m7q1`).
 - Only admins can change the IDs; each is checked on save and again when
   the site reads it, and an invalid stored ID is ignored.
-- **The banner:** once an ID is set, visitors see a small banner at the
-  bottom of the page with the banner text, Accept and Decline buttons and
-  a link to the privacy policy. Their choice is kept for a year in the
-  browser (`localStorage` and a `thc-consent` cookie), so the banner does
-  not return.
+- **The banner:** once an ID is set, visitors who have not chosen yet see
+  a small banner at the bottom of the page, shortly after it loads, with
+  the banner text, Accept and Decline buttons and a link to the privacy
+  policy. Their choice is kept for a year in the browser (`localStorage`
+  and a `thc-consent` cookie), so the banner does not return, not even
+  briefly while a page loads.
 - **Accept** loads the configured vendor scripts in the browser. **Decline**
   (or no choice) loads nothing; declining is remembered and the site works
   the same either way. The server-rendered pages never contain a vendor
   script; they are added on the client only after an accept.
 - The privacy page names the configured vendors and lets a visitor change
   their choice. Switching from accept to decline reloads the page so no
-  vendor script keeps running.
+  vendor script keeps running; cookies the vendors already set are not
+  removed (see `docs/TODO.md`).
+- The site's report-only Content-Security-Policy (`src/config/headers.ts`)
+  lists the Google and Clarity hosts the scripts use.
 - The seed leaves both IDs empty and only fills in a missing banner text.
 
 ### Seeding

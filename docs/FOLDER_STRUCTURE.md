@@ -71,7 +71,7 @@ of the documentation.
 - `src/app/(frontend)/privacy/`, `terms/` — privacy policy and terms pages
   (prose in `src/lib/legal-copy.ts`).
 - `src/app/(frontend)/reviews/` — reviews page.
-- `src/app/(payload)/` — the CMS route group: its layout and admin styles,
+- `src/app/(payload)/` — the CMS route group: its layout and admin brand styles (`custom.scss`),
   plus a subdirectory (named after the private admin URL) holding the
   admin pages, their not-found page and the generated admin import map.
 - `src/app/(payload)/api/[...slug]/` — the CMS REST API used by the admin
@@ -82,14 +82,15 @@ of the documentation.
 - `src/cms/` — generated `payload-types.ts`.
 - `src/cms/access/` — access-control functions (published-only reads,
   editor/admin checks, server-only create), with tests.
-- `src/cms/admin/` — custom admin views (the "not initialised" screen shown
-  instead of a sign-up form).
+- `src/cms/admin/` — custom admin views and graphics: the "not initialised"
+  screen shown instead of a sign-up form, and the `Logo` (login screen)
+  and `Icon` (navigation) brand graphics.
 - `src/cms/bootstrap/` — first-admin creation from the environment, with tests.
 - `src/cms/collections/` — collection configs (packages, destinations,
   testimonials, gallery items, experiences, enquiries, media, users), with
   access tests.
-- `src/cms/config/` — database adapter selection and security settings,
-  with tests.
+- `src/cms/config/` — database adapter selection, security settings and
+  admin metadata (title suffix, favicon, Open Graph, graphics), with tests.
 - `src/cms/fields/` — reusable fields (slug, image, string list).
 - `src/cms/globals/` — pricing, site, legal, notification and analytics settings.
 - `src/cms/hooks/` — revalidation of public pages on publish and the
@@ -133,11 +134,13 @@ of the documentation.
 - `src/config/` — site configuration (name, URL, fallback contact details)
   and security headers, with tests.
 - `src/lib/` — SEO helpers, server-side pricing, structured data and
-  `llms.txt` builders, each with a colocated test.
+  `llms.txt` builders, the privacy and terms prose (`legal-copy.ts`) and
+  the analytics consent rules (`consent.ts`), each with a colocated test.
 - `src/lib/cms/` — the typed data layer the site reads content through:
   Payload client, queries, mappers from CMS documents to domain types,
-  pricing tables, enquiry storage and the empty-database build guard, with
-  tests.
+  pricing tables, enquiry storage, the legal, notification and analytics
+  settings readers (`legal.ts`, `notifications.ts`, `analytics.ts`) and
+  the empty-database build guard, with tests.
 - `src/lib/enquiry/` — the shared enquiry pipeline: Zod schema, origin/body
   guards and client-IP lookup, in-memory rate limiter, HTML email
   templates, Resend mail sender and the route handler factory, each with a

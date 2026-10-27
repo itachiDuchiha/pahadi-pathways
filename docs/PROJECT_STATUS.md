@@ -35,8 +35,8 @@ complete.
   site contact details are CMS globals. The public pages read them through
   the typed data layer in `src/lib/cms/`.
 - Editors manage content, media and prices and read stored enquiries;
-  admins additionally manage users, site and legal settings and enquiry
-  deletion.
+  admins additionally manage users, site, legal, notification and
+  analytics settings and enquiry deletion.
   The admin lives at a private URL known to the owner and is not linked or
   listed anywhere public.
 - There is no open sign-up: the first admin is created from
@@ -48,6 +48,15 @@ complete.
   (create-only by default; `--overwrite` resets seeded items).
   `npm run cms:prune-enquiries` is optional, only if the owner adopts a
   retention limit; enquiries are otherwise kept and deleted on request.
+- The admin is branded with the site logo, icon, name, favicon and
+  colours (done).
+- Notification settings (done): per enquiry source, admins turn the email
+  on or off and list up to 10 recipients; an empty list falls back to
+  `TRIP_ENQUIRY_EMAIL`.
+- Analytics (done): admins can set a Google Analytics 4 measurement ID and
+  a Microsoft Clarity project ID. Vendor scripts load only after a visitor
+  accepts the consent banner; with no ID set there is no banner and no
+  script.
 - SQLite is the default database; a Postgres `init` migration is committed
   and was rehearsed end to end (migrate, seed, build) against Postgres 16.
 
@@ -104,10 +113,13 @@ complete.
   uploads.
 - `npm audit --omit=dev` is clean, with three dependency overrides
   documented in `docs/TODO.md`.
-- Privacy policy (`/privacy`) and terms (`/terms`) pages are in place; their
-  variable facts (grievance officer, data contact, effective date, deletion
-  window) come from the legal settings, and the consent line under each
-  form links both.
+- Privacy policy (`/privacy`) and terms (`/terms`) pages are in place
+  (done); their variable facts (grievance officer, data contact, effective
+  date, deletion window, retention statement) come from the legal
+  settings, and the consent line under each form links both. The
+  grievance officer shows a placeholder until the owner fills it in.
+- The report-only Content-Security-Policy lists the Google Analytics and
+  Clarity hosts.
 
 ### Images
 
@@ -117,7 +129,7 @@ complete.
 
 ### Tests, CI and deployment
 
-- 276 Vitest tests across 31 files cover site configuration, SEO helpers,
+- 456 Vitest tests across 39 files cover site configuration, SEO helpers,
   pricing, the enquiry pipeline, structured data, CMS access control,
   fields, hooks, mappers, the data layer and the seed (integration tests
   run against a temporary SQLite database).
@@ -138,7 +150,7 @@ complete.
 - Enforcing the Content-Security-Policy (moving off report-only) after a
   monitoring period.
 - An external, shared rate limiter and a CAPTCHA for the enquiry APIs.
-- Browser/end-to-end tests, analytics, error reporting.
+- Browser/end-to-end tests and error reporting.
 - Further trimming of the largest remaining images.
 
 See `docs/TODO.md` for the full list of open items.
