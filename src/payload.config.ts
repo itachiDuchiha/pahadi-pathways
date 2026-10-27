@@ -13,6 +13,7 @@ import { Packages } from "./cms/collections/Packages";
 import { Testimonials } from "./cms/collections/Testimonials";
 import { Users } from "./cms/collections/Users";
 import { bootstrapAdmin } from "./cms/bootstrap/ensureAdmin";
+import { adminGraphics, adminMeta } from "./cms/config/admin";
 import { buildDbAdapter } from "./cms/config/db";
 import { securityConfig } from "./cms/config/security";
 import { PricingSettings } from "./cms/globals/PricingSettings";
@@ -28,7 +29,9 @@ export default buildConfig({
       baseDir: dirname,
       importMapFile: path.resolve(dirname, "app/(payload)/ramram/importMap.js"),
     },
+    meta: adminMeta,
     components: {
+      graphics: adminGraphics,
       views: {
         createFirstUser: {
           Component: "/cms/admin/AdminNotInitialised#AdminNotInitialised",
