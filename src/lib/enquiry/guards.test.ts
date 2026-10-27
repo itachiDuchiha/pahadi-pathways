@@ -63,6 +63,28 @@ describe("rateLimitKey", () => {
     );
   });
 
+  it("uses the first non-empty x-forwarded-for entry", async () => {
+    const { rateLimitKey } = await import("./guards");
+    expect(rateLimitKey("trip-enquiry", post({ "x-forwarded-for": ", 9.9.9.9" }))).toBe(
+      "trip-enquiry:9.9.9.9"
+    );
+  });
+
+  it("uses a shared invalid bucket when a header is present but empty", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { rateLimitKey } = await import("./guards");
+    expect(rateLimitKey("trip-enquiry", post({ "x-forwarded-for": "" }))).toBe(
+      "trip-enquiry:invalid"
+    );
+    expect(rateLimitKey("trip-enquiry", post({ "x-forwarded-for": " , " }))).toBe(
+      "trip-enquiry:invalid"
+    );
+    expect(rateLimitKey("trip-enquiry", post({ "x-real-ip": " " }))).toBe(
+      "trip-enquiry:invalid"
+    );
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it("skips the limiter when the client IP is unknown and warns once per process", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { rateLimitKey } = await import("./guards");

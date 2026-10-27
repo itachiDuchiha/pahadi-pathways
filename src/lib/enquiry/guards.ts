@@ -28,34 +28,43 @@ export function checkOrigin(request: Request, siteUrl: string): boolean {
   return expected !== null && actual !== null && actual === expected;
 }
 
+const IP_HEADERS = ["x-forwarded-for", "x-real-ip", "cf-connecting-ip"] as const;
+
 /**
  * Best-effort client IP for rate limiting.
  *
  * Trust assumption: the hosting edge overwrites `x-forwarded-for` with the
- * real client address (Vercel does). Behind a proxy that appends to a
- * client-supplied header instead, the first entry is attacker-controlled and
- * the limit can be bypassed. Headers are read in this order:
- * `x-forwarded-for` (first entry), `x-real-ip`, `cf-connecting-ip`. With
- * none of them the result is "unknown".
+ * real client address. Behind a proxy that appends to a client-supplied
+ * header instead, the first entry is attacker-controlled and the limit can
+ * be bypassed. Headers are read in this order: `x-forwarded-for`,
+ * `x-real-ip`, `cf-connecting-ip`; the first non-empty comma-separated
+ * entry wins. When a header is present but holds no usable entry the
+ * result is "invalid" (a bucket that is still limited); only when none of
+ * the headers is present at all is it "unknown".
  */
 export function clientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  if (forwarded) return forwarded;
+  let present = false;
 
-  const realIp = request.headers.get("x-real-ip")?.trim();
-  if (realIp) return realIp;
+  for (const name of IP_HEADERS) {
+    const value = request.headers.get(name);
+    if (value === null) continue;
 
-  const cloudflareIp = request.headers.get("cf-connecting-ip")?.trim();
-  if (cloudflareIp) return cloudflareIp;
+    present = true;
+    const entry = value
+      .split(",")
+      .map((part) => part.trim())
+      .find(Boolean);
+    if (entry) return entry;
+  }
 
-  return "unknown";
+  return present ? "invalid" : "unknown";
 }
 
 let unknownIpWarned = false;
 
 /**
- * Rate-limit bucket key for this request, or `null` when the client IP is
- * unknown. Unknown clients are not limited at all rather than sharing one
+ * Rate-limit bucket key for this request, or `null` when no client IP
+ * header is present at all. Unknown clients are not limited at all rather than sharing one
  * bucket, which would cap the whole site at the per-visitor allowance. The
  * first such request logs a warning; later ones stay quiet.
  */
@@ -74,7 +83,7 @@ export function rateLimitKey(routeKey: string, request: Request): string | null 
 }
 
 /** True when the declared Content-Length is over the body limit. */
-export function declaredBodyTooLarge(request: Request): boolean {
+function declaredBodyTooLarge(request: Request): boolean {
   const declared = Number(request.headers.get("content-length"));
   return Number.isFinite(declared) && declared > MAX_BODY_BYTES;
 }

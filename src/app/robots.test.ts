@@ -14,6 +14,13 @@ describe("robots", () => {
     }
   });
 
+  it("allows public CMS media in every group", () => {
+    for (const rule of rules) {
+      const allow = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+      expect(allow).toEqual(expect.arrayContaining(["/", "/api/media/file/"]));
+    }
+  });
+
   it("never names the admin path", () => {
     expect(JSON.stringify(output)).not.toContain("ramram");
   });

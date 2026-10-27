@@ -182,8 +182,19 @@ describe("enquiry handler pipeline", () => {
 
     expect(statuses).toEqual([200, 200, 200, 200, 200, 200]);
     expect(sendMock).toHaveBeenCalledTimes(6);
-    expect(warn.mock.calls.length).toBeLessThanOrEqual(1);
+    expect(warn).toHaveBeenCalledTimes(1);
     warn.mockRestore();
+  });
+
+  it("rate-limits a present but empty x-forwarded-for instead of skipping", async () => {
+    const statuses: number[] = [];
+
+    for (let i = 0; i < 6; i += 1) {
+      const response = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": "" }));
+      statuses.push(response.status);
+    }
+
+    expect(statuses).toEqual([200, 200, 200, 200, 200, 429]);
   });
 
   it("hands the subject to the mail layer unsanitised (sanitised once, in mail)", async () => {

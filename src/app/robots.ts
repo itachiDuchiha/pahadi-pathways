@@ -20,13 +20,18 @@ const aiCrawlers = [
   "meta-externalagent",
 ];
 
+// The API is not for crawlers, but uploaded media served from it is used
+// on public pages and as og:image, so it stays crawlable (the longer Allow
+// match wins over the Disallow).
+const access = { allow: ["/", "/api/media/file/"], disallow: ["/api/"] };
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/api/"] },
+      { userAgent: "*", ...access },
       // A crawler-specific group replaces the "*" group for that crawler,
-      // so each one repeats the disallow list.
-      ...aiCrawlers.map((userAgent) => ({ userAgent, allow: "/", disallow: ["/api/"] })),
+      // so each one repeats the same rules.
+      ...aiCrawlers.map((userAgent) => ({ userAgent, ...access })),
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
   };
