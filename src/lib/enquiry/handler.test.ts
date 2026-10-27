@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 
 import { withTempPayload } from "@/cms/test/withTempPayload";
 import { packages } from "@/cms/seed/packages";
@@ -183,6 +183,7 @@ describe("enquiry handler pipeline", () => {
     }
 
     expect(sendMock).not.toHaveBeenCalled();
+    expect((await temp.payload.count({ collection: "enquiries" })).totalDocs).toBe(0);
 
     const real = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": ip }));
     expect(real.status).toBe(200);
@@ -358,3 +359,122 @@ describe("package quotes follow the published CMS price", () => {
   });
 });
 
+
+describe("enquiry storage alongside email", () => {
+  const trip = {
+    source: "trip",
+    name: "Asha",
+    phone: "9876543210",
+    adults: 2,
+    children: 0,
+    budgetPerPerson: 25000,
+    website: "",
+  };
+
+  let errorSpy: MockInstance<typeof console.error>;
+
+  beforeEach(() => {
+    errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  async function enquiries() {
+    return (await temp.payload.find({ collection: "enquiries", depth: 0, overrideAccess: true })).docs;
+  }
+
+  function failStorage() {
+    vi.spyOn(temp.payload, "create").mockRejectedValueOnce(new Error("database is locked"));
+  }
+
+  it("stores the lead and answers 200 when the mail sender throws", async () => {
+    sendMock.mockRejectedValueOnce(new Error("socket hang up"));
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, message: "Your trip enquiry was sent successfully." });
+    expect(await enquiries()).toHaveLength(1);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("stores the lead and answers 200 when the mail sender reports a failure", async () => {
+    sendMock.mockResolvedValueOnce({ ok: false, error: "rejected" });
+
+    const response = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(await enquiries()).toHaveLength(1);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers 200 when mail is not configured but the lead was stored", async () => {
+    mailConfigMock.mockReturnValue(null);
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect((await response.json()).ok).toBe(true);
+    expect(sendMock).not.toHaveBeenCalled();
+    const docs = await enquiries();
+    expect(docs).toHaveLength(1);
+    expect(docs[0]).toMatchObject({ source: "trip", name: "Asha", adults: 2, budgetPerPerson: 25000 });
+  });
+
+  it("still sends the email and answers 200 when storage fails", async () => {
+    failStorage();
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(await enquiries()).toHaveLength(0);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("answers 502 when both storage and email fail", async () => {
+    failStorage();
+    sendMock.mockResolvedValueOnce({ ok: false, error: "rejected" });
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(502);
+    expect((await response.json()).ok).toBe(false);
+  });
+
+  it("answers 503 when storage fails and mail is not configured", async () => {
+    failStorage();
+    mailConfigMock.mockReturnValue(null);
+
+    const response = await tripPOST(post(TRIP_URL, trip, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(503);
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("stores a package enquiry with the server-computed price, never the client's", async () => {
+    const response = await packagePOST(
+      post(PACKAGE_URL, { ...pkg, packageCost: 1, gst: 1 }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    const docs = await enquiries();
+    expect(docs).toHaveLength(1);
+    const [published] = (
+      await temp.payload.find({ collection: "packages", where: { slug: { equals: SLUG } }, depth: 0 })
+    ).docs;
+    expect(docs[0]).toMatchObject({
+      source: "package",
+      package: published.id,
+      selections: {
+        stay: "Premium",
+        meals: "Breakfast Only (CP)",
+        vehicle: "Ertiga / Rumion or similar",
+        childAges: [{ age: 3 }, { age: 7 }],
+      },
+      computedPrice: { packageCost: 48654, gst: 2433, gstPercent: 5, estimatedTotal: 51087 },
+    });
+  });
+});

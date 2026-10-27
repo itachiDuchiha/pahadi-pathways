@@ -1,3 +1,4 @@
+import { storeEnquiry } from "@/lib/cms/enquiries";
 import { createEnquiryHandler, type EnquiryEmail } from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
 import { DESTINATIONS, type ContactEnquiry, type TripEnquiry } from "@/lib/enquiry/schema";
@@ -49,6 +50,9 @@ export const POST = createEnquiryHandler({
     trip: "Your trip enquiry was sent successfully.",
     contact: "Your message was sent successfully.",
   },
-  buildEmail: (enquiry) =>
-    enquiry.source === "trip" ? tripEmail(enquiry) : contactEmail(enquiry),
+  buildEmail: (enquiry) => ({
+    email: enquiry.source === "trip" ? tripEmail(enquiry) : contactEmail(enquiry),
+    stored: enquiry,
+  }),
+  storeEnquiry,
 });

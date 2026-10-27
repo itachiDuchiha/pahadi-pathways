@@ -5,6 +5,7 @@ import { buildConfig } from "payload";
 import sharp from "sharp";
 
 import { Destinations } from "./cms/collections/Destinations";
+import { Enquiries } from "./cms/collections/Enquiries";
 import { Experiences } from "./cms/collections/Experiences";
 import { GalleryItems } from "./cms/collections/GalleryItems";
 import { Media } from "./cms/collections/Media";
@@ -37,7 +38,7 @@ export default buildConfig({
     },
   },
   routes: { admin: "/ramram" },
-  collections: [Packages, Destinations, Testimonials, GalleryItems, Experiences, Media, Users],
+  collections: [Packages, Destinations, Testimonials, GalleryItems, Experiences, Enquiries, Media, Users],
   globals: [PricingSettings, SiteSettings],
   db: buildDbAdapter(process.env),
   sharp,

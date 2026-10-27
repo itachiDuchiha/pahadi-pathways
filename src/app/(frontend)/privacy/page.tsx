@@ -285,6 +285,8 @@ export default function PrivacyPage() {
             >
               We keep enquiry emails for up to 24 months so we can refer
               back to past conversations, after which they are deleted.
+              Enquiries are also stored in the website&apos;s content system
+              so our team can follow up; they are deleted after 24 months.
             </p>
 
 

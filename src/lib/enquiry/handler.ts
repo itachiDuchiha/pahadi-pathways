@@ -1,4 +1,5 @@
 import { site } from "@/config/site";
+import type { StoredEnquiryInput, StoreEnquiryResult } from "@/lib/cms/enquiries";
 
 import { checkOrigin, clientIp, declaredBodyTooLarge, readJson } from "./guards";
 import type { EnquiryContent } from "./html";
@@ -15,7 +16,10 @@ export type EnquiryEmail = Required<Pick<EnquiryContent, "heading" | "kind">> & 
 /** The enquiry is well formed but refers to something that does not exist. */
 export type InvalidEnquiry = { invalid: string };
 
-type BuildResult = EnquiryEmail | InvalidEnquiry | null;
+/** What a route builds from a valid enquiry: the email and the lead to store. */
+export type BuiltEnquiry = { email: EnquiryEmail; stored: StoredEnquiryInput };
+
+type BuildResult = BuiltEnquiry | InvalidEnquiry | null;
 
 type HandlerConfig<S extends EnquirySource> = {
   /** Distinguishes this route's rate-limit buckets from other routes'. */
@@ -23,14 +27,17 @@ type HandlerConfig<S extends EnquirySource> = {
   sources: readonly S[];
   successMessage: Record<S, string>;
   /**
-   * Builds the notification email. Returning `null` means the enquiry
-   * refers to something that does not exist (for example an unknown
-   * package), which is answered with 400 and `invalidMessage`; returning
-   * `{ invalid }` answers 400 with that message instead.
+   * Builds the notification email and the lead to store. Returning `null`
+   * means the enquiry refers to something that does not exist (for
+   * example an unknown package), which is answered with 400 and
+   * `invalidMessage`; returning `{ invalid }` answers 400 with that
+   * message instead.
    */
   buildEmail: (
     enquiry: Extract<Enquiry, { source: S }>
   ) => BuildResult | Promise<BuildResult>;
+  /** Stores the lead in the CMS; a failure is reported, not thrown. */
+  storeEnquiry: (input: StoredEnquiryInput) => Promise<StoreEnquiryResult>;
   invalidMessage?: string;
 };
 
@@ -61,8 +68,13 @@ function honeypotFilled(body: unknown): boolean {
 /**
  * Builds a POST handler that runs every enquiry through the same pipeline:
  * body-size guard, origin check, JSON read, honeypot, rate limit, schema,
- * then mail. Honeypot hits are answered before the limiter so they never
- * consume a real visitor's allowance.
+ * then storage and mail. Honeypot hits are answered before the limiter so
+ * they never consume a real visitor's allowance.
+ *
+ * A stored lead counts as success: when the email cannot be sent the
+ * visitor still gets 200, because the lead is in the admin and a retry
+ * would only create a duplicate. Storage failure never blocks the email;
+ * only when both fail does the visitor get 502 or 503.
  */
 export function createEnquiryHandler<S extends EnquirySource>(
   config: HandlerConfig<S>
@@ -120,17 +132,32 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(400, false, "Invalid enquiry details.");
       }
 
-      const email = await config.buildEmail(enquiry as Extract<Enquiry, { source: S }>);
+      const built = await config.buildEmail(enquiry as Extract<Enquiry, { source: S }>);
 
-      if (!email) {
+      if (!built) {
         return respond(400, false, config.invalidMessage ?? "Invalid enquiry details.");
       }
 
-      if ("invalid" in email) {
-        return respond(400, false, email.invalid);
+      if ("invalid" in built) {
+        return respond(400, false, built.invalid);
+      }
+
+      const accepted: S = enquiry.source;
+      const success = () => respond(200, true, config.successMessage[accepted]);
+
+      const stored = await config
+        .storeEnquiry(built.stored)
+        .catch((error: unknown) => ({ ok: false as const, error: errorMessage(error) }));
+
+      if (!stored.ok) {
+        console.error("Enquiry storage failed:", stored.error);
       }
 
       if (!getMailConfig()) {
+        if (stored.ok) {
+          console.error("Enquiry stored; mail is not configured.");
+          return success();
+        }
         console.error("Enquiry email configuration is incomplete.");
         return respond(
           503,
@@ -139,9 +166,15 @@ export function createEnquiryHandler<S extends EnquirySource>(
         );
       }
 
-      const sent = await sendEnquiryEmail({ ...email, replyTo: enquiry.email });
+      const sent = await sendEnquiryEmail({ ...built.email, replyTo: enquiry.email }).catch(
+        (error: unknown) => ({ ok: false as const, error: errorMessage(error) })
+      );
 
       if (!sent.ok) {
+        if (stored.ok) {
+          console.error("Enquiry email failed; enquiry stored:", sent.error);
+          return success();
+        }
         console.error("Enquiry email failed:", sent.error);
         return respond(
           502,
@@ -150,7 +183,7 @@ export function createEnquiryHandler<S extends EnquirySource>(
         );
       }
 
-      return respond(200, true, config.successMessage[enquiry.source]);
+      return success();
     } catch (error) {
       console.error("Enquiry handler error:", errorMessage(error));
       return respond(

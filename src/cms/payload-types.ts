@@ -72,6 +72,7 @@ export interface Config {
     testimonials: Testimonial;
     'gallery-items': GalleryItem;
     experiences: Experience;
+    enquiries: Enquiry;
     media: Media;
     users: User;
     'payload-kv': PayloadKv;
@@ -86,6 +87,7 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'gallery-items': GalleryItemsSelect<false> | GalleryItemsSelect<true>;
     experiences: ExperiencesSelect<false> | ExperiencesSelect<true>;
+    enquiries: EnquiriesSelect<false> | EnquiriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -369,6 +371,52 @@ export interface Experience {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiries".
+ */
+export interface Enquiry {
+  id: number;
+  source: 'trip' | 'contact' | 'package';
+  name: string;
+  phone: string;
+  email?: string | null;
+  message?: string | null;
+  travelDate?: string | null;
+  /**
+   * Trip planner destination key.
+   */
+  destination?: string | null;
+  adults?: number | null;
+  children?: number | null;
+  /**
+   * Rupees.
+   */
+  budgetPerPerson?: number | null;
+  package?: (number | null) | Package;
+  selections?: {
+    stay?: string | null;
+    meals?: string | null;
+    vehicle?: string | null;
+    childAges?:
+      | {
+          age: number;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Computed on the server from the published prices (rupees).
+   */
+  computedPrice?: {
+    packageCost?: number | null;
+    gst?: number | null;
+    gstPercent?: number | null;
+    estimatedTotal?: number | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -437,6 +485,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'experiences';
         value: number | Experience;
+      } | null)
+    | ({
+        relationTo: 'enquiries';
+        value: number | Enquiry;
       } | null)
     | ({
         relationTo: 'media';
@@ -653,6 +705,46 @@ export interface ExperiencesSelect<T extends boolean = true> {
   image?: T;
   icon?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enquiries_select".
+ */
+export interface EnquiriesSelect<T extends boolean = true> {
+  source?: T;
+  name?: T;
+  phone?: T;
+  email?: T;
+  message?: T;
+  travelDate?: T;
+  destination?: T;
+  adults?: T;
+  children?: T;
+  budgetPerPerson?: T;
+  package?: T;
+  selections?:
+    | T
+    | {
+        stay?: T;
+        meals?: T;
+        vehicle?: T;
+        childAges?:
+          | T
+          | {
+              age?: T;
+              id?: T;
+            };
+      };
+  computedPrice?:
+    | T
+    | {
+        packageCost?: T;
+        gst?: T;
+        gstPercent?: T;
+        estimatedTotal?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

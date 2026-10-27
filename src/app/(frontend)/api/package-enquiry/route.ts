@@ -1,9 +1,10 @@
+import { storeEnquiry } from "@/lib/cms/enquiries";
 import { getPackageBySlug } from "@/lib/cms/packages";
 import { getPricingTables } from "@/lib/cms/pricing-tables";
 import type { PricingTables } from "@/lib/cms/types";
 import {
   createEnquiryHandler,
-  type EnquiryEmail,
+  type BuiltEnquiry,
   type InvalidEnquiry,
 } from "@/lib/enquiry/handler";
 import { sanitizeSubject } from "@/lib/enquiry/mail";
@@ -27,9 +28,9 @@ function unknownOption(enquiry: PackageEnquiry, tables: PricingTables): string |
   return null;
 }
 
-async function packageEmail(
+async function buildPackageEnquiry(
   enquiry: PackageEnquiry
-): Promise<EnquiryEmail | InvalidEnquiry | null> {
+): Promise<BuiltEnquiry | InvalidEnquiry | null> {
   // The schema checks the slug's shape only; only a published package counts.
   // Prices come from the CMS on every enquiry; client totals are never used.
   const pkg = await getPackageBySlug(enquiry.slug);
@@ -55,8 +56,8 @@ async function packageEmail(
     ? `${enquiry.childAges.length} (${enquiry.childAges.map((age) => `Age ${age}`).join(", ")})`
     : "None";
 
-  return {
-    kind: "package",
+  const email = {
+    kind: "package" as const,
     heading: "New Package Booking Enquiry",
     subject: sanitizeSubject(`Package enquiry: ${pkg.title} — ${enquiry.name}`),
     intro: "A customer has submitted a package booking enquiry through your website.",
@@ -74,8 +75,21 @@ async function packageEmail(
       ["Package Cost", formatCurrency(price.packageCost)],
       [`GST (${price.gstPercent}%)`, formatCurrency(price.gst)],
       ["Estimated Total", formatCurrency(price.estimatedTotal)],
-    ],
+    ] satisfies [string, string][],
   };
+
+  // Only the server-computed price is stored alongside the typed fields.
+  const stored = {
+    ...enquiry,
+    price: {
+      packageCost: price.packageCost,
+      gst: price.gst,
+      gstPercent: price.gstPercent,
+      estimatedTotal: price.estimatedTotal,
+    },
+  };
+
+  return { email, stored };
 }
 
 export const POST = createEnquiryHandler({
@@ -84,6 +98,7 @@ export const POST = createEnquiryHandler({
   successMessage: {
     package: "Your package enquiry has been sent successfully.",
   },
-  buildEmail: packageEmail,
+  buildEmail: buildPackageEnquiry,
+  storeEnquiry,
   invalidMessage: "Please choose a valid package.",
 });

@@ -2,11 +2,12 @@ import { NotFound } from "payload";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 
-import { isEditorOrAdmin } from "../access";
+import { deny, isAdmin, isEditorOrAdmin, serverOnly } from "../access";
 import { validateUniqueVehicleKeys } from "../globals/PricingSettings";
 import { withTempPayload } from "../test/withTempPayload";
 
 import { Destinations } from "./Destinations";
+import { Enquiries } from "./Enquiries";
 import { Packages } from "./Packages";
 
 const temp = withTempPayload();
@@ -381,5 +382,134 @@ describe("validateUniqueVehicleKeys", () => {
 
   it("names the repeated key", () => {
     expect(validateUniqueVehicleKeys([{ key: "ertiga" }, { key: "ertiga" }])).toMatch(/ertiga/);
+  });
+});
+
+describe("enquiries access", () => {
+  const internal = { ...context, internal: true };
+  const lead = { source: "contact" as const, name: "Asha", phone: "9876543210" };
+
+  async function makeEnquiry() {
+    return temp.payload.create({
+      collection: "enquiries",
+      data: lead,
+      overrideAccess: true,
+      context: internal,
+    });
+  }
+
+  it("uses the agreed access map", () => {
+    // Payload adds its own defaults (such as `unlock`) when it sanitises the config.
+    expect(Enquiries.access).toMatchObject({
+      read: isEditorOrAdmin,
+      create: serverOnly,
+      update: deny,
+      delete: isAdmin,
+    });
+    expect(Enquiries.versions ?? false).toBe(false);
+  });
+
+  it("keeps enquiries unreadable without a user", async () => {
+    await makeEnquiry();
+
+    await expect(
+      temp.payload.find({ collection: "enquiries", overrideAccess: false })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("lets an editor read enquiries", async () => {
+    await makeEnquiry();
+    const editor = await makeUser("editor");
+
+    const result = await temp.payload.find({
+      collection: "enquiries",
+      overrideAccess: false,
+      user: editor,
+    });
+
+    expect(result.docs.map((doc) => doc.name)).toEqual(["Asha"]);
+  });
+
+  it("forbids anonymous and editor creates without the internal context", async () => {
+    const editor = await makeUser("editor");
+
+    await expect(
+      temp.payload.create({ collection: "enquiries", data: lead, overrideAccess: false, context })
+    ).rejects.toThrow(/not allowed/i);
+
+    await expect(
+      temp.payload.create({
+        collection: "enquiries",
+        data: lead,
+        overrideAccess: false,
+        user: editor,
+        context,
+      })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("allows a server-side create marked internal", async () => {
+    const doc = await temp.payload.create({
+      collection: "enquiries",
+      data: lead,
+      overrideAccess: false,
+      context: internal,
+    });
+
+    expect(doc.source).toBe("contact");
+  });
+
+  it("lets an admin delete an enquiry but not an editor", async () => {
+    const doc = await makeEnquiry();
+    const editor = await makeUser("editor");
+    const admin = await makeUser("admin");
+
+    await expect(
+      temp.payload.delete({ collection: "enquiries", id: doc.id, overrideAccess: false, user: editor })
+    ).rejects.toThrow(/not allowed/i);
+
+    await temp.payload.delete({ collection: "enquiries", id: doc.id, overrideAccess: false, user: admin });
+
+    const left = await temp.payload.find({ collection: "enquiries", overrideAccess: true });
+    expect(left.totalDocs).toBe(0);
+  });
+
+  it("forbids updates for everyone, admins included", async () => {
+    const doc = await makeEnquiry();
+    const admin = await makeUser("admin");
+
+    await expect(
+      temp.payload.update({
+        collection: "enquiries",
+        id: doc.id,
+        data: { name: "Changed" },
+        overrideAccess: false,
+        user: admin,
+        context: internal,
+      })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("stores no client IP address or user agent", () => {
+    // Payload appends `id` and the timestamps when it sanitises the config.
+    const managed = new Set(["id", "createdAt", "updatedAt"]);
+    const names = Enquiries.fields.flatMap((field) =>
+      "name" in field && !managed.has(field.name) ? [field.name] : []
+    );
+    expect(names).toEqual([
+      "source",
+      "name",
+      "phone",
+      "email",
+      "message",
+      "travelDate",
+      "destination",
+      "adults",
+      "children",
+      "budgetPerPerson",
+      "package",
+      "selections",
+      "computedPrice",
+    ]);
   });
 });

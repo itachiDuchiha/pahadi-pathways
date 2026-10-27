@@ -351,7 +351,35 @@ describe("isMissingSchemaError", () => {
 });
 
 describe("pruneEnquiries", () => {
-  it("returns 0 while the enquiries collection is not registered", async () => {
-    await expect(pruneEnquiries(temp.payload, 24)).resolves.toBe(0);
+  it("deletes enquiries older than the retention window and keeps recent ones", async () => {
+    const context = { internal: true, skipRevalidate: true };
+    const create = (name: string) =>
+      temp.payload.create({
+        collection: "enquiries",
+        data: { source: "contact", name, phone: "9876543210" },
+        overrideAccess: true,
+        context,
+      });
+
+    const old = await create("Old lead");
+    const recent = await create("Recent lead");
+
+    const backdated = new Date();
+    backdated.setMonth(backdated.getMonth() - 25);
+    // createdAt is managed by Payload, so backdate it at the database layer.
+    await temp.payload.db.updateOne({
+      collection: "enquiries",
+      id: old.id,
+      data: { createdAt: backdated.toISOString() },
+    });
+
+    await expect(pruneEnquiries(temp.payload, 24)).resolves.toBe(1);
+
+    const left = await temp.payload.find({ collection: "enquiries", overrideAccess: true });
+    expect(left.docs.map((doc) => doc.id)).toEqual([recent.id]);
+  });
+
+  it("rejects a retention window that is not a positive whole number", async () => {
+    await expect(pruneEnquiries(temp.payload, 0)).rejects.toThrow(/positive/);
   });
 });
