@@ -34,6 +34,7 @@ export const PricingSettings: GlobalConfig = {
     {
       name: "stayOptions",
       type: "array",
+      minRows: 1,
       admin: { description: "Hotel tiers. Delta is rupees per adult added to the base rate." },
       fields: [
         { name: "label", type: "text", required: true },
@@ -43,6 +44,7 @@ export const PricingSettings: GlobalConfig = {
     {
       name: "mealOptions",
       type: "array",
+      minRows: 1,
       admin: { description: "Meal plans. Delta is rupees per adult; negative lowers the price." },
       fields: [
         { name: "label", type: "text", required: true },
@@ -52,6 +54,7 @@ export const PricingSettings: GlobalConfig = {
     {
       name: "vehicleOptions",
       type: "array",
+      minRows: 1,
       validate: (value: unknown) => validateUniqueVehicleKeys(value),
       admin: { description: "Vehicles offered. Per-day upgrade applies when a package has no vehicle rate." },
       fields: [

@@ -10,7 +10,8 @@ export type RevalidateKind =
   | "gallery"
   | "experience"
   | "pricing"
-  | "site";
+  | "site"
+  | "media";
 
 export type RevalidateTarget = { path: string; type?: "page" | "layout" };
 
@@ -25,6 +26,7 @@ const TAGS: Record<RevalidateKind, string> = {
   experience: "experiences",
   pricing: "pricing-settings",
   site: "site-settings",
+  media: "media",
 };
 
 const LISTINGS: Record<RevalidateKind, string | null> = {
@@ -35,6 +37,7 @@ const LISTINGS: Record<RevalidateKind, string | null> = {
   experience: "/experiences",
   pricing: "/packages",
   site: null,
+  media: null,
 };
 
 export function tagFor(kind: RevalidateKind): string {
@@ -87,6 +90,9 @@ export function pathsFor(
   if (kind === "site") {
     targets.push({ path: "/contact" }, { path: "/privacy" }, { path: "/", type: "layout" });
   }
+  // An image (or its alt text) can appear on any page, so the whole
+  // layout goes.
+  if (kind === "media") targets.push({ path: "/", type: "layout" });
 
   return targets;
 }

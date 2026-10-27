@@ -2,15 +2,15 @@ import type { PricingSetting } from "@/cms/payload-types";
 import type { VehicleKey } from "@/lib/cms/types";
 
 /**
- * Per-adult rate for each vehicle, by package slug. Each package's
- * published base price is its Sedan rate.
+ * Per-adult rate for each upgraded vehicle, by package slug. The Sedan is
+ * left empty so it always follows the package's base price.
  */
-export const packageVehicleRates: Record<string, Record<VehicleKey, number>> = {
-  "shimla-kinnaur-spiti-chandratal": { sedan: 32249, ertiga: 38749, crysta: 54999 },
-  "shimla-manali-getaway": { sedan: 18999, ertiga: 21624, crysta: 32999 },
-  "himachal-grand-circuit": { sedan: 32074, ertiga: 36624, crysta: 47999 },
-  "shimla-manali-jibhi": { sedan: 18999, ertiga: 19999, crysta: 32999 },
-  "shimla-kinnaur-spiti-kalpa": { sedan: 29549, ertiga: 34799, crysta: 49499 },
+export const packageVehicleRates: Record<string, Partial<Record<VehicleKey, number>>> = {
+  "shimla-kinnaur-spiti-chandratal": { ertiga: 38749, crysta: 54999 },
+  "shimla-manali-getaway": { ertiga: 21624, crysta: 32999 },
+  "himachal-grand-circuit": { ertiga: 36624, crysta: 47999 },
+  "shimla-manali-jibhi": { ertiga: 19999, crysta: 32999 },
+  "shimla-kinnaur-spiti-kalpa": { ertiga: 34799, crysta: 49499 },
 };
 
 /** The `pricing-settings` global as the seed writes it. */

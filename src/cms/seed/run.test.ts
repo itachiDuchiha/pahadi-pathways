@@ -151,7 +151,7 @@ describe("seed", () => {
 
       const spiti = publicPackages.docs.find((doc) => doc.slug === "shimla-kinnaur-spiti-chandratal");
       expect(spiti?.pricing?.basePricePerAdult).toBe(32249);
-      expect(spiti?.pricing?.vehicleRates).toMatchObject({ sedan: 32249, ertiga: 38749, crysta: 54999 });
+      expect(spiti?.pricing?.vehicleRates).toMatchObject({ sedan: null, ertiga: 38749, crysta: 54999 });
       expect(spiti?.itinerary[0]?.item).toBe("1N Shimla");
       expect(typeof spiti?.image === "object" && spiti.image.filename).toBe("packages-spiti.webp");
 

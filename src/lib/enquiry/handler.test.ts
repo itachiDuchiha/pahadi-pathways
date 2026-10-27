@@ -337,8 +337,8 @@ describe("package quotes follow the published CMS price", () => {
   }
 
   it("uses an editor's new base price once it is published, ignoring client totals", async () => {
-    // A package priced from its base rate alone (no per-vehicle rates).
-    const doc = await seedPackage(SPITI, {});
+    // The seeded rates leave the Sedan empty, so the base price drives a Sedan quote.
+    const doc = await seedPackage(SPITI);
 
     expect((await quote(sedan))["Estimated Total"]).toBe("₹67,723"); // (32249 * 2) * 1.05
 

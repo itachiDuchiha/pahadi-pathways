@@ -88,6 +88,13 @@ describe("pathsFor", () => {
     );
     expect(targets).toContainEqual({ path: "/", type: "layout" });
   });
+
+  it("revalidates the whole layout and the shared routes for media changes", () => {
+    const targets = pathsFor("media", { filename: "x.webp" });
+
+    expect(targets).toContainEqual({ path: "/", type: "layout" });
+    expect(targets.map((target) => target.path)).toEqual(expect.arrayContaining(COMMON));
+  });
 });
 
 describe("tagFor", () => {
@@ -104,6 +111,7 @@ describe("tagFor", () => {
     expect(tagFor("experience")).toBe("experiences");
     expect(tagFor("pricing")).toBe("pricing-settings");
     expect(tagFor("site")).toBe("site-settings");
+    expect(tagFor("media")).toBe("media");
   });
 });
 

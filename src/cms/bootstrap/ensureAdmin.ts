@@ -1,3 +1,5 @@
+import { isMissingSchemaError } from "./schema";
+
 export type EnsureAdminResult = "created" | "exists" | "skipped";
 
 export const MIN_ADMIN_PASSWORD_LENGTH = 12;
@@ -56,4 +58,23 @@ export async function ensureAdmin(
   payload.logger.info("Created the first admin user from the environment.");
 
   return "created";
+}
+
+export const MISSING_SCHEMA_MESSAGE =
+  "Database schema is missing. Run `npm run payload migrate` then `npm run cms:seed`.";
+
+/**
+ * The server's `onInit`: creates the first admin, and turns a database
+ * that was never migrated into an error that says what to run.
+ */
+export async function bootstrapAdmin(
+  payload: AdminBootstrapPayload,
+  env: Env
+): Promise<EnsureAdminResult> {
+  try {
+    return await ensureAdmin(payload, env);
+  } catch (error) {
+    if (isMissingSchemaError(error)) throw new Error(MISSING_SCHEMA_MESSAGE, { cause: error });
+    throw error;
+  }
 }

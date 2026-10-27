@@ -10,6 +10,17 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 # so keep values to simple KEY=value lines (no unquoted ; & spaces backticks
 # or $), and remember that whoever can write it can run code as this user.
 if [[ -f .env.local ]]; then
+  # Refuse values the shell would expand or run: any $ or backtick, and a
+  # ; or & in a value that does not start with a quote. Only line numbers
+  # and names are printed, never values.
+  expands='^[^#]*[$`]'
+  unquoted='^[[:space:]]*(export[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=[^"'"'"'][^#]*[;&]'
+  if bad="$(grep -nE -e "$expands" -e "$unquoted" .env.local)"; then
+    echo "deploy: refusing to run; .env.local is read by the shell, so values must not" >&2
+    echo "deploy: contain \$ or a backtick, or an unquoted ; or &. Fix these lines:" >&2
+    cut -d= -f1 <<<"$bad" >&2
+    exit 1
+  fi
   set -a
   source .env.local
   set +a

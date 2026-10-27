@@ -1,6 +1,10 @@
 import type { CollectionConfig } from "payload";
 
 import { isEditorOrAdmin } from "../access";
+import { protectInUseMedia } from "../hooks/protectInUseMedia";
+import { revalidateHooks } from "../hooks/revalidate";
+
+const revalidate = revalidateHooks("media");
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -9,6 +13,11 @@ export const Media: CollectionConfig = {
     create: isEditorOrAdmin,
     update: isEditorOrAdmin,
     delete: isEditorOrAdmin,
+  },
+  hooks: {
+    beforeDelete: [protectInUseMedia],
+    afterChange: [revalidate.afterChange],
+    afterDelete: [revalidate.afterDelete],
   },
   upload: {
     staticDir: process.env.MEDIA_DIR ?? "media",

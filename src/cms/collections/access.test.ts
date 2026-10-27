@@ -515,3 +515,149 @@ describe("enquiries access", () => {
     ]);
   });
 });
+
+describe("user self-service", () => {
+  let counter = 0;
+
+  async function makeNamedUser(role: Role) {
+    counter += 1;
+    return temp.payload.create({
+      collection: "users",
+      data: { email: `${role}-${counter}@example.test`, password: "a-long-test-password", role },
+      overrideAccess: true,
+      context: { ...context, internal: true },
+    });
+  }
+
+  it("lets an editor change their own password", async () => {
+    const editor = await makeNamedUser("editor");
+
+    await temp.payload.update({
+      collection: "users",
+      id: editor.id,
+      data: { password: "a-new-long-password" },
+      overrideAccess: false,
+      user: editor,
+    });
+
+    const login = await temp.payload.login({
+      collection: "users",
+      data: { email: editor.email, password: "a-new-long-password" },
+    });
+    expect(login.user?.id).toBe(editor.id);
+  });
+
+  it("forbids an editor from updating another user", async () => {
+    const editor = await makeNamedUser("editor");
+    const other = await makeNamedUser("editor");
+
+    await expect(
+      temp.payload.update({
+        collection: "users",
+        id: other.id,
+        data: { password: "a-new-long-password" },
+        overrideAccess: false,
+        user: editor,
+      })
+    ).rejects.toThrow(/not allowed/i);
+  });
+
+  it("keeps an editor from promoting themselves or changing their email", async () => {
+    const editor = await makeNamedUser("editor");
+
+    await temp.payload.update({
+      collection: "users",
+      id: editor.id,
+      data: { role: "admin", email: "taken-over@example.test" },
+      overrideAccess: false,
+      user: editor,
+    });
+
+    const stored = await temp.payload.findByID({ collection: "users", id: editor.id, overrideAccess: true });
+    expect(stored.role).toBe("editor");
+    expect(stored.email).toBe(editor.email);
+  });
+
+  it("lets an admin change another user's role", async () => {
+    const admin = await makeNamedUser("admin");
+    const editor = await makeNamedUser("editor");
+
+    const updated = await temp.payload.update({
+      collection: "users",
+      id: editor.id,
+      data: { role: "admin" },
+      overrideAccess: false,
+      user: admin,
+    });
+    expect(updated.role).toBe("admin");
+  });
+});
+
+describe("in-use media protection", () => {
+  it("refuses to delete an image a package uses, naming the package", async () => {
+    const pkg = await makePackage("in-use-image", "published");
+    const imageId = typeof pkg.image === "object" ? pkg.image.id : pkg.image;
+    const editor = await makeUser("editor");
+
+    await expect(
+      temp.payload.delete({ collection: "media", id: imageId, overrideAccess: false, user: editor, context })
+    ).rejects.toThrow('This image is still used by: packages "Package in-use-image"');
+    await expect(
+      temp.payload.findByID({ collection: "media", id: imageId, overrideAccess: true })
+    ).resolves.toMatchObject({ id: imageId });
+  });
+
+  it("counts an image used only by a draft of a published package", async () => {
+    const pkg = await makePackage("draft-image", "published");
+    const image = await makeImage();
+
+    await temp.payload.update({
+      collection: "packages",
+      id: pkg.id,
+      data: { heroImage: image.id },
+      draft: true,
+      overrideAccess: true,
+      context,
+    });
+
+    await expect(
+      temp.payload.delete({ collection: "media", id: image.id, overrideAccess: true, context })
+    ).rejects.toThrow('This image is still used by: packages "Package draft-image"');
+  });
+
+  it("counts a destination gallery image", async () => {
+    const image = await makeImage();
+    const cover = await makeImage();
+
+    await temp.payload.create({
+      collection: "destinations",
+      data: {
+        slug: "gallery-dest",
+        name: "Gallery Dest",
+        description: "d",
+        fullDescription: "f",
+        image: cover.id,
+        gallery: [image.id],
+        subtitle: "s",
+        category: "Featured Journeys",
+        _status: "published",
+      },
+      overrideAccess: true,
+      context,
+    });
+
+    await expect(
+      temp.payload.delete({ collection: "media", id: image.id, overrideAccess: true, context })
+    ).rejects.toThrow('This image is still used by: destinations "Gallery Dest"');
+  });
+
+  it("deletes an image nothing uses", async () => {
+    const image = await makeImage();
+    const editor = await makeUser("editor");
+
+    await temp.payload.delete({ collection: "media", id: image.id, overrideAccess: false, user: editor, context });
+
+    const { totalDocs } = await temp.payload.count({ collection: "media", where: { id: { equals: image.id } } });
+    expect(totalDocs).toBe(0);
+  });
+});

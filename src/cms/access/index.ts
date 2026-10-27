@@ -1,6 +1,20 @@
-import type { Access } from "payload";
+import type { Access, FieldAccess } from "payload";
 
-export const isAdmin = (({ req }) => req.user?.role === "admin") satisfies Access;
+/** True for a signed-in admin. */
+export function isAdminUser(user: { role?: unknown } | null | undefined): boolean {
+  return user?.role === "admin";
+}
+
+export const isAdmin = (({ req }) => isAdminUser(req.user)) satisfies Access;
+
+/** Field-level counterpart of `isAdmin`. */
+export const isAdminField: FieldAccess = ({ req }) => isAdminUser(req.user);
+
+/** Admins may update anyone; any other signed-in user only themselves. */
+export const isAdminOrSelf = (({ req }) => {
+  if (!req.user) return false;
+  return isAdminUser(req.user) || { id: { equals: req.user.id } };
+}) satisfies Access;
 
 export const isEditorOrAdmin = (({ req }) =>
   req.user?.role === "admin" || req.user?.role === "editor") satisfies Access;

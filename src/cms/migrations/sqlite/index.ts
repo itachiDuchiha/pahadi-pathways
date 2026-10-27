@@ -3,6 +3,7 @@ import * as migration_20261023_103425_gallery_caption_pricing_spiti from './2026
 import * as migration_20261027_080305_drop_legacy_price from './20261027_080305_drop_legacy_price';
 import * as migration_20261027_081908_enquiries from './20261027_081908_enquiries';
 import * as migration_20261027_082751_enquiries_package_text from './20261027_082751_enquiries_package_text';
+import * as migration_20261027_093704_clear_sedan_equal_to_base from './20261027_093704_clear_sedan_equal_to_base';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20261027_082751_enquiries_package_text.up,
     down: migration_20261027_082751_enquiries_package_text.down,
-    name: '20261027_082751_enquiries_package_text'
+    name: '20261027_082751_enquiries_package_text',
+  },
+  {
+    up: migration_20261027_093704_clear_sedan_equal_to_base.up,
+    down: migration_20261027_093704_clear_sedan_equal_to_base.down,
+    name: '20261027_093704_clear_sedan_equal_to_base'
   },
 ];

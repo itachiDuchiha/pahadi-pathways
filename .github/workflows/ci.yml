@@ -27,4 +27,11 @@ jobs:
           mkdir -p data
           npm run payload migrate
           npm run cms:seed
+      - name: Fail when the config needs a migration that is not committed
+        run: |
+          npm run payload migrate:create ci-drift -- --skip-empty
+          if git status --porcelain src/cms/migrations | grep .; then
+            echo "The Payload config changed without a migration; run npm run payload migrate:create." >&2
+            exit 1
+          fi
       - run: npm run build

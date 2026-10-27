@@ -20,9 +20,19 @@ Open items only; each line notes why it is still open.
 - **Ask before `cms:seed -- --overwrite`.** It reverts editor changes
   without a confirmation step; a prompt or a `--yes` flag would prevent
   accidents.
-- **Render without a missing image.** A deleted image that published
-  content still uses makes that page and the build fail; a fallback image
+- **Render without a missing image.** Deleting an image that content
+  still uses is now refused, but a media file removed from disk outside
+  the admin still makes that page and the build fail; a fallback image
   would degrade more gracefully.
+- **Build into a separate directory when deploying.** `scripts/deploy.sh`
+  builds in place, so a failed build leaves no working build until the
+  documented rollback is run; building into a fresh directory and
+  switching over only on success would keep the old build serving.
+- **De-duplicate the shared content types.** `DESTINATION_CATEGORIES`
+  (CMS config and site types), `EXPERIENCE_ICONS` (CMS config and the
+  site's `ExperienceIcon` type) and the `Package` type (built on the
+  seed's `PackageContent`) each have more than one source; a single one
+  would stop them drifting apart.
 
 ## Security
 
@@ -41,7 +51,7 @@ Open items only; each line notes why it is still open.
 ## Testing
 
 - **Add browser/E2E tests.** Only Vitest unit and integration tests exist
-  today (276 tests across `src/**/*.test.ts`); there is no coverage that
+  today (295 tests across `src/**/*.test.ts`); there is no coverage that
   exercises the app or the admin in a real browser (forms, modal focus
   trapping, navigation, editing and publishing).
 

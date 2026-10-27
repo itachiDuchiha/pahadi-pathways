@@ -12,7 +12,7 @@ import { Media } from "./cms/collections/Media";
 import { Packages } from "./cms/collections/Packages";
 import { Testimonials } from "./cms/collections/Testimonials";
 import { Users } from "./cms/collections/Users";
-import { ensureAdmin } from "./cms/bootstrap/ensureAdmin";
+import { bootstrapAdmin } from "./cms/bootstrap/ensureAdmin";
 import { buildDbAdapter } from "./cms/config/db";
 import { securityConfig } from "./cms/config/security";
 import { PricingSettings } from "./cms/globals/PricingSettings";
@@ -48,6 +48,6 @@ export default buildConfig({
     autoGenerate: process.env.NODE_ENV !== "test",
   },
   onInit: async (payload) => {
-    await ensureAdmin(payload, process.env);
+    await bootstrapAdmin(payload, process.env);
   },
 });

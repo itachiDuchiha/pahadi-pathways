@@ -14,6 +14,8 @@ function loadLocalEnv(): void {
 export type CliOptions = {
   /** Extra lines printed after the error when the task fails. */
   failureHint?: readonly string[];
+  /** Print how long the task took (default true). */
+  timing?: boolean;
 };
 
 /**
@@ -45,7 +47,7 @@ export async function runCli(
     const seconds = ((performance.now() - started) / 1000).toFixed(1);
 
     for (const line of lines) console.log(line);
-    console.log(`${name} finished in ${seconds}s`);
+    if (options.timing ?? true) console.log(`${name} finished in ${seconds}s`);
   } catch (error) {
     console.error(`${name} failed: ${error instanceof Error ? error.message : String(error)}`);
     for (const line of options.failureHint ?? []) console.error(line);

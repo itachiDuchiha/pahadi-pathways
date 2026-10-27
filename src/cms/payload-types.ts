@@ -161,7 +161,7 @@ export interface Package {
      */
     basePricePerAdult: number;
     /**
-     * Per-adult rate for each vehicle. Leave a vehicle empty to use the base price. If you change the base price, update the Sedan rate too, or clear it.
+     * Per-adult rate for each vehicle. Leave a vehicle empty to use the base price (Sedan is normally left empty). Ertiga and Crysta rates are absolute, not deltas.
      */
     vehicleRates?: {
       sedan?: number | null;

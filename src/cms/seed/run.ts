@@ -4,6 +4,7 @@ import path from "node:path";
 import type { Payload, RequiredDataFromCollectionSlug } from "payload";
 
 import { ensureAdmin, type EnsureAdminResult } from "../bootstrap/ensureAdmin";
+import { isMissingSchemaError } from "../bootstrap/schema";
 import { DESTINATION_CATEGORIES } from "../collections/Destinations";
 import { MIN_SECRET_LENGTH } from "../config/security";
 import type { Destination as DestinationDoc } from "../payload-types";
@@ -16,6 +17,8 @@ import { packageVehicleRates, pricingSettings } from "./pricing";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { parsePackagePrice } from "@/lib/pricing";
+
+export { isMissingSchemaError };
 
 type Env = Readonly<Record<string, string | undefined>>;
 
@@ -103,21 +106,6 @@ function rows(list: readonly string[] | undefined): { item: string }[] | undefin
 
 function isDestinationCategory(value: string): value is DestinationDoc["category"] {
   return (DESTINATION_CATEGORIES as readonly string[]).includes(value);
-}
-
-const MISSING_SCHEMA = /no such table|relation "[^"]+" does not exist/i;
-
-/** True when the error (or one it wraps) says the schema has not been migrated. */
-export function isMissingSchemaError(error: unknown): boolean {
-  for (let current = error, depth = 0; current && depth < 5; depth++) {
-    if (current instanceof Error) {
-      if (MISSING_SCHEMA.test(current.message)) return true;
-      current = current.cause;
-    } else {
-      return MISSING_SCHEMA.test(String(current));
-    }
-  }
-  return false;
 }
 
 /**

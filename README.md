@@ -80,12 +80,14 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `npm run cms:seed` | Fill empty collections with the bundled content and create the first admin (see Content management). |
 | `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes. |
 | `npm run cms:prune-enquiries` | Delete stored enquiries older than 24 months (pass a number of months to change it). |
+| `npm run cms:set-password -- --email <addr>` | Set a user's password from `NEW_PASSWORD` (see "Recovering the admin account"). |
 | `scripts/deploy.sh` | Install, migrate, seed, build and restart on the server (see Deployment). |
 
 CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run lint`,
 `npm run typecheck`, `npm test`, then migrates and seeds a throwaway SQLite
-database and runs `npm run build` against it, on every push and pull
-request. The CI build only proves the code builds; it is not what gets
+database, fails if the CMS config needs a migration that is not committed
+(`migrate:create --skip-empty` must create nothing), and runs
+`npm run build` against it, on every push and pull request. The CI build only proves the code builds; it is not what gets
 deployed.
 
 ## Project structure
@@ -115,6 +117,9 @@ that the owner knows; it is deliberately not written in any documentation,
   tagline) and delete enquiries.
 - New accounts are editors unless an admin chooses otherwise. Logins lock
   for 15 minutes after 5 failed attempts.
+- Every user can change their own password in the admin; only admins can
+  change anyone's email address or role, so an editor cannot promote
+  themselves.
 
 ### First admin
 
@@ -124,6 +129,22 @@ server (on start) and `npm run cms:seed` create the first admin from
 admin shows a "not initialised" message. The values are never printed.
 Once the account exists, remove the password from the environment and
 change it in the admin.
+
+### Recovering the admin account
+
+If the admin password is lost (or the account is locked after failed
+logins), set a new one from the server, where the database is reachable:
+
+```bash
+NEW_PASSWORD='a-new-password-of-12-or-more' npm run cms:set-password -- --email owner@example.com
+```
+
+The script reads `.env.local` like the seed, takes the password only from
+the `NEW_PASSWORD` environment variable (never as an argument, so it stays
+out of the process list), refuses passwords shorter than 12 characters,
+clears any login lockout and prints only `Password updated for <email>`.
+It works for any user, not just admins. Prefix the command with a space or
+clear the shell history afterwards so the password is not kept there.
 
 ### What is editable and what is code
 
@@ -139,9 +160,12 @@ change it in the admin.
   the site. Publishing revalidates the affected pages, so changes show up
   without a rebuild. Enquiries submitted on the site are stored under
   Leads as well as emailed.
-- Do not delete an image that a package or destination still uses; the
-  page fails to render (and the next build fails) instead of showing it
-  without the image.
+- An image that a package, destination (cover or gallery), gallery item or
+  experience still uses cannot be deleted; the admin names up to five of
+  the documents that use it. Replace the image there first. Drafts count
+  too.
+- Replacing or editing an image revalidates every page, since an image can
+  appear anywhere on the site.
 
 ### Seeding
 
@@ -240,7 +264,9 @@ it runs on the server itself.
    directory, then run `scripts/deploy.sh` after every pull. It refuses to
    run unless `PAYLOAD_SECRET`, `DATABASE_URL` and `NEXT_PUBLIC_SITE_URL`
    are set (it reads `.env.local` first, executing it as shell, so keep it
-   to plain `KEY=value` lines and writable only by the deploy user). It then
+   to plain `KEY=value` lines and writable only by the deploy user; it
+   refuses to run when a value contains `$`, a backtick, or an unquoted `;`
+   or `&`). It then
    runs `nvm use` when nvm is installed; for SQLite it creates the database
    directory and copies the current database to `<file>.bak-<timestamp>`
    (keeping the newest three); it creates `MEDIA_DIR` if it is missing;
@@ -282,9 +308,9 @@ The reverse proxy **must set `X-Forwarded-For` to the real client
 address**, overwriting any value the client sent. The rate limiter reads
 `x-forwarded-for` before `x-real-ip`, so setting only `X-Real-IP` is not
 enough: a client-forged `X-Forwarded-For` would pass through and defeat the
-limiter. Without the header every visitor appears to come from the proxy's
-address and shares one rate-limit bucket, so a single visitor can block
-enquiries for everyone. For nginx:
+limiter. Without the header the client address is unknown and the rate limiter is
+skipped entirely, so enquiries are unlimited; the proxy must set the
+header for the limiter to work. For nginx:
 `proxy_set_header X-Forwarded-For $remote_addr;`. Serve the site over
 HTTPS: in production the admin session cookie is `secure`.
 
@@ -328,8 +354,12 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   forged.
 - `npm run cms:seed -- --overwrite` reverts editor changes without a
   confirmation step.
-- Deleting an image that published content still uses makes that page and
-  the next build fail.
+- Media files are publicly readable by URL, including images attached only
+  to drafts that are not published yet (accepted by the owner).
+- The deploy builds in place: a failed `npm run build` leaves the site
+  without a working build until it is fixed. To roll back, restore the
+  newest `<database>.bak-<timestamp>` copy over the database file,
+  `git checkout` the previous commit and run `scripts/deploy.sh` again.
 - Gallery videos and experience icons are managed in code, not the CMS.
 - There is no live preview of drafts in the admin.
 - Media is stored on the server's disk, which suits a single server only.

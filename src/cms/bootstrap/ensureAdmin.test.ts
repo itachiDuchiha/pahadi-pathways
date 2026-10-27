@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ensureAdmin, type AdminBootstrapPayload } from "./ensureAdmin";
+import { MISSING_SCHEMA_MESSAGE, bootstrapAdmin, ensureAdmin, type AdminBootstrapPayload } from "./ensureAdmin";
 
 function stubPayload(totalDocs: number) {
   const create = vi.fn(async () => ({}));
@@ -80,5 +80,37 @@ describe("ensureAdmin", () => {
     const logged = JSON.stringify([...info.mock.calls, ...warn.mock.calls]);
     expect(logged).not.toContain(email);
     expect(logged).not.toContain(password);
+  });
+});
+
+describe("bootstrapAdmin", () => {
+  it("explains how to create a missing schema", async () => {
+    const { payload } = stubPayload(0);
+    payload.count = vi.fn(async () => {
+      throw new Error("Failed query", { cause: new Error("SQLITE_ERROR: no such table: users") });
+    });
+
+    await expect(bootstrapAdmin(payload, {})).rejects.toThrow(MISSING_SCHEMA_MESSAGE);
+    expect(MISSING_SCHEMA_MESSAGE).toBe(
+      "Database schema is missing. Run `npm run payload migrate` then `npm run cms:seed`."
+    );
+  });
+
+  it("rethrows any other error unchanged", async () => {
+    const { payload } = stubPayload(0);
+    const failure = new Error("connection refused");
+    payload.count = vi.fn(async () => {
+      throw failure;
+    });
+
+    await expect(bootstrapAdmin(payload, {})).rejects.toBe(failure);
+  });
+
+  it("creates the admin like ensureAdmin otherwise", async () => {
+    const { payload } = stubPayload(0);
+
+    expect(await bootstrapAdmin(payload, { PAYLOAD_ADMIN_EMAIL: email, PAYLOAD_ADMIN_PASSWORD: password })).toBe(
+      "created"
+    );
   });
 });

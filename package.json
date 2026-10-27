@@ -20,7 +20,8 @@
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",
     "cms:seed": "tsx scripts/cms-seed.ts",
-    "cms:prune-enquiries": "tsx scripts/cms-prune-enquiries.ts"
+    "cms:prune-enquiries": "tsx scripts/cms-prune-enquiries.ts",
+    "cms:set-password": "tsx scripts/cms-set-password.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.92.0",

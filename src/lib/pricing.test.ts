@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { packageVehicleRates, pricingSettings } from "@/cms/seed/pricing";
+import { mapPackagePricing } from "@/lib/cms/mappers";
 import { mapPricingTables } from "@/lib/cms/pricing-tables";
 
 import {
@@ -72,7 +73,10 @@ describe("computePackagePrice", () => {
           package: {
             slug: "shimla-manali-getaway",
             basePricePerAdult: 18999,
-            vehicleRates: packageVehicleRates["shimla-manali-getaway"],
+            vehicleRates: mapPackagePricing({
+              basePricePerAdult: 18999,
+              vehicleRates: packageVehicleRates["shimla-manali-getaway"],
+            }).vehicleRates,
             tourDays: 7,
             isSpitiRoute: false,
           },

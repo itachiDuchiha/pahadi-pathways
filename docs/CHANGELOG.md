@@ -13,13 +13,14 @@
 ### Changed
 - Read all site content from Payload through a typed data layer, with a build guard against an empty database (a220936).
 - Moved the stay, meal and vehicle pricing tables into the CMS while keeping quotes computed on the server (b2ff325).
-- Refresh changelog commit references after a history rewrite (this commit)
+- Refresh changelog commit references after a history rewrite (af2c281)
 
 ### Fixed
 - Made gallery captions optional, tested draft isolation and extended package pricing fields (44931a3).
 - Made the content seed skip populated collections by default, with `--overwrite` to reset them (e10acb7).
 - Explained the base price versus vehicle rates in the admin and trimmed option labels (a27e0ad).
 - Kept the package slug and title on stored leads (c4e316b).
+- Closed editor workflow gaps: media changes revalidate the site, base-price changes reach Sedan quotes (seeded and stored Sedan rates equal to the base price are cleared by a migration), users can change their own password while role and email stay admin-only, `npm run cms:set-password` recovers an account, in-use images cannot be deleted, and a missing schema at startup says which commands to run (this commit).
 
 ### Security
 - Restricted unlocking locked user accounts to admins and tested the authentication seams (9a69e3c).
