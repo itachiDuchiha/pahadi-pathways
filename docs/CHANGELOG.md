@@ -8,11 +8,9 @@
 - Added an idempotent content seed from the bundled content and images, and a script that prunes stored enquiries after 24 months (e78d3e8).
 - Stored every enquiry in the CMS alongside the notification email; a stored enquiry counts as success even if the email fails (813e211).
 - Made the site contact details editable through site settings (df5d371).
-- Added a deploy script, the Postgres migration, CI seeding and CMS documentation (this commit).
+- Added a deploy script, the Postgres migration, CI seeding and CMS documentation (1b08ea4).
 
 ### Changed
-- Recorded review resolutions and rewrote the README, changelog, folder structure, status and TODO docs to match the app (f016e60).
-- Shared dialog behaviour through one hook, derived the destination list from data and recorded deferrals (55e7ce3).
 - Read all site content from Payload through a typed data layer, with a build guard against an empty database (4f718e9).
 - Moved the stay, meal and vehicle pricing tables into the CMS while keeping quotes computed on the server (bbba484).
 
@@ -26,6 +24,7 @@
 - Restricted unlocking locked user accounts to admins and tested the authentication seams (9a69e3c).
 - Hardened the admin routes and robots rules, and skipped the rate limiter instead of sharing one bucket when the client IP is unknown (ef5f290).
 - Kept CMS media indexable and closed a bypass through an empty `x-forwarded-for` header (6b3779e).
+- Made the deploy script create the database and media directories and back up the SQLite file before migrating, and corrected the reverse-proxy guidance to require `X-Forwarded-For` (this commit).
 
 ## 2026-10-23
 
@@ -40,6 +39,8 @@
 - Moved the navbar, footer and planner modal into the root layout so they render consistently across pages (b89c5a1).
 - Removed components that became unused during cleanup and brought lint to zero warnings (ae0c8ef).
 - Removed components left orphaned by the cleanup and finished converting remaining links to the router's `Link` component (512723b).
+- Rewrote the README, changelog, folder structure, status and TODO docs to match the app and recorded review resolutions (f016e60).
+- Shared dialog behaviour through one hook, derived the destination list from data and recorded deferrals (55e7ce3).
 
 ### Fixed
 - Fixed destination pages without a photo gallery to show a single hero image instead of an empty gallery (9c6e498).

@@ -34,6 +34,7 @@ git clone <repository-url>
 cd the-himalayan-compass
 npm ci
 cp .env.example .env.local   # then fill in the values, see below
+mkdir -p data media
 npm run payload migrate
 npm run cms:seed
 npm run dev
@@ -159,9 +160,9 @@ Everything editors change lives in the database (`data/` for SQLite, i.e.
 the file named in `DATABASE_URL`) and the media directory (`MEDIA_DIR`,
 default `media/`). Neither is in git. Back up both together, for example
 with a nightly copy to another machine; for SQLite, copy the database file
-while the server is stopped so the copy is consistent. Stored enquiries contain personal data; they
-are kept for 24 months, so schedule `npm run cms:prune-enquiries`
-(for example monthly).
+while the server is stopped so the copy is consistent. Stored enquiries
+contain personal data; they are kept for 24 months, so schedule
+`npm run cms:prune-enquiries` (for example monthly).
 
 ## Enquiry pipeline
 
@@ -195,31 +196,33 @@ is no CAPTCHA.
 
 ## SEO, AEO and GEO
 
-- `src/app/(frontend)/sitemap.ts` and `src/app/robots.ts` generate `sitemap.xml` and
-  `robots.txt`; `robots.txt` explicitly allows common AI/answer-engine
-  crawlers (GPTBot, ClaudeBot, PerplexityBot and others) alongside general
-  search bots.
+- `src/app/(frontend)/sitemap.ts` and `src/app/robots.ts` generate
+  `sitemap.xml` and `robots.txt`; `robots.txt` explicitly allows common
+  AI/answer-engine crawlers (GPTBot, ClaudeBot, PerplexityBot and others)
+  alongside general search bots.
 - `src/components/seo/JsonLd.tsx` and `src/lib/structured-data.ts` emit
   JSON-LD (organization and page-level structured data).
-- `src/app/(frontend)/llms.txt/route.ts` and `src/app/(frontend)/llms-full.txt/route.ts` serve
-  `/llms.txt` and `/llms-full.txt` for AI crawlers, built from helpers in
-  `src/lib/llms.ts`.
+- `src/app/(frontend)/llms.txt/route.ts` and
+  `src/app/(frontend)/llms-full.txt/route.ts` serve `/llms.txt` and
+  `/llms-full.txt` for AI crawlers, built from helpers in `src/lib/llms.ts`.
 - `src/app/opengraph-image.tsx` provides a default Open Graph image, used
   as a fallback on every page.
-- `src/app/(frontend)/destinations/[slug]/page.tsx` and `src/app/(frontend)/packages/[slug]/page.tsx`
-  use `generateStaticParams` to pre-render destination and package pages;
-  `src/app/(frontend)/packages/page.tsx` reads search params and is rendered on
-  demand rather than statically.
+- `src/app/(frontend)/destinations/[slug]/page.tsx` and
+  `src/app/(frontend)/packages/[slug]/page.tsx` use `generateStaticParams`
+  to pre-render destination and package pages;
+  `src/app/(frontend)/packages/page.tsx` reads search params and is
+  rendered on demand rather than statically.
 
 ## Images
 
 Images uploaded in the CMS are stored in `MEDIA_DIR`, re-encoded into
 several sizes, and served by the CMS; they are not part of the build. The
 bundled images under `public/images` (about 13 MB total, WebP with capped
-dimensions) are the seed source and the site's fixed artwork. Run `npm run images:optimize` after adding or replacing
-images to re-encode and resize them with `scripts/optimize-images.mjs`. A
-few package/destination hero images are still in the 300–432 KB range and
-are candidates for further trimming (see `docs/TODO.md`).
+dimensions) are the seed source and the site's fixed artwork. Run
+`npm run images:optimize` after adding or replacing images to re-encode
+and resize them with `scripts/optimize-images.mjs`. A few
+package/destination hero images are still in the 300–432 KB range and are
+candidates for further trimming (see `docs/TODO.md`).
 
 ## Deployment
 
@@ -233,23 +236,57 @@ it runs on the server itself.
    real values. Point `DATABASE_URL` and `MEDIA_DIR` at locations outside
    the checkout (for example `file:/srv/thc/data/cms.db` and
    `/srv/thc/media`) so they survive a fresh clone and are easy to back up.
-2. Run `scripts/deploy.sh` after every pull. It refuses to run unless
-   `PAYLOAD_SECRET`, `DATABASE_URL` and `NEXT_PUBLIC_SITE_URL` are set
-   (it reads `.env.local` first), then runs `nvm use` when nvm is installed,
-   `npm ci`, `npm run payload migrate`, `npm run cms:seed` (fills only empty
-   collections, creates the first admin only when there are no users),
-   `npm run build`, and restarts the server.
+2. Back up `data/` (or wherever `DATABASE_URL` points) and the media
+   directory, then run `scripts/deploy.sh` after every pull. It refuses to
+   run unless `PAYLOAD_SECRET`, `DATABASE_URL` and `NEXT_PUBLIC_SITE_URL`
+   are set (it reads `.env.local` first, executing it as shell, so keep it
+   to plain `KEY=value` lines and writable only by the deploy user). It then
+   runs `nvm use` when nvm is installed; for SQLite it creates the database
+   directory and copies the current database to `<file>.bak-<timestamp>`
+   (keeping the newest three); it creates `MEDIA_DIR` if it is missing;
+   then it runs `npm ci`, `npm run payload migrate`, `npm run cms:seed`
+   (fills only empty collections, creates the first admin only when there
+   are no users), `npm run build`, and restarts the server. Expect a brief
+   disruption while the build replaces the running build output and the
+   server restarts.
 3. The restart command defaults to `systemctl --user restart thc`, i.e. a
    systemd user unit named `thc` that runs `npm start` in the checkout.
    For another process manager set `APP_RESTART_CMD`, for example
    `APP_RESTART_CMD="pm2 reload thc" scripts/deploy.sh`.
 
-The reverse proxy **must forward the real client IP** in `x-forwarded-for`
-(or `x-real-ip`), overwriting any value sent by the client. Otherwise every
-visitor appears to come from the proxy's address and shares one
-rate-limit bucket, so a single visitor can block enquiries for everyone.
-For nginx: `proxy_set_header X-Forwarded-For $remote_addr;`. Serve the site
-over HTTPS: in production the admin session cookie is `secure`.
+A minimal user unit, saved as `~/.config/systemd/user/thc.service` (adjust
+the paths; `PATH` must contain the nvm Node version because systemd does
+not load nvm):
+
+```ini
+[Unit]
+Description=The Himalayan Compass
+
+[Service]
+WorkingDirectory=/srv/thc/app
+EnvironmentFile=/srv/thc/app/.env.local
+Environment=NODE_ENV=production
+Environment=PATH=/home/deploy/.nvm/versions/node/v24.22.1/bin:/usr/bin:/bin
+ExecStart=/home/deploy/.nvm/versions/node/v24.22.1/bin/npm start
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+Enable it with `systemctl --user enable --now thc`. A user unit stops when
+that user logs out unless lingering is enabled once with
+`loginctl enable-linger <user>`.
+
+The reverse proxy **must set `X-Forwarded-For` to the real client
+address**, overwriting any value the client sent. The rate limiter reads
+`x-forwarded-for` before `x-real-ip`, so setting only `X-Real-IP` is not
+enough: a client-forged `X-Forwarded-For` would pass through and defeat the
+limiter. Without the header every visitor appears to come from the proxy's
+address and shares one rate-limit bucket, so a single visitor can block
+enquiries for everyone. For nginx:
+`proxy_set_header X-Forwarded-For $remote_addr;`. Serve the site over
+HTTPS: in production the admin session cookie is `secure`.
 
 CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`) before merging to the default branch.
@@ -284,9 +321,11 @@ each adapter: run `npm run payload migrate:create <name>` once with each
 
 - The enquiry rate limiter is per server process and keeps its counters in
   memory (they reset on restart); there is no CAPTCHA.
-- The rate limiter trusts `x-forwarded-for`; the reverse proxy must
-  overwrite it with the real client IP (see Deployment). On a bare
-  `next start` without a proxy the header can be forged.
+- The rate limiter trusts `x-forwarded-for`; the reverse proxy must set
+  `X-Forwarded-For` to the real client address, overwriting any
+  client-sent value (setting only `X-Real-IP` is not enough; see
+  Deployment). On a bare `next start` without a proxy the header can be
+  forged.
 - `npm run cms:seed -- --overwrite` reverts editor changes without a
   confirmation step.
 - Deleting an image that published content still uses makes that page and

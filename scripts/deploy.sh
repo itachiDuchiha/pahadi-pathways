@@ -6,7 +6,9 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-# Load the server's environment file when present.
+# Load the server's environment file when present. It is executed as shell,
+# so keep values to simple KEY=value lines (no unquoted ; & spaces backticks
+# or $), and remember that whoever can write it can run code as this user.
 if [[ -f .env.local ]]; then
   set -a
   source .env.local
@@ -36,6 +38,26 @@ fi
 
 # Never let a script push the schema; committed migrations are the source of truth.
 export PAYLOAD_DB_PUSH=false
+
+# SQLite: create the database directory and back up the current file
+# (the newest three backups are kept). Create the media directory too.
+if [[ "$DATABASE_URL" == file:* ]]; then
+  db_path="${DATABASE_URL#file:}"
+  db_path="${db_path#//}"
+  mkdir -p "$(dirname "$db_path")"
+  if [[ -f "$db_path" ]]; then
+    backup="$db_path.bak-$(date +%Y%m%d-%H%M%S)"
+    cp -p "$db_path" "$backup"
+    echo "deploy: backed up the database to $backup"
+    mapfile -t old_backups < <(ls -1t "$db_path".bak-* 2>/dev/null | tail -n +4)
+    for old in "${old_backups[@]}"; do
+      rm -f -- "$old"
+    done
+  fi
+fi
+if [[ -n "${MEDIA_DIR:-}" ]]; then
+  mkdir -p "$MEDIA_DIR"
+fi
 
 npm ci
 npm run payload migrate
