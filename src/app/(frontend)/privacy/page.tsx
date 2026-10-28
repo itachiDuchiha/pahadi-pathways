@@ -5,7 +5,7 @@ import LegalDocument from "@/components/legal/LegalDocument";
 import { getAnalyticsSettings } from "@/lib/cms/analytics";
 import { getLegalSettings } from "@/lib/cms/legal";
 import { getSiteSettings } from "@/lib/cms/site";
-import { captchaEnabled } from "@/lib/captcha-config";
+import { captchaEnabled } from "@/lib/enquiry/captcha";
 import { formatEffectiveDate, PROCESSORS_HEADING, privacySections } from "@/lib/legal-copy";
 import { pageMetadata } from "@/lib/seo";
 

@@ -159,9 +159,11 @@ export default function EnquiryModal({
           ? error.message
           : "We could not send your enquiry. Please try again."
       );
+      // The token was spent on this attempt; fetch a fresh one. After a
+      // success the modal closes, and reopening it renews.
+      if (captcha.required) captcha.renew();
     } finally {
       setIsSubmitting(false);
-      if (captcha.required) captcha.renew();
     }
   };
 
@@ -226,7 +228,7 @@ export default function EnquiryModal({
               {enquiryError && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{enquiryError}</p>}
 
               {captcha.required && (
-                <Turnstile key={captcha.round} onToken={captcha.setToken} />
+                <Turnstile key={captcha.round} {...captcha.widget} />
               )}
 
               <button type="submit" disabled={isSubmitting || !captcha.ready} className="flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-[#C89A3D] px-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#10264A] shadow-[0_6px_15px_rgba(200,154,61,0.25)] transition hover:bg-[#D5AA4F] disabled:cursor-not-allowed disabled:opacity-60">

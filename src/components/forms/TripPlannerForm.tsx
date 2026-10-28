@@ -127,9 +127,10 @@ export default function TripPlannerForm() {
           ? error.message
           : "Something went wrong. Please try again."
       );
+      // The token was spent on this attempt; fetch a fresh one.
+      if (captcha.required) captcha.renew();
     } finally {
       setIsSubmitting(false);
-      if (captcha.required) captcha.renew();
     }
   };
 
@@ -185,6 +186,7 @@ export default function TripPlannerForm() {
               setSubmitted(false);
               setErrorMessage("");
               setWhatsappMessage("");
+              if (captcha.required) captcha.renew();
             }}
             className="mt-5 text-sm font-semibold text-[#10264A] underline underline-offset-4"
           >
@@ -575,7 +577,7 @@ export default function TripPlannerForm() {
           {/* SUBMIT */}
 
           {captcha.required && (
-            <Turnstile key={captcha.round} onToken={captcha.setToken} />
+            <Turnstile key={captcha.round} {...captcha.widget} />
           )}
 
           <button

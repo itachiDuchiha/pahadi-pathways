@@ -342,10 +342,14 @@ enable it, add a widget in the Turnstile dashboard
 hostname, set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
 in the server environment, and rebuild (the site key is inlined into the
 browser bundle). The three forms then show the widget and keep the submit
-button disabled until it yields a token; the privacy policy names
+button disabled until it yields a token; if the widget cannot load (script
+blocked, widget error, or no token or challenge within 15 seconds) they
+say so and point to WhatsApp instead. The privacy policy names
 Cloudflare. With either key missing there is no widget, no script and no
 server check. The check fails open: when Cloudflare cannot be reached
-(timeout after 5 seconds, error status or unreadable reply) the enquiry is
+(timeout after 5 seconds, error status, unreadable reply, or a
+configuration error such as a wrong secret, which is also logged as
+`captcha misconfigured: <codes>`) the enquiry is
 accepted and `captcha unavailable; accepting enquiry` is logged, so an
 outage never loses a real lead; only a token Cloudflare rejects, or a
 missing one, is refused. The token is never stored or emailed.
