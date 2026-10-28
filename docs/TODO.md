@@ -50,12 +50,6 @@ Open items only; each line notes why it is still open.
 
 ## Analytics
 
-- **Delete vendor cookies on decline.** Declining after accepting reloads
-  the page so the scripts stop, but cookies Google Analytics (`_ga*`) and
-  Clarity (`_clck`, `_clsk`) already set stay until they expire.
-- **Stop running scripts when another tab declines.** A decline in one tab
-  updates the choice in the others, but a tab that already loaded the
-  vendor scripts keeps them until it is reloaded.
 - **Confirm the Clarity image hosts.** Clarity's documentation may also
   require `https://*.clarity.ms` and `https://c.bing.com` in `img-src` of
   the Content-Security-Policy; check before enforcing it.

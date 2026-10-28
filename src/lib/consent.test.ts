@@ -5,7 +5,10 @@ import {
   CONSENT_KEY,
   CONSENT_MAX_AGE,
   GA_MEASUREMENT_ID_PATTERN,
+  cookieDomainsFor,
   expireConsentCookie,
+  expiredCookieStrings,
+  isVendorCookie,
   parseConsent,
   readConsentCookie,
   serializeConsentCookie,
@@ -128,5 +131,67 @@ describe("ID patterns", () => {
 
   it.each(["", "abcd", "ABCDE1", "abc de", "abcde;alert(1)"])("rejects the Clarity project ID %j", (id) => {
     expect(CLARITY_PROJECT_ID_PATTERN.test(id)).toBe(false);
+  });
+});
+
+describe("isVendorCookie", () => {
+  it.each(["_ga", "_ga_ABC123", "_gid", "_gat_gtag_G_X", "_clck", "_clsk", "CLID", "ANONCHK", "MUID", "SM"])(
+    "matches %s",
+    (name) => {
+      expect(isVendorCookie(name)).toBe(true);
+    }
+  );
+
+  it.each([CONSENT_KEY, "session", "gallery", "_other", ""])("does not match %j", (name) => {
+    expect(isVendorCookie(name)).toBe(false);
+  });
+});
+
+describe("cookieDomainsFor", () => {
+  it("lists the host, its dotted form and the registrable domain", () => {
+    expect(cookieDomainsFor("www.thehimalayancompass.in")).toEqual([
+      "www.thehimalayancompass.in",
+      ".www.thehimalayancompass.in",
+      ".thehimalayancompass.in",
+    ]);
+  });
+
+  it("lists every level between host and registrable domain", () => {
+    expect(cookieDomainsFor("a.b.c.d")).toEqual(["a.b.c.d", ".a.b.c.d", ".b.c.d", ".c.d"]);
+  });
+
+  it("handles a bare registrable domain", () => {
+    expect(cookieDomainsFor("thehimalayancompass.in")).toEqual([
+      "thehimalayancompass.in",
+      ".thehimalayancompass.in",
+    ]);
+  });
+
+  it("keeps localhost as is and gives IPs no domains", () => {
+    expect(cookieDomainsFor("localhost")).toEqual(["localhost"]);
+    expect(cookieDomainsFor("127.0.0.1")).toEqual([]);
+    expect(cookieDomainsFor("[::1]")).toEqual([]);
+  });
+});
+
+describe("expiredCookieStrings", () => {
+  it("expires the cookie for each domain and once without a domain", () => {
+    expect(expiredCookieStrings("_ga", "www.example.in", false)).toEqual([
+      "_ga=; Max-Age=0; Path=/; Domain=www.example.in",
+      "_ga=; Max-Age=0; Path=/; Domain=.www.example.in",
+      "_ga=; Max-Age=0; Path=/; Domain=.example.in",
+      "_ga=; Max-Age=0; Path=/",
+    ]);
+  });
+
+  it("adds Secure on https", () => {
+    const strings = expiredCookieStrings("_clck", "example.in", true);
+
+    expect(strings).toHaveLength(3);
+    expect(strings.every((s) => s.endsWith("; Secure"))).toBe(true);
+  });
+
+  it("still expires the host-only cookie for an IP", () => {
+    expect(expiredCookieStrings("_ga", "127.0.0.1", false)).toEqual(["_ga=; Max-Age=0; Path=/"]);
   });
 });

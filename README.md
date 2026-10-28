@@ -269,9 +269,12 @@ are empty the site loads no analytics and shows no banner.
   the same either way. The server-rendered pages never contain a vendor
   script; they are added on the client only after an accept.
 - The privacy page names the configured vendors and lets a visitor change
-  their choice. Switching from accept to decline reloads the page so no
-  vendor script keeps running; cookies the vendors already set are not
-  removed (see `docs/TODO.md`).
+  their choice. Switching from accept to decline reloads the page (and
+  every other open tab that ran the scripts) so no vendor script keeps
+  running, and removes the Google Analytics (`_ga*`, `_gid`, `_gat*`) and
+  Clarity (`_clck`, `_clsk`) cookies the site can see; Clarity's `CLID`,
+  `ANONCHK`, `MUID` and `SM` cookies belong to Clarity's own domain and
+  cannot be cleared from this site.
 - The site's report-only Content-Security-Policy (`src/config/headers.ts`)
   lists the Google and Clarity hosts the scripts use.
 - The seed leaves both IDs empty and only fills in a missing banner text;

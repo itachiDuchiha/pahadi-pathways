@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, 
 
 import {
   CONSENT_KEY,
+  expiredCookieStrings,
+  isVendorCookie,
   parseConsent,
   readConsentCookie,
   serializeConsentCookie,
@@ -39,6 +41,27 @@ function readStored(): Consent | null {
   return readConsentCookie(document.cookie);
 }
 
+/**
+ * Expires every analytics vendor cookie this origin can see. Clarity's
+ * `CLID`, `ANONCHK`, `MUID` and `SM` live on its own domain and cannot be
+ * removed from here.
+ */
+function clearVendorCookies(): void {
+  const secure = window.location.protocol === "https:";
+
+  for (const part of document.cookie.split(";")) {
+    const name = part.split("=")[0]?.trim();
+    if (!name || !isVendorCookie(name)) continue;
+
+    for (const cookie of expiredCookieStrings(name, window.location.hostname, secure)) {
+      document.cookie = cookie;
+    }
+  }
+}
+
+/** The choice as this tab last saw it, so a change from accepted can be spotted. */
+let lastSeen: Consent | null | undefined;
+
 function store(value: Consent): void {
   const secure = window.location.protocol === "https:";
 
@@ -48,6 +71,7 @@ function store(value: Consent): void {
     // See readStored.
   }
   document.cookie = serializeConsentCookie(value, secure);
+  lastSeen = value;
 
   for (const listener of listeners) listener();
 }
@@ -55,8 +79,22 @@ function store(value: Consent): void {
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   // Another tab changed the choice.
+  if (lastSeen === undefined) lastSeen = readStored();
   const onStorage = (event: StorageEvent) => {
-    if (event.key === CONSENT_KEY || event.key === null) listener();
+    if (event.key !== CONSENT_KEY && event.key !== null) return;
+
+    const previous = lastSeen;
+    const next = readStored();
+    lastSeen = next;
+
+    // Scripts this tab already ran cannot be unloaded; drop them and the
+    // cookies they set. `lastSeen` has moved on, so this happens once.
+    if (previous === "accepted" && next !== "accepted") {
+      clearVendorCookies();
+      window.location.reload();
+      return;
+    }
+    listener();
   };
   window.addEventListener("storage", onStorage);
 
@@ -75,6 +113,7 @@ export default function ConsentProvider({ children }: { children: ReactNode }) {
   const decline = useCallback(() => {
     const wasAccepted = readStored() === "accepted";
     store("declined");
+    clearVendorCookies();
     // Vendor scripts cannot be unloaded, so a reload drops any that ran.
     if (wasAccepted) window.location.reload();
   }, []);

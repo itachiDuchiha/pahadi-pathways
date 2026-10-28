@@ -76,3 +76,41 @@ export function readConsentCookie(cookies: string): Consent | null {
 
   return null;
 }
+
+/**
+ * Cookie names the analytics vendors set. The underscore-led ones are
+ * families (`_ga_<ID>`, `_gat_gtag_...`) and match by prefix; the others
+ * are exact names, so an unrelated `SMTP` or `MUIDX` is left alone.
+ */
+export const VENDOR_COOKIE_PREFIXES = ["_ga", "_gid", "_gat", "_clck", "_clsk", "CLID", "ANONCHK", "MUID", "SM"];
+
+export function isVendorCookie(name: string): boolean {
+  return VENDOR_COOKIE_PREFIXES.some((prefix) => (prefix.startsWith("_") ? name.startsWith(prefix) : name === prefix));
+}
+
+/**
+ * The `Domain` values a vendor cookie could have been set with, from the
+ * host itself down to the registrable (last two labels) domain. IPs have
+ * none, and a single-label host such as `localhost` is its own only value.
+ */
+export function cookieDomainsFor(hostname: string): string[] {
+  if (hostname.includes(":") || /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return [];
+
+  const labels = hostname.split(".");
+  if (labels.length < 2) return [hostname];
+
+  const domains = [hostname];
+  for (let start = 0; start <= labels.length - 2; start += 1) {
+    domains.push(`.${labels.slice(start).join(".")}`);
+  }
+
+  return domains;
+}
+
+/** The `document.cookie` strings that expire `name` on every domain variant and host-only. */
+export function expiredCookieStrings(name: string, hostname: string, secure = false): string[] {
+  const suffix = secure ? "; Secure" : "";
+  const base = `${name}=; Max-Age=0; Path=/`;
+
+  return [...cookieDomainsFor(hostname).map((domain) => `${base}; Domain=${domain}${suffix}`), `${base}${suffix}`];
+}
