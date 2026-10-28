@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createElement } from "react";
 
-import { getDestinationPage } from "@/components/destination-page/registry";
-import JsonLd from "@/components/seo/JsonLd";
+import DestinationPage from "@/components/destination-page/DestinationPage";
 import { getDestinationBySlug, getDestinations } from "@/lib/cms/destinations";
 import { assertContentPresent } from "@/lib/cms/guard";
 import { getPackages } from "@/lib/cms/packages";
 import { getSiteSettings } from "@/lib/cms/site";
 import { pageMetadata, truncate } from "@/lib/seo";
-import { breadcrumbJsonLd, destinationJsonLd } from "@/lib/structured-data";
 
 type Props = {
   params: Promise<{
@@ -49,7 +46,7 @@ export async function generateMetadata({
   );
 }
 
-export default async function DestinationPage({ params }: Props) {
+export default async function DestinationDetailsPage({ params }: Props) {
   const { slug } = await params;
   const [destination, packages] = await Promise.all([getDestinationBySlug(slug), getPackages()]);
 
@@ -57,24 +54,5 @@ export default async function DestinationPage({ params }: Props) {
     notFound();
   }
 
-  // The registry returns stable, module-level components, so creating the
-  // element from the looked-up type does not remount anything per render.
-  return (
-    <>
-      <JsonLd data={destinationJsonLd(destination)} />
-
-      <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Destinations", path: "/destinations" },
-          { name: destination.name, path: `/destinations/${destination.slug}` },
-        ])}
-      />
-
-      {createElement(getDestinationPage(destination), {
-        destination,
-        packages,
-      })}
-    </>
-  );
+  return <DestinationPage destination={destination} packages={packages} />;
 }

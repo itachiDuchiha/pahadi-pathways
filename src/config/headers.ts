@@ -19,6 +19,21 @@ const ANALYTICS_IMG = ["https://*.google-analytics.com", "https://*.googletagman
 // the script, the iframe the widget renders in, and its own requests.
 const TURNSTILE = "https://challenges.cloudflare.com";
 
+function siteCsp(frameAncestors: string): string {
+  return [
+    "default-src 'self'",
+    `img-src 'self' data: blob: ${ANALYTICS_IMG.join(" ")}`,
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' data:",
+    `script-src 'self' 'unsafe-inline' ${ANALYTICS_SCRIPTS.join(" ")} ${TURNSTILE}`,
+    `connect-src 'self' ${ANALYTICS_CONNECT.join(" ")} ${TURNSTILE}`,
+    `frame-src 'self' ${TURNSTILE}`,
+    `frame-ancestors ${frameAncestors}`,
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+}
+
 const siteHeaders = [
   {
     key: "X-Frame-Options",
@@ -42,18 +57,7 @@ const siteHeaders = [
   },
   {
     key: "Content-Security-Policy-Report-Only",
-    value: [
-      "default-src 'self'",
-      `img-src 'self' data: blob: ${ANALYTICS_IMG.join(" ")}`,
-      "style-src 'self' 'unsafe-inline'",
-      "font-src 'self' data:",
-      `script-src 'self' 'unsafe-inline' ${ANALYTICS_SCRIPTS.join(" ")} ${TURNSTILE}`,
-      `connect-src 'self' ${ANALYTICS_CONNECT.join(" ")} ${TURNSTILE}`,
-      `frame-src 'self' ${TURNSTILE}`,
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
+    value: siteCsp("'none'"),
   },
 ];
 
@@ -70,6 +74,14 @@ const cmsHeaders = [
   },
 ];
 
+// Draft previews: site pages the admin shows in its live preview iframe,
+// so they may be framed by the same origin, and never indexed.
+const previewHeaders = [
+  { key: "X-Robots-Tag", value: "noindex, nofollow" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Content-Security-Policy-Report-Only", value: siteCsp("'self'") },
+];
+
 /**
  * Later rules override earlier ones for the same header key. Public media
  * files (`/api/media/file/*`, used as page and og:image sources) are not
@@ -78,6 +90,7 @@ const cmsHeaders = [
  */
 export const headerRules: HeaderRule[] = [
   { source: "/(.*)", headers: siteHeaders },
+  { source: "/preview/:path*", headers: previewHeaders },
   { source: "/ramram/:path*", headers: cmsHeaders },
   { source: "/api", headers: cmsHeaders },
   { source: "/api/:path((?!media/file/).*)", headers: cmsHeaders },

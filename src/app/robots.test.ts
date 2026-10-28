@@ -21,6 +21,13 @@ describe("robots", () => {
     }
   });
 
+  it("disallows draft previews in every group", () => {
+    for (const rule of rules) {
+      const disallow = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+      expect(disallow).toContain("/preview/");
+    }
+  });
+
   it("never names the admin path", () => {
     expect(JSON.stringify(output)).not.toContain("ramram");
   });

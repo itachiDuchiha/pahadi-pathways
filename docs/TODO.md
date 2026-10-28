@@ -9,9 +9,6 @@ Open items only; each line notes why it is still open.
   existing SQLite content is not copied automatically (see "Switching to
   Postgres" in the README). After the move, every schema change needs a
   migration for each adapter.
-- **Add live preview of drafts.** Editors currently publish to see a
-  change on the site; Payload's live preview needs a preview route and
-  draft-aware reads.
 - **Move media to S3-compatible storage if the site ever runs on more than
   one server.** Media is on the server's disk (`MEDIA_DIR`), which only
   works for a single instance.

@@ -43,6 +43,28 @@ describe("header rules", () => {
   );
 });
 
+describe("preview headers", () => {
+  it.each(["/preview/packages/x", "/preview/destinations/y"])(
+    "%s is kept out of search and can be framed by the admin only",
+    (pathname) => {
+      const headers = headersFor(pathname);
+      expect(headers["X-Robots-Tag"]).toBe("noindex, nofollow");
+      expect(headers["X-Frame-Options"]).toBe("SAMEORIGIN");
+      const csp = headers["Content-Security-Policy-Report-Only"] ?? "";
+      expect(csp).toMatch(new RegExp(`^${SITE_CSP_PREFIX}`));
+      expect(directive(csp, "frame-ancestors")).toEqual(["'self'"]);
+      expect(headers["X-Content-Type-Options"]).toBe("nosniff");
+    }
+  );
+
+  it("leaves the public pages unframeable", () => {
+    expect(headersFor("/packages/x")["X-Frame-Options"]).toBe("DENY");
+    expect(directive(headersFor("/packages/x")["Content-Security-Policy-Report-Only"] ?? "", "frame-ancestors")).toEqual([
+      "'none'",
+    ]);
+  });
+});
+
 /** The value of one directive in a CSP string. */
 function directive(csp: string, name: string): string[] {
   const part = csp.split(";").map((item) => item.trim()).find((item) => item.startsWith(`${name} `));

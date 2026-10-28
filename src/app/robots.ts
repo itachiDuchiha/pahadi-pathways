@@ -22,8 +22,8 @@ const aiCrawlers = [
 
 // The API is not for crawlers, but uploaded media served from it is used
 // on public pages and as og:image, so it stays crawlable (the longer Allow
-// match wins over the Disallow).
-const access = { allow: ["/", "/api/media/file/"], disallow: ["/api/"] };
+// match wins over the Disallow). Draft previews are for signed-in editors.
+const access = { allow: ["/", "/api/media/file/"], disallow: ["/api/", "/preview/"] };
 
 export default function robots(): MetadataRoute.Robots {
   return {

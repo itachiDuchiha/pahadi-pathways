@@ -15,6 +15,7 @@ import { Users } from "./cms/collections/Users";
 import { bootstrapAdmin } from "./cms/bootstrap/ensureAdmin";
 import { adminGraphics, adminMeta } from "./cms/config/admin";
 import { buildDbAdapter } from "./cms/config/db";
+import { livePreview } from "./cms/config/livePreview";
 import { securityConfig } from "./cms/config/security";
 import { AnalyticsSettings } from "./cms/globals/AnalyticsSettings";
 import { LegalSettings } from "./cms/globals/LegalSettings";
@@ -33,6 +34,7 @@ export default buildConfig({
       importMapFile: path.resolve(dirname, "app/(payload)/ramram/importMap.js"),
     },
     meta: adminMeta,
+    livePreview,
     components: {
       graphics: adminGraphics,
       views: {

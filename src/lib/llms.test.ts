@@ -55,6 +55,13 @@ describe("buildLlmsFullTxt", () => {
   });
 });
 
+describe("draft previews", () => {
+  it("are never linked", () => {
+    expect(buildLlmsTxt(content)).not.toContain("/preview/");
+    expect(buildLlmsFullTxt(content)).not.toContain("/preview/");
+  });
+});
+
 describe("contact details", () => {
   it("come from the settings it is given", () => {
     const text = buildLlmsTxt({

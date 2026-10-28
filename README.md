@@ -190,6 +190,24 @@ clear the shell history afterwards so the password is not kept there.
 - Replacing or editing an image revalidates every page, since an image can
   appear anywhere on the site.
 
+### Previewing drafts
+
+Packages and destinations can be previewed on the real site before they
+are published. In the admin, open a package or destination and turn on
+**Live Preview** (the eye icon next to **Save Draft**): the page renders
+beside the form, exactly as visitors will see it, with Mobile, Tablet and
+Desktop sizes in the toolbar. Change a field and click **Save Draft**; the
+preview reloads with the draft. The published page does not change until
+you click **Publish changes**.
+
+The preview lives under `/preview/packages/<slug>` and
+`/preview/destinations/<slug>`. It is shown only to someone signed in to
+the admin in the same browser; everyone else gets a 404. Preview pages
+are never cached, never listed in the sitemap or `llms.txt`, are
+disallowed in `robots.txt` and are sent with
+`X-Robots-Tag: noindex, nofollow`. A new document shows a preview once it
+has a slug and has been saved.
+
 ### Branding
 
 The admin carries the site's brand: the full logo on the login screen, the
@@ -564,7 +582,6 @@ each adapter: run `npm run payload migrate:create <name>` once with each
 - Uploaded videos are stored and served as uploaded (no transcoding or
   compression), and an upload is held in server memory while it is
   processed.
-- There is no live preview of drafts in the admin.
 - Media is stored on the server's disk, which suits a single server only.
 - Moving from SQLite to Postgres does not copy existing content.
 - The Content-Security-Policy header is sent as

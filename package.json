@@ -26,6 +26,7 @@
   "dependencies": {
     "@payloadcms/db-postgres": "3.92.0",
     "@payloadcms/db-sqlite": "3.92.0",
+    "@payloadcms/live-preview-react": "3.92.0",
     "@payloadcms/next": "3.92.0",
     "graphql": "^16.14.2",
     "lucide-react": "^1.24.0",
