@@ -29,7 +29,11 @@ build_and_swap() {
     mv .next .next-previous
   fi
   if ! mv .next-build .next; then
-    echo "deploy: swap failed; restore the previous build with: mv .next-previous .next" >&2
+    if [[ -d .next-previous ]]; then
+      echo "deploy: swap failed; restore the previous build with: mv .next-previous .next" >&2
+    else
+      echo "deploy: swap failed; there is no previous build to restore" >&2
+    fi
     return 1
   fi
 }

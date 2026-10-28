@@ -27,7 +27,7 @@ Open items only; each line notes why it is still open.
 ## Testing
 
 - **Add browser/E2E tests.** Only Vitest unit and integration tests exist
-  today (Vitest tests across `src/**/*.test.ts`); there is no coverage that
+  today (`src/**/*.test.ts`); there is no coverage that
   exercises the app or the admin in a real browser (forms, modal focus
   trapping, navigation, editing and publishing, the consent banner and
   the analytics scripts it gates).
@@ -84,8 +84,9 @@ Each is accepted for now; the line says why it is still open.
   (README, Deployment); the app cannot raise a limit set in front of it.
 - **Videos are stored as uploaded**, with no transcoding or codec check.
 - **Live preview needs the admin on the same origin as
-  `NEXT_PUBLIC_SITE_URL`.** Otherwise the frame loads but does not refresh
-  after a save.
+  `NEXT_PUBLIC_SITE_URL`.** From another origin it does not work at all:
+  `X-Frame-Options: SAMEORIGIN` blocks the frame and the admin login
+  cookie is bound to the admin's host, so the preview page answers 404.
 - **Four hero images stay above the 260 KB budget at the quality floor of
   60** (`destination-shimla`, and the Dharamshala, Kalpa and Manali package
   heroes); meeting it would mean smaller dimensions.

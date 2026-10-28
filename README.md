@@ -211,8 +211,11 @@ are never cached, never listed in the sitemap or `llms.txt`, are
 disallowed in `robots.txt` and are sent with
 `X-Robots-Tag: noindex, nofollow`. A new document shows a preview once it
 has a slug and has been saved. Open the admin on the same origin as
-`NEXT_PUBLIC_SITE_URL` (same host, scheme and port, no `www.` variant),
-or the preview frame loads but does not refresh after a save.
+`NEXT_PUBLIC_SITE_URL` (same host, scheme and port, no `www.` variant).
+From any other origin the preview does not work at all: the site sends
+`X-Frame-Options: SAMEORIGIN`, so the browser blocks the frame, and the
+admin login cookie belongs to the admin's host, so the preview page
+answers 404.
 
 ### Branding
 
@@ -435,7 +438,8 @@ keep the size and quality they were uploaded with.
 - **Maximum image width:** 2400 pixels by default, enough for full-screen
   photos; it can be set between 1200 and 4000.
 
-The seed never changes these settings (see Seeding).
+The seed fills these only when they are empty and never overwrites them
+(see Seeding).
 
 The bundled images under `public/images` (about 13 MB total, WebP with capped
 dimensions) are the seed source and the site's fixed artwork. Run
@@ -492,7 +496,11 @@ it runs on the server itself.
    and restart the server with the same command the script uses
    (`systemctl --user restart thc` by default). This does not undo
    database migrations; restore the newest `<database>.bak-<timestamp>`
-   copy as well if a migration must be reverted.
+   copy as well if a migration must be reverted. If `package-lock.json`
+   changed in the failed deploy, `npm ci` has already replaced
+   `node_modules`: check out the previous commit and run `npm ci` before
+   restarting, so the old build runs against the dependencies it was
+   built with.
 3. The restart command defaults to `systemctl --user restart thc`, i.e. a
    systemd user unit named `thc` that runs `npm start` in the checkout.
    For another process manager set `APP_RESTART_CMD`, for example
@@ -564,11 +572,13 @@ CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
 ## Switching to Postgres
 
 Both database adapters are installed, so switching is configuration only.
-The Postgres schema is a single `init` migration in
-`src/cms/migrations/postgres/`, generated from the current configuration;
-it already contains every change the SQLite history adds step by step
-(optional gallery captions, the pricing fields, enquiries), because no
-Postgres database existed before it.
+The Postgres schema is built by nine migrations in
+`src/cms/migrations/postgres/`. The first, `init`, was generated from the
+configuration at the time and already contains every change the SQLite
+history had added step by step until then (optional gallery captions, the
+pricing fields, enquiries), because no Postgres database existed before
+it; each later schema change has a Postgres migration of its own next to
+its SQLite one.
 
 1. Create an empty Postgres database (16 has been tested).
 2. Set `DATABASE_ADAPTER=postgres` and

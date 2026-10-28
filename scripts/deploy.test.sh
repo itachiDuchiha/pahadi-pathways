@@ -49,6 +49,19 @@ NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/new" build_and_swap >/
 [[ -f .next/new ]] || fail "first build is not in .next"
 [[ ! -e .next-previous ]] || fail ".next-previous appeared on a first deploy"
 
+# A failed swap names the restore command only when there is a previous build.
+fresh
+if (NEXT_BUILD_CMD=true build_and_swap) 2>"$tmp/err"; then
+  fail "build_and_swap succeeded although the swap failed"
+fi
+grep -q "mv .next-previous .next" "$tmp/err" || fail "failed swap did not name the restore command"
+rm -rf "$tmp/work"; mkdir -p "$tmp/work"; cd "$tmp/work"
+if (NEXT_BUILD_CMD=true build_and_swap) 2>"$tmp/err"; then
+  fail "build_and_swap succeeded although the first swap failed"
+fi
+grep -q "swap failed" "$tmp/err" || fail "failed first swap was not reported"
+! grep -q "next-previous" "$tmp/err" || fail "failed first swap named a missing .next-previous"
+
 # The build command sees NEXT_DIST_DIR.
 fresh
 NEXT_BUILD_CMD='mkdir -p "$NEXT_DIST_DIR" && echo "$NEXT_DIST_DIR" > "$NEXT_DIST_DIR/dir"' build_and_swap >/dev/null

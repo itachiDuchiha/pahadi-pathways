@@ -1,14 +1,15 @@
 /**
- * Every file under `public/images`, keyed by its public path, with the alt
- * text the seed gives its Media document. Alt text comes from the package
- * or destination that uses the image, or from the page that shows it.
- */
-/**
  * Files under `public/images` that are site assets, not content: they are
  * never seeded into the media library, so an editor cannot pick them.
  */
 export const SEED_EXCLUDED_IMAGES: readonly string[] = ["/images/placeholder.webp"];
 
+/**
+ * Every file under `public/images` except `SEED_EXCLUDED_IMAGES`, keyed by
+ * its public path, with the alt text the seed gives its Media document.
+ * Alt text comes from the package or destination that uses the image, or
+ * from the page that shows it.
+ */
 export const mediaManifest: Readonly<Record<string, string>> = {
   "/images/destinations/chitkul.webp": "Chitkul",
   "/images/destinations/destination-manali.webp": "Manali",

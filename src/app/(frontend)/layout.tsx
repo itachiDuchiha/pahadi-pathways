@@ -5,6 +5,7 @@ import "./globals.css";
 import { site } from "@/config/site";
 import { getAnalyticsSettings } from "@/lib/cms/analytics";
 import { getSiteSettings } from "@/lib/cms/site";
+import { captchaEnabled } from "@/lib/enquiry/captcha";
 import { defaultDescription, defaultTitle } from "@/lib/seo";
 import { organizationJsonLd } from "@/lib/structured-data";
 
@@ -68,7 +69,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <JsonLd data={organizationJsonLd(settings)} />
-        <SiteSettingsProvider settings={settings}>
+        <SiteSettingsProvider settings={settings} captchaEnabled={captchaEnabled()}>
           <ConsentProvider>
             <PlannerProvider>
               <Navbar />

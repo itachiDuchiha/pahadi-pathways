@@ -123,8 +123,8 @@ complete.
   production), locks logins after 5 failures and accepts only image and
   (up to 100 MB) MP4/WebM video uploads.
 - `npm audit --omit=dev` shows only the upstream `deepmerge` advisory
-  GHSA-gcqx-w48m-w2h4, with three dependency overrides; both are
-  documented in `docs/TODO.md`.
+  GHSA-gcqx-w48m-w2h4, with three dependency overrides; the advisory and
+  the three overrides are documented in `docs/TODO.md`.
 - Dependabot (done, `.github/dependabot.yml`) opens weekly update pull
   requests for npm and GitHub Actions.
 - Privacy policy (`/privacy`) and terms (`/terms`) pages are in place

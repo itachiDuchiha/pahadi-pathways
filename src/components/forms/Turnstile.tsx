@@ -3,9 +3,9 @@
 import Script from "next/script";
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 
-import { useSiteSettings } from "@/components/layout/SiteSettingsProvider";
+import { useCaptchaEnabled, useSiteSettings } from "@/components/layout/SiteSettingsProvider";
 import { whatsappUrl } from "@/config/site";
-import { captchaSiteKey } from "@/lib/captcha-config";
+import { captchaWidgetSiteKey } from "@/lib/captcha-config";
 
 type TurnstileRenderOptions = {
   sitekey: string;
@@ -48,12 +48,13 @@ type Props = {
 
 /**
  * Cloudflare Turnstile widget with a status line. Renders nothing (and
- * loads no script) when no site key is configured. A token is single-use:
+ * loads no script) unless both keys are configured (the server's
+ * `captchaEnabled()`, passed down by `SiteSettingsProvider`). A token is single-use:
  * remount the widget (change its `key`) to get a new one. State lives in
  * `useCaptchaToken`, which hands these props over as `widget`.
  */
 export default function Turnstile({ status, onToken, onError, onChallenge }: Props) {
-  const siteKey = captchaSiteKey();
+  const siteKey = captchaWidgetSiteKey(useCaptchaEnabled());
   const settings = useSiteSettings();
   const container = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -130,16 +131,16 @@ export default function Turnstile({ status, onToken, onError, onChallenge }: Pro
 
 /**
  * Token and status for a form with a Turnstile widget, shared by the three
- * enquiry forms. `ready` is true once a token exists, or always when no
- * site key is configured. The status turns `failed` when the script fails
- * to load, the widget errors, or no token or challenge appears within
- * `CAPTCHA_FALLBACK_MS`; submit stays disabled and the widget names
- * WhatsApp instead. Call `renew` after a failed submission (the token is
+ * enquiry forms. `ready` is true once a token exists, or always when the
+ * CAPTCHA is off (either key missing). The status turns `failed` when
+ * the script fails to load, the widget errors, or no token or challenge
+ * appears within `CAPTCHA_FALLBACK_MS`; submit stays disabled and the
+ * widget names WhatsApp instead. Call `renew` after a failed submission (the token is
  * spent) or before reusing the form; render
  * `<Turnstile key={round} {...widget} />`.
  */
 export function useCaptchaToken() {
-  const required = captchaSiteKey() !== null;
+  const required = captchaWidgetSiteKey(useCaptchaEnabled()) !== null;
   const [token, setToken] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [challenged, setChallenged] = useState(false);

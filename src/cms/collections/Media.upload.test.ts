@@ -72,7 +72,9 @@ async function tempFilesLeft(): Promise<string[]> {
 }
 
 describe("media uploads over HTTP (temp files)", () => {
-  it("compresses an image streamed to a temp file and removes the temp file", async () => {
+  // Encoding a 3000x2000 image plus three sizes outruns the 5 s default
+  // when the whole suite runs in parallel.
+  it("compresses an image streamed to a temp file and removes the temp file", { timeout: 30_000 }, async () => {
     const token = await editorToken();
     const data = await sharp({ create: { width: 3000, height: 2000, channels: 3, background: "#884422" } })
       .png()
