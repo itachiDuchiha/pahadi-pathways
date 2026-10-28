@@ -450,8 +450,13 @@ it runs on the server itself.
    succeeds does it move `.next` to `.next-previous`, move `.next-build`
    to `.next`, and restart the server. If the build fails, the script
    exits with "build failed; the running site is untouched", `.next` is
-   not changed and the server is not restarted. Expect a brief disruption
-   only while the server restarts.
+   not changed and the server is not restarted. The restart follows the
+   swap immediately; in that short gap the old process may serve pages
+   with mismatched assets, so expect a brief disruption around the
+   restart. The build cache in `.next/cache` does not carry over between
+   deploys, so each build starts cold. After a build the script restores
+   `tsconfig.json` and `AGENTS.md`, which Next rewrites, so the checkout
+   stays clean for the next pull.
 
    To roll back to the previous build (kept in `.next-previous` until the
    next deploy), run `mv .next .next-failed && mv .next-previous .next`

@@ -10,7 +10,16 @@ set -euo pipefail
 # repository root.
 build_and_swap() {
   rm -rf .next-build
-  if ! NEXT_DIST_DIR=.next-build bash -c "${NEXT_BUILD_CMD:-npm run build}"; then
+  local status=0
+  NEXT_DIST_DIR=.next-build bash -c "${NEXT_BUILD_CMD:-npm run build}" || status=$?
+  # Next rewrites tsconfig.json and AGENTS.md during a build; put them back so
+  # the checkout stays clean for the next pull. A no-op outside a git checkout.
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    for rewritten in tsconfig.json AGENTS.md; do
+      git checkout -- "$rewritten" 2>/dev/null || true
+    done
+  fi
+  if (( status != 0 )); then
     rm -rf .next-build
     echo "deploy: build failed; the running site is untouched" >&2
     return 1
@@ -19,7 +28,10 @@ build_and_swap() {
   if [[ -d .next ]]; then
     mv .next .next-previous
   fi
-  mv .next-build .next
+  if ! mv .next-build .next; then
+    echo "deploy: swap failed; restore the previous build with: mv .next-previous .next" >&2
+    return 1
+  fi
 }
 
 # Sourced by scripts/deploy.test.sh to get the functions without deploying.

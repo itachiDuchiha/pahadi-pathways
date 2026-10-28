@@ -24,6 +24,7 @@ if (NEXT_BUILD_CMD=false build_and_swap) 2>/dev/null; then
   fail "build_and_swap succeeded although the build failed"
 fi
 [[ -f .next/marker ]] || fail "failed build removed the running .next"
+[[ ! -e .next-build ]] || fail "failed build left .next-build behind"
 [[ ! -e .next-previous ]] || fail "failed build created .next-previous"
 
 # A failing build after partial output still leaves .next untouched.
@@ -32,6 +33,7 @@ if (NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/partial && false" 
   fail "build_and_swap succeeded although the build failed midway"
 fi
 [[ -f .next/marker ]] || fail "partial failed build replaced .next"
+[[ ! -e .next-build ]] || fail "partial failed build left .next-build behind"
 [[ ! -e .next-previous ]] || fail "partial failed build created .next-previous"
 
 # A successful build is swapped in and the old one is kept.
@@ -51,5 +53,16 @@ NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/new" build_and_swap >/
 fresh
 NEXT_BUILD_CMD='mkdir -p "$NEXT_DIST_DIR" && echo "$NEXT_DIST_DIR" > "$NEXT_DIST_DIR/dir"' build_and_swap >/dev/null
 [[ "$(cat .next/dir)" == ".next-build" ]] || fail "NEXT_DIST_DIR was not .next-build"
+
+# Files Next rewrites during a build are restored, on success and on failure.
+for outcome in true false; do
+  rm -rf "$tmp/work"; mkdir -p "$tmp/work"; cd "$tmp/work"
+  git init -q .
+  echo original > tsconfig.json
+  git add tsconfig.json
+  git -c user.name=t -c user.email=t@example.com commit -q -m init
+  NEXT_BUILD_CMD="echo dirty > tsconfig.json && mkdir -p .next-build && $outcome" build_and_swap >/dev/null 2>&1 || true
+  [[ -z "$(git status --porcelain --untracked-files=no)" ]] || fail "tracked file left dirty after build ($outcome)"
+done
 
 echo "deploy.test.sh: all passed"
