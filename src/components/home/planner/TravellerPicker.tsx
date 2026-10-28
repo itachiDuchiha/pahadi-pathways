@@ -9,8 +9,32 @@ import {
 
 import type { HeroPlannerState } from "@/components/home/planner/useHeroPlanner";
 
-type Props = {
-  planner: HeroPlannerState;
+type FieldProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "isTravelersOpen"
+    | "children"
+    | "travelerButtonRef"
+    | "handleTravelersOpen"
+    | "travelerLabel"
+  >;
+};
+
+type PickerProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "adults"
+    | "children"
+    | "isChildAgeOpen"
+    | "setIsChildAgeOpen"
+    | "travelerPosition"
+    | "travelerPopupRef"
+    | "decreaseAdults"
+    | "increaseAdults"
+    | "handleChildAgeSelect"
+    | "removeChild"
+    | "isTravelersOpen"
+  >;
 };
 
 const childAges = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -19,7 +43,7 @@ const childAges = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 export function TravellerField({
   planner,
-}: Props) {
+}: FieldProps) {
   const {
     isTravelersOpen,
     children,
@@ -127,7 +151,7 @@ export function TravellerField({
 
 export default function TravellerPicker({
   planner,
-}: Props) {
+}: PickerProps) {
   const {
     adults,
     children,
@@ -149,11 +173,7 @@ export default function TravellerPicker({
   return (
         <div
           ref={travelerPopupRef}
-          style={{
-            position: "fixed",
-            top: `${travelerPosition.top}px`,
-            left: `${travelerPosition.left}px`,
-          }}
+          style={travelerPosition}
           className="
             z-[60]
             w-[300px]

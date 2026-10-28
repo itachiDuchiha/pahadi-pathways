@@ -7,15 +7,37 @@ import {
 
 import { destinations, type HeroPlannerState } from "@/components/home/planner/useHeroPlanner";
 
-type Props = {
-  planner: HeroPlannerState;
+type FieldProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "destination"
+    | "setDestination"
+    | "isDestinationOpen"
+    | "setIsDestinationOpen"
+    | "setIsDateOpen"
+    | "setIsTravelersOpen"
+    | "setIsChildAgeOpen"
+    | "destinationButtonRef"
+  >;
+};
+
+type PickerProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "destination"
+    | "destinationPosition"
+    | "destinationPopupRef"
+    | "filteredDestinations"
+    | "handleDestinationSelect"
+    | "isDestinationOpen"
+  >;
 };
 
 /* Trigger shown inside the planner bar. */
 
 export function DestinationField({
   planner,
-}: Props) {
+}: FieldProps) {
   const {
     destination,
     setDestination,
@@ -153,7 +175,7 @@ export function DestinationField({
 
 export default function DestinationPicker({
   planner,
-}: Props) {
+}: PickerProps) {
   const {
     destination,
     destinationPosition,
@@ -170,11 +192,7 @@ export default function DestinationPicker({
   return (
         <div
           ref={destinationPopupRef}
-          style={{
-            position: "fixed",
-            top: `${destinationPosition.top}px`,
-            left: `${destinationPosition.left}px`,
-          }}
+          style={destinationPosition}
           className="
             z-[60]
             w-[calc(100vw-24px)]

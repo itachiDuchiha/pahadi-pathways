@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { usePopupPosition } from "@/components/home/planner/usePopupPosition";
+
 export const destinations = [
   "Shimla",
   "Manali",
@@ -42,6 +44,19 @@ export const monthNames = [
   "November",
   "December",
 ];
+
+/* Place an open popup now and again on every resize or scroll. */
+function trackPosition(update: () => void) {
+  requestAnimationFrame(update);
+
+  window.addEventListener("resize", update);
+  window.addEventListener("scroll", update, true);
+
+  return () => {
+    window.removeEventListener("resize", update);
+    window.removeEventListener("scroll", update, true);
+  };
+}
 
 /* =========================================================
    HERO PLANNER STATE
@@ -87,55 +102,32 @@ export function useHeroPlanner() {
   const [isChildAgeOpen, setIsChildAgeOpen] = useState(false);
 
   /* =========================================================
-     DESTINATION POPUP POSITION
+     POPUP POSITIONS
   ========================================================= */
 
-  const [destinationPosition, setDestinationPosition] = useState({
-    top: 0,
-    left: 0,
-  });
-
-  /* =========================================================
-     CALENDAR POSITION
-  ========================================================= */
-
-  const [calendarPosition, setCalendarPosition] = useState({
-    top: 0,
-    left: 0,
-  });
-
-  /* =========================================================
-     TRAVELER POPUP POSITION
-  ========================================================= */
-
-  const [travelerPosition, setTravelerPosition] = useState({
-    top: 0,
-    left: 0,
-  });
+  /*
+    The destination list is kept inside the viewport using the
+    destination field's width; the calendar and traveler popups
+    use their own (fixed 300px) width.
+  */
+  const { style: destinationPosition, place: placeDestination } =
+    usePopupPosition({ widthFrom: "anchor" });
+  const { style: calendarPosition, place: placeCalendar } =
+    usePopupPosition();
+  const { style: travelerPosition, place: placeTraveler } =
+    usePopupPosition();
 
   /* =========================================================
      REFS
   ========================================================= */
 
   const plannerRef = useRef<HTMLDivElement>(null);
-
-  const destinationButtonRef =
-    useRef<HTMLButtonElement>(null);
-
-  const destinationPopupRef =
-    useRef<HTMLDivElement>(null);
-
-  const dateButtonRef =
-    useRef<HTMLButtonElement>(null);
-
-  const calendarRef =
-    useRef<HTMLDivElement>(null);
-
-  const travelerButtonRef =
-    useRef<HTMLButtonElement>(null);
-
-  const travelerPopupRef =
-    useRef<HTMLDivElement>(null);
+  const destinationButtonRef = useRef<HTMLButtonElement>(null);
+  const destinationPopupRef = useRef<HTMLDivElement>(null);
+  const dateButtonRef = useRef<HTMLButtonElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const travelerButtonRef = useRef<HTMLButtonElement>(null);
+  const travelerPopupRef = useRef<HTMLDivElement>(null);
 
   /* =========================================================
      FILTER DESTINATIONS
@@ -143,9 +135,7 @@ export function useHeroPlanner() {
 
   const filteredDestinations = destination.trim()
     ? destinations.filter((place) =>
-        place
-          .toLowerCase()
-          .includes(destination.toLowerCase())
+        place.toLowerCase().includes(destination.toLowerCase())
       )
     : popularDestinations;
 
@@ -164,31 +154,19 @@ export function useHeroPlanner() {
 
     if (startDate) {
       const year = startDate.getFullYear();
-      const month = String(
-        startDate.getMonth() + 1
-      ).padStart(2, "0");
-      const day = String(
-        startDate.getDate()
-      ).padStart(2, "0");
+      const month = String(startDate.getMonth() + 1).padStart(2, "0");
+      const day = String(startDate.getDate()).padStart(2, "0");
 
-      params.set(
-        "date",
-        `${year}-${month}-${day}`
-      );
+      params.set("date", `${year}-${month}-${day}`);
     }
 
     params.set("adults", String(adults));
 
     if (children.length > 0) {
-      params.set(
-        "children",
-        children.join(",")
-      );
+      params.set("children", children.join(","));
     }
 
-    router.push(
-      `/packages?${params.toString()}`
-    );
+    router.push(`/packages?${params.toString()}`);
 
     closeAllPopups();
   };
@@ -202,207 +180,6 @@ export function useHeroPlanner() {
     setIsDateOpen(false);
     setIsTravelersOpen(false);
     setIsChildAgeOpen(false);
-  };
-
-  /* =========================================================
-     DESTINATION POSITION
-  ========================================================= */
-
-  const updateDestinationPosition = () => {
-    if (!destinationButtonRef.current) return;
-
-    const buttonRect =
-      destinationButtonRef.current.getBoundingClientRect();
-
-    const popupWidth =
-      buttonRect.width;
-
-    const gap = 8;
-    const viewportPadding = 12;
-
-    const popupHeight =
-      destinationPopupRef.current?.getBoundingClientRect()
-        .height ?? 300;
-
-    const spaceBelow =
-      window.innerHeight -
-      buttonRect.bottom;
-
-    const spaceAbove = buttonRect.top;
-
-    /*
-      Open upward when there isn't enough room below
-      but there is enough room above.
-    */
-    const openUp =
-      spaceBelow <
-        popupHeight + gap &&
-      spaceAbove >=
-        popupHeight + gap;
-
-    let top = openUp
-      ? buttonRect.top -
-        popupHeight -
-        gap
-      : buttonRect.bottom + gap;
-
-    /*
-      Keep popup inside viewport.
-    */
-    top = Math.max(
-      viewportPadding,
-      Math.min(
-        top,
-        window.innerHeight -
-          popupHeight -
-          viewportPadding
-      )
-    );
-
-    let left = buttonRect.left;
-
-    left = Math.max(
-      viewportPadding,
-      Math.min(
-        left,
-        window.innerWidth -
-          popupWidth -
-          viewportPadding
-      )
-    );
-
-    setDestinationPosition({
-      top,
-      left,
-    });
-  };
-
-  /* =========================================================
-     CALENDAR POSITION
-  ========================================================= */
-
-  const updateCalendarPosition = () => {
-    if (!dateButtonRef.current) return;
-
-    const buttonRect =
-      dateButtonRef.current.getBoundingClientRect();
-
-    const calendarWidth = 300;
-    const gap = 8;
-    const viewportPadding = 12;
-
-    const calendarHeight =
-      calendarRef.current?.getBoundingClientRect()
-        .height ?? 270;
-
-    const spaceBelow =
-      window.innerHeight -
-      buttonRect.bottom;
-
-    const spaceAbove = buttonRect.top;
-
-    const openUp =
-      spaceBelow <
-        calendarHeight + gap &&
-      spaceAbove >=
-        calendarHeight + gap;
-
-    let top = openUp
-      ? buttonRect.top -
-        calendarHeight -
-        gap
-      : buttonRect.bottom + gap;
-
-    top = Math.max(
-      viewportPadding,
-      Math.min(
-        top,
-        window.innerHeight -
-          calendarHeight -
-          viewportPadding
-      )
-    );
-
-    let left = buttonRect.left;
-
-    left = Math.max(
-      viewportPadding,
-      Math.min(
-        left,
-        window.innerWidth -
-          calendarWidth -
-          viewportPadding
-      )
-    );
-
-    setCalendarPosition({
-      top,
-      left,
-    });
-  };
-
-  /* =========================================================
-     TRAVELER POPUP POSITION
-  ========================================================= */
-
-  const updateTravelerPosition = () => {
-    if (!travelerButtonRef.current) return;
-
-    const buttonRect =
-      travelerButtonRef.current.getBoundingClientRect();
-
-    const popupWidth = 300;
-    const gap = 8;
-    const viewportPadding = 12;
-
-    const popupHeight =
-      travelerPopupRef.current?.getBoundingClientRect()
-        .height ?? 250;
-
-    const spaceBelow =
-      window.innerHeight -
-      buttonRect.bottom;
-
-    const spaceAbove = buttonRect.top;
-
-    const openUp =
-      spaceBelow <
-        popupHeight + gap &&
-      spaceAbove >=
-        popupHeight + gap;
-
-    let top = openUp
-      ? buttonRect.top -
-        popupHeight -
-        gap
-      : buttonRect.bottom + gap;
-
-    top = Math.max(
-      viewportPadding,
-      Math.min(
-        top,
-        window.innerHeight -
-          popupHeight -
-          viewportPadding
-      )
-    );
-
-    let left = buttonRect.left;
-
-    left = Math.max(
-      viewportPadding,
-      Math.min(
-        left,
-        window.innerWidth -
-          popupWidth -
-          viewportPadding
-      )
-    );
-
-    setTravelerPosition({
-      top,
-      left,
-    });
   };
 
   /* =========================================================
@@ -428,133 +205,50 @@ export function useHeroPlanner() {
   };
 
   /* =========================================================
-     DESTINATION POSITION EFFECT
+     POSITION EFFECTS
+
+     Re-place each open popup when it opens, when its content
+     changes size, and on every resize or scroll.
   ========================================================= */
 
   useEffect(() => {
     if (!isDestinationOpen) return;
-
-    requestAnimationFrame(() => {
-      updateDestinationPosition();
+    return trackPosition(() => {
+      if (destinationButtonRef.current && destinationPopupRef.current) {
+        placeDestination(destinationButtonRef.current, destinationPopupRef.current);
+      }
     });
-
-    const handlePositionUpdate = () => {
-      updateDestinationPosition();
-    };
-
-    window.addEventListener(
-      "resize",
-      handlePositionUpdate
-    );
-
-    window.addEventListener(
-      "scroll",
-      handlePositionUpdate,
-      true
-    );
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        handlePositionUpdate
-      );
-
-      window.removeEventListener(
-        "scroll",
-        handlePositionUpdate,
-        true
-      );
-    };
   }, [
     isDestinationOpen,
     destination,
+    placeDestination,
   ]);
-
-  /* =========================================================
-     CALENDAR POSITION EFFECT
-  ========================================================= */
 
   useEffect(() => {
     if (!isDateOpen) return;
-
-    requestAnimationFrame(() => {
-      updateCalendarPosition();
+    return trackPosition(() => {
+      if (dateButtonRef.current && calendarRef.current) {
+        placeCalendar(dateButtonRef.current, calendarRef.current);
+      }
     });
-
-    const handlePositionUpdate = () => {
-      updateCalendarPosition();
-    };
-
-    window.addEventListener(
-      "resize",
-      handlePositionUpdate
-    );
-
-    window.addEventListener(
-      "scroll",
-      handlePositionUpdate,
-      true
-    );
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        handlePositionUpdate
-      );
-
-      window.removeEventListener(
-        "scroll",
-        handlePositionUpdate,
-        true
-      );
-    };
   }, [
     isDateOpen,
     calendarMonth,
+    placeCalendar,
   ]);
-
-  /* =========================================================
-     TRAVELER POSITION EFFECT
-  ========================================================= */
 
   useEffect(() => {
     if (!isTravelersOpen) return;
-
-    requestAnimationFrame(() => {
-      updateTravelerPosition();
+    return trackPosition(() => {
+      if (travelerButtonRef.current && travelerPopupRef.current) {
+        placeTraveler(travelerButtonRef.current, travelerPopupRef.current);
+      }
     });
-
-    const handlePositionUpdate = () => {
-      updateTravelerPosition();
-    };
-
-    window.addEventListener(
-      "resize",
-      handlePositionUpdate
-    );
-
-    window.addEventListener(
-      "scroll",
-      handlePositionUpdate,
-      true
-    );
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        handlePositionUpdate
-      );
-
-      window.removeEventListener(
-        "scroll",
-        handlePositionUpdate,
-        true
-      );
-    };
   }, [
     isTravelersOpen,
     isChildAgeOpen,
     children.length,
+    placeTraveler,
   ]);
 
   /* =========================================================
@@ -615,9 +309,7 @@ export function useHeroPlanner() {
      DESTINATION SELECT
   ========================================================= */
 
-  const handleDestinationSelect = (
-    place: string
-  ) => {
+  const handleDestinationSelect = (place: string) => {
     setDestination(place);
     setIsDestinationOpen(false);
   };
@@ -627,22 +319,14 @@ export function useHeroPlanner() {
   ========================================================= */
 
   const formatDate = (date: Date) => {
-    return `${date.getDate()} ${
-      monthNames[date.getMonth()]
-    } ${date.getFullYear()}`;
+    return `${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  const isSameDate = (
-    date1: Date,
-    date2: Date
-  ) => {
+  const isSameDate = (date1: Date, date2: Date) => {
     return (
-      date1.getFullYear() ===
-        date2.getFullYear() &&
-      date1.getMonth() ===
-        date2.getMonth() &&
-      date1.getDate() ===
-        date2.getDate()
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
     );
   };
 
@@ -659,49 +343,26 @@ export function useHeroPlanner() {
   ========================================================= */
 
   const getCalendarDays = () => {
-    const year =
-      calendarMonth.getFullYear();
+    const year = calendarMonth.getFullYear();
+    const month = calendarMonth.getMonth();
 
-    const month =
-      calendarMonth.getMonth();
-
-    const firstDay = new Date(
-      year,
-      month,
-      1
-    ).getDay();
-
-    const daysInMonth = new Date(
-      year,
-      month + 1,
-      0
-    ).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const days: (Date | null)[] = [];
 
-    for (
-      let i = 0;
-      i < firstDay;
-      i++
-    ) {
+    for (let i = 0; i < firstDay; i++) {
       days.push(null);
     }
 
-    for (
-      let day = 1;
-      day <= daysInMonth;
-      day++
-    ) {
-      days.push(
-        new Date(year, month, day)
-      );
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
     }
 
     return days;
   };
 
-  const calendarDays =
-    getCalendarDays();
+  const calendarDays = getCalendarDays();
 
   /* =========================================================
      MONTH NAVIGATION
@@ -714,28 +375,16 @@ export function useHeroPlanner() {
       1
     );
 
-    const currentMonth = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      1
-    );
+    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-    if (
-      previousMonth >= currentMonth
-    ) {
-      setCalendarMonth(
-        previousMonth
-      );
+    if (previousMonth >= currentMonth) {
+      setCalendarMonth(previousMonth);
     }
   };
 
   const goToNextMonth = () => {
     setCalendarMonth(
-      new Date(
-        calendarMonth.getFullYear(),
-        calendarMonth.getMonth() + 1,
-        1
-      )
+      new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1)
     );
   };
 
@@ -743,9 +392,7 @@ export function useHeroPlanner() {
      SELECT DATE
   ========================================================= */
 
-  const handleDateSelect = (
-    date: Date
-  ) => {
+  const handleDateSelect = (date: Date) => {
     if (isPastDate(date)) return;
 
     setStartDate(date);
@@ -757,29 +404,19 @@ export function useHeroPlanner() {
   ========================================================= */
 
   const decreaseAdults = () => {
-    setAdults((current) =>
-      Math.max(1, current - 1)
-    );
+    setAdults((current) => Math.max(1, current - 1));
   };
 
   const increaseAdults = () => {
-    setAdults((current) =>
-      Math.min(10, current + 1)
-    );
+    setAdults((current) => Math.min(10, current + 1));
   };
 
   /* =========================================================
      CHILD AGE
   ========================================================= */
 
-  const handleChildAgeSelect = (
-    age: number
-  ) => {
-    setChildren((current) => [
-      ...current,
-      age,
-    ]);
-
+  const handleChildAgeSelect = (age: number) => {
+    setChildren((current) => [...current, age]);
     setIsChildAgeOpen(false);
   };
 
@@ -787,14 +424,9 @@ export function useHeroPlanner() {
      REMOVE CHILD
   ========================================================= */
 
-  const removeChild = (
-    index: number
-  ) => {
+  const removeChild = (index: number) => {
     setChildren((current) =>
-      current.filter(
-        (_, childIndex) =>
-          childIndex !== index
-      )
+      current.filter((_, childIndex) => childIndex !== index)
     );
   };
 
@@ -802,15 +434,9 @@ export function useHeroPlanner() {
      DISPLAY
   ========================================================= */
 
-  const displayedDate = startDate
-    ? formatDate(startDate)
-    : "Select Date";
+  const displayedDate = startDate ? formatDate(startDate) : "Select Date";
 
-  const travelerLabel = `${adults} ${
-    adults === 1
-      ? "Adult"
-      : "Adults"
-  }`;
+  const travelerLabel = `${adults} ${adults === 1 ? "Adult" : "Adults"}`;
 
   return {
     destination,

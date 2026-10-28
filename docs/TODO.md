@@ -47,17 +47,6 @@ Open items only; each line notes why it is still open.
   require `https://*.clarity.ms` and `https://c.bing.com` in `img-src` of
   the Content-Security-Policy; check before enforcing it.
 
-## Code structure
-
-- **Extract the popup-positioning logic from `useHeroPlanner`.**
-  `src/components/home/planner/useHeroPlanner.ts` currently computes popup
-  visibility, viewport-aware positioning and the shared handlers in one
-  hook; splitting the positioning math into its own hook would make the
-  state hook easier to follow and test in isolation.
-- **Narrow the hero picker props.** The picker components under
-  `src/components/home/planner/` take broader prop types than they use
-  internally; tightening them would make misuse show up at compile time.
-
 ## Dependencies
 
 - **Remove the `npm audit` overrides in `package.json` when upstream

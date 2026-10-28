@@ -9,8 +9,32 @@ import {
 
 import { monthNames, type HeroPlannerState } from "@/components/home/planner/useHeroPlanner";
 
-type Props = {
-  planner: HeroPlannerState;
+type FieldProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "isDateOpen"
+    | "dateButtonRef"
+    | "handleDateOpen"
+    | "displayedDate"
+  >;
+};
+
+type PickerProps = {
+  planner: Pick<
+    HeroPlannerState,
+    | "startDate"
+    | "today"
+    | "calendarMonth"
+    | "calendarPosition"
+    | "calendarRef"
+    | "isSameDate"
+    | "isPastDate"
+    | "calendarDays"
+    | "goToPreviousMonth"
+    | "goToNextMonth"
+    | "handleDateSelect"
+    | "isDateOpen"
+  >;
 };
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
@@ -19,7 +43,7 @@ const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
 export function DateField({
   planner,
-}: Props) {
+}: FieldProps) {
   const {
     isDateOpen,
     dateButtonRef,
@@ -119,7 +143,7 @@ export function DateField({
 
 export default function DatePicker({
   planner,
-}: Props) {
+}: PickerProps) {
   const {
     startDate,
     today,
@@ -142,11 +166,7 @@ export default function DatePicker({
   return (
         <div
           ref={calendarRef}
-          style={{
-            position: "fixed",
-            top: `${calendarPosition.top}px`,
-            left: `${calendarPosition.left}px`,
-          }}
+          style={calendarPosition}
           className="
             z-[60]
             w-[300px]
