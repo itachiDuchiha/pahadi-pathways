@@ -17,10 +17,6 @@ Open items only; each line notes why it is still open.
 - **Move media to S3-compatible storage if the site ever runs on more than
   one server.** Media is on the server's disk (`MEDIA_DIR`), which only
   works for a single instance.
-- **Render without a missing image.** Deleting an image that content
-  still uses is now refused, but a media file removed from disk outside
-  the admin still makes that page and the build fail; a fallback image
-  would degrade more gracefully.
 - **Build into a separate directory when deploying.** `scripts/deploy.sh`
   builds in place, so a failed build leaves no working build until the
   documented rollback is run; building into a fresh directory and

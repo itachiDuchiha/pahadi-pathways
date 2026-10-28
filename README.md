@@ -367,6 +367,9 @@ does not slow the site down:
   sizes are then made from that file, also as WebP.
 - A file that cannot be read as an image is refused with a message asking
   for a JPEG, PNG or WebP; other file types are not accepted at all.
+- If an image file is removed from `MEDIA_DIR` outside the admin, pages show
+  a placeholder image instead of failing, and the build or server log names
+  the missing file once.
 
 Two settings under **Site settings → Uploaded images** control this
 (admins only). They apply to new uploads; images already in the library

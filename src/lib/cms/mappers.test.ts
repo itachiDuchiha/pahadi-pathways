@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type {
   Destination as DestinationDoc,
@@ -18,7 +18,15 @@ import {
   mapPackage,
   mapTestimonial,
   mediaPath,
+  mediaUrl,
+  heroUrl,
+  PLACEHOLDER_IMAGE,
+  resetMissingMediaWarnings,
 } from "./mappers";
+
+// The fixtures name files that are not on disk; the mapping tests below
+// treat every file as present. Missing files are tested with `exists`.
+vi.mock("./media-files", () => ({ mediaFileExists: () => true }));
 
 const ORIGIN = "https://thehimalayancompass.in";
 const STAMP = "2026-10-27T00:00:00.000Z";
@@ -260,5 +268,47 @@ describe("mapTestimonial, mapGalleryItem, mapExperience", () => {
       image: "/api/media/file/packages-kalpa1.webp",
       icon: "Star",
     });
+  });
+});
+
+describe("missing media files", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    resetMissingMediaWarnings();
+  });
+
+  it("keeps the media path when the file exists", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(mediaUrl(media("a.webp"), "owner", "image", () => true)).toBe("/api/media/file/a.webp");
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("returns the placeholder and warns once per file when the file is missing", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const doc = media("a.webp");
+    expect(mediaUrl(doc, "owner", "image", () => false)).toBe(PLACEHOLDER_IMAGE);
+    expect(mediaUrl(doc, "other", "image", () => false)).toBe(PLACEHOLDER_IMAGE);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("a.webp");
+  });
+
+  it("still throws for an unpopulated relation", () => {
+    expect(() => mediaUrl(7, "owner", "image", () => false)).toThrow(/not populated/);
+    expect(() => heroUrl(7, "owner", "image", () => false)).toThrow(/not populated/);
+  });
+
+  it("checks the hero rendition's own file and falls back to the placeholder", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const doc = media("h.webp", { hero: true });
+    doc.sizes!.hero!.filename = "h-1920x1280.webp";
+    const onlyOriginal = (name: string) => name === "h.webp";
+    expect(heroUrl(doc, "owner", "heroImage", () => true)).toBe("/api/media/file/h-1920x1280.webp");
+    expect(heroUrl(doc, "owner", "heroImage", onlyOriginal)).toBe(PLACEHOLDER_IMAGE);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("h-1920x1280.webp");
+  });
+
+  it("uses the original when there is no hero rendition", () => {
+    expect(heroUrl(media("a.webp"), "owner", "heroImage", () => true)).toBe("/api/media/file/a.webp");
   });
 });

@@ -9,6 +9,8 @@ import type {
 
 import { formatCurrency } from "@/lib/pricing";
 
+import { mediaFileExists } from "./media-files";
+
 import type {
   Destination,
   Experience,
@@ -35,17 +37,51 @@ function populated(media: number | Media | null | undefined, owner: string, fiel
   throw new Error(`Media for "${field}" on ${owner} is not populated; read it with depth >= 1.`);
 }
 
-function mediaUrl(media: number | Media | null | undefined, owner: string, field: string): string {
+/** Shown in place of an image whose file is gone from the media directory. */
+export const PLACEHOLDER_IMAGE = "/images/placeholder.webp";
+
+const warnedMissing = new Set<string>();
+
+/** Lets tests see the warning again; each missing file is otherwise reported once per process. */
+export function resetMissingMediaWarnings(): void {
+  warnedMissing.clear();
+}
+
+type FileExists = (filename: string) => boolean;
+
+/** The site path for a stored file, or the placeholder (with one warning per file) when it is missing. */
+function servedPath(url: string, filename: string | null | undefined, exists: FileExists): string {
+  const name = filename ?? mediaPath(url).split("/").pop() ?? "";
+  if (exists(name)) return mediaPath(url);
+
+  if (!warnedMissing.has(name)) {
+    warnedMissing.add(name);
+    console.warn(`Media file "${name}" is missing from the media directory; showing a placeholder image.`);
+  }
+  return PLACEHOLDER_IMAGE;
+}
+
+export function mediaUrl(
+  media: number | Media | null | undefined,
+  owner: string,
+  field: string,
+  exists: FileExists = mediaFileExists
+): string {
   const doc = populated(media, owner, field);
   if (!doc.url) throw new Error(`Media for "${field}" on ${owner} has no URL.`);
-  return mediaPath(doc.url);
+  return servedPath(doc.url, doc.filename, exists);
 }
 
 /** The hero rendition when one was generated (only for wide originals), else the original. */
-function heroUrl(media: number | Media | null | undefined, owner: string, field: string): string {
+export function heroUrl(
+  media: number | Media | null | undefined,
+  owner: string,
+  field: string,
+  exists: FileExists = mediaFileExists
+): string {
   const doc = populated(media, owner, field);
-  const hero = doc.sizes?.hero?.url;
-  return hero ? mediaPath(hero) : mediaUrl(doc, owner, field);
+  const hero = doc.sizes?.hero;
+  return hero?.url ? servedPath(hero.url, hero.filename, exists) : mediaUrl(doc, owner, field, exists);
 }
 
 /** `null` becomes `undefined`, so optional domain fields stay absent. */

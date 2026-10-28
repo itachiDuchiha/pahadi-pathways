@@ -44,6 +44,7 @@ export const mediaManifest: Readonly<Record<string, string>> = {
   "/images/logo/full-logo.webp": "The Himalayan Compass",
   "/images/logo/icon-logo.webp": "The Himalayan Compass",
   "/images/logo/navbar-logo5.webp": "The Himalayan Compass",
+  "/images/placeholder.webp": "Image unavailable",
   "/images/packages/dharamshala.webp": "Himachal Grand Circuit",
   "/images/packages/heroes/dharamshala.webp": "Himachal Grand Circuit",
   "/images/packages/heroes/kalpa.webp": "Shimla, Kinnaur & Spiti Explorer",
