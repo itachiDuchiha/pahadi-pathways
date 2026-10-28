@@ -529,6 +529,26 @@ export default function Navbar() {
                   Gallery
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  href="/contact"
+                  onClick={closeMobileMenu}
+                  className="
+                    block
+                    rounded-xl
+                    px-4
+                    py-3
+                    font-semibold
+                    text-[#10264A]
+                    transition-colors
+                    hover:bg-[#F7F3E9]
+                    hover:text-[#C89A3D]
+                  "
+                >
+                  Contact
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
