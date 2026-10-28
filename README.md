@@ -289,8 +289,8 @@ are empty the site loads no analytics and shows no banner.
   fresh or throwaway database, or to complete a seed that was interrupted.
   Without a terminal (CI, scripts) it refuses unless `--yes` is added:
   `npm run cms:seed -- --overwrite --yes`. It keeps the owner's analytics
-  IDs, notification choices and data contact email. `scripts/deploy.sh`
-  never passes `--overwrite`.
+  IDs, notification choices, data contact email and image upload settings.
+  `scripts/deploy.sh` never passes `--overwrite`.
 
 ### Backups
 
@@ -355,9 +355,33 @@ is no CAPTCHA.
 
 ## Images
 
-Images uploaded in the CMS are stored in `MEDIA_DIR`, re-encoded into
-several sizes, and served by the CMS; they are not part of the build. The
-bundled images under `public/images` (about 13 MB total, WebP with capped
+Images uploaded in the CMS are stored in `MEDIA_DIR` and served by the
+CMS; they are not part of the build. Every JPEG, PNG, WebP or AVIF upload
+is shrunk before it is stored, so a photo straight from a phone or camera
+does not slow the site down:
+
+- It is turned upright (using the orientation the camera recorded),
+  scaled down to the maximum width if it is wider (never enlarged), and
+  saved as WebP, so its file name ends in `.webp`.
+- The card (800 px), hero (1920 px) and social-sharing (1200 × 630 px)
+  sizes are then made from that file, also as WebP.
+- A file that cannot be read as an image is refused with a message asking
+  for a JPEG, PNG or WebP; other file types are not accepted at all.
+
+Two settings under **Site settings → Uploaded images** control this
+(admins only). They apply to new uploads; images already in the library
+keep the size and quality they were uploaded with.
+
+- **Image quality:** *Balanced* (the default) suits most photos. Choose
+  *Sharp* if photos look soft, or *Small files* to make pages load faster
+  at a slight cost in detail.
+- **Maximum image width:** 2400 pixels by default, enough for full-screen
+  photos; it can be set between 1200 and 4000.
+
+The seed fills in these defaults only when they are empty and never
+changes them, even with `--overwrite`.
+
+The bundled images under `public/images` (about 13 MB total, WebP with capped
 dimensions) are the seed source and the site's fixed artwork. Run
 `npm run images:optimize` after adding or replacing images to re-encode
 and resize them with `scripts/optimize-images.ts`. Size budget: hero

@@ -2,6 +2,8 @@
  * Domain types the frontend renders. Payload documents are mapped into
  * these shapes in `mappers.ts`, so components never see CMS documents.
  */
+import type { MediaSettings } from "@/lib/media/compress";
+
 export type { Testimonial } from "@/types/testimonial";
 
 /**
@@ -167,6 +169,8 @@ export type Site = {
   email: string;
   social: { instagram: string; facebook: string };
   address: { region: string; country: string };
+  /** How uploaded images are compressed, with the defaults applied. */
+  media: MediaSettings;
 };
 
 export type GrievanceOfficer = { name: string; email: string; phone: string };

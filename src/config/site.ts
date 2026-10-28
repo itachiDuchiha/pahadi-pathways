@@ -24,6 +24,11 @@ export const site = {
     region: "Himachal Pradesh",
     country: "IN",
   },
+  /** Upload compression defaults; the owner changes them in the site settings. */
+  media: {
+    imageQuality: "balanced",
+    maxImageWidth: 2400,
+  },
 } as const;
 
 /**

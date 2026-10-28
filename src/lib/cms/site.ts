@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import type { SiteSetting } from "@/cms/payload-types";
 import { site } from "@/config/site";
+import { resolveMediaSettings } from "@/lib/media/compress";
 
 import { getPayloadClient } from "./client";
 import type { Site } from "./types";
@@ -28,6 +29,7 @@ export function mergeSiteSettings(doc: SiteSetting): Site {
       facebook: pick(doc.facebook, site.social.facebook),
     },
     address: { region: site.address.region, country: site.address.country },
+    media: resolveMediaSettings(doc.media),
   };
 }
 

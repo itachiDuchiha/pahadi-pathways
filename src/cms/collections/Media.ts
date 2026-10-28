@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { isEditorOrAdmin } from "../access";
+import { compressUpload } from "../hooks/compressUpload";
 import { protectInUseMedia } from "../hooks/protectInUseMedia";
 import { revalidateHooks } from "../hooks/revalidate";
 
@@ -15,6 +16,8 @@ export const Media: CollectionConfig = {
     delete: isEditorOrAdmin,
   },
   hooks: {
+    // Compresses an uploaded image before Payload stores it and makes the sizes.
+    beforeOperation: [compressUpload],
     beforeDelete: [protectInUseMedia],
     afterChange: [revalidate.afterChange],
     afterDelete: [revalidate.afterDelete],
@@ -23,12 +26,17 @@ export const Media: CollectionConfig = {
     staticDir: process.env.MEDIA_DIR ?? "media",
     mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/avif"],
     imageSizes: [
-      { name: "card", width: 800 },
-      { name: "hero", width: 1920 },
-      { name: "og", width: 1200, height: 630, position: "centre" },
+      { name: "card", width: 800, formatOptions: { format: "webp", options: { quality: 80 } } },
+      { name: "hero", width: 1920, formatOptions: { format: "webp", options: { quality: 80 } } },
+      {
+        name: "og",
+        width: 1200,
+        height: 630,
+        position: "centre",
+        formatOptions: { format: "webp", options: { quality: 80 } },
+      },
     ],
     adminThumbnail: "card",
-    formatOptions: { format: "webp" },
   },
   fields: [
     {

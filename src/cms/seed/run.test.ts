@@ -307,6 +307,7 @@ describe("seed", () => {
 
       const siteSettings = await payload.findGlobal({ slug: "site-settings" });
       expect(siteSettings).toMatchObject({ phoneE164: "+917559697919", whatsapp: "917559697919" });
+      expect(siteSettings.media).toEqual({ imageQuality: "balanced", maxImageWidth: 2400 });
 
       const legal = await payload.findGlobal({ slug: "legal-settings" });
       // The contact email stays empty: the live read falls back to the site email.
@@ -386,6 +387,28 @@ describe("seed", () => {
       expect(settings.trip).toMatchObject({ sendEmail: false, recipients: [{ email: "owner@example.com" }] });
       expect(settings.contact?.sendEmail).toBe(true);
       expect(settings.package?.sendEmail).toBe(true);
+    },
+    120_000
+  );
+
+  it(
+    "fills only the media settings that are missing",
+    async () => {
+      const { payload } = temp;
+      await run();
+      await payload.updateGlobal({
+        slug: "site-settings",
+        data: { media: { imageQuality: "small", maxImageWidth: null } },
+        context: quiet,
+      });
+
+      const second = await run();
+
+      expect(second.updated["site-settings"]).toBe(1);
+      expect((await payload.findGlobal({ slug: "site-settings" })).media).toEqual({
+        imageQuality: "small",
+        maxImageWidth: 2400,
+      });
     },
     120_000
   );
@@ -472,6 +495,11 @@ describe("seed", () => {
         data: { contact: { sendEmail: false, recipients: [{ email: "sales@example.com" }] } },
         context: quiet,
       });
+      await payload.updateGlobal({
+        slug: "site-settings",
+        data: { media: { imageQuality: "sharp", maxImageWidth: 3200 } },
+        context: quiet,
+      });
 
       const result = await run(true);
 
@@ -497,6 +525,10 @@ describe("seed", () => {
       });
       const notifications = await payload.findGlobal({ slug: "notification-settings" });
       expect(notifications.contact?.sendEmail).toBe(false);
+      expect((await payload.findGlobal({ slug: "site-settings" })).media).toEqual({
+        imageQuality: "sharp",
+        maxImageWidth: 3200,
+      });
       expect(notifications.contact?.recipients?.map((r) => r.email)).toEqual(["sales@example.com"]);
 
       const after = await packageBySlug("shimla-manali-getaway");

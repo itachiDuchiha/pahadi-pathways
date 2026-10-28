@@ -992,6 +992,19 @@ export interface SiteSetting {
   instagram?: string | null;
   facebook?: string | null;
   tagline?: string | null;
+  /**
+   * Every image uploaded to the media library is turned upright, made no wider than the maximum width and saved as WebP. These settings apply to new uploads only.
+   */
+  media?: {
+    /**
+     * Balanced suits most photos. Choose Sharp if photos look soft, or Small files to make pages load faster.
+     */
+    imageQuality?: ('small' | 'balanced' | 'sharp') | null;
+    /**
+     * Wider images are scaled down to this width; smaller ones are never enlarged. 2400 is plenty for full-screen photos.
+     */
+    maxImageWidth?: number | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1159,6 +1172,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   instagram?: T;
   facebook?: T;
   tagline?: T;
+  media?:
+    | T
+    | {
+        imageQuality?: T;
+        maxImageWidth?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

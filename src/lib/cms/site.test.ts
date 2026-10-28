@@ -48,4 +48,17 @@ describe("mergeSiteSettings", () => {
     expect(merged.name).toBe(site.name);
     expect(merged.url).toBe(site.url);
   });
+
+  it("exposes the media settings and falls back on missing or invalid values", () => {
+    expect(mergeSiteSettings(doc({ media: { imageQuality: "sharp", maxImageWidth: 3200 } })).media).toEqual({
+      imageQuality: "sharp",
+      maxImageWidth: 3200,
+    });
+    expect(mergeSiteSettings(doc({ media: { imageQuality: null, maxImageWidth: null } })).media).toEqual({
+      imageQuality: "balanced",
+      maxImageWidth: 2400,
+    });
+    expect(mergeSiteSettings(doc({ media: { maxImageWidth: 9000 } })).media.maxImageWidth).toBe(4000);
+    expect(mergeSiteSettings(doc({ media: { maxImageWidth: 100 } })).media.maxImageWidth).toBe(1200);
+  });
 });

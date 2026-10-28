@@ -9,6 +9,7 @@ import * as migration_20261027_114014_legal_settings from './20261027_114014_leg
 import * as migration_20261027_115006_legal_effective_date_required from './20261027_115006_legal_effective_date_required';
 import * as migration_20261027_115708_notification_settings from './20261027_115708_notification_settings';
 import * as migration_20261027_121121_analytics_settings from './20261027_121121_analytics_settings';
+import * as migration_20261028_073322_media_settings from './20261028_073322_media_settings';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261027_121121_analytics_settings.up,
     down: migration_20261027_121121_analytics_settings.down,
-    name: '20261027_121121_analytics_settings'
+    name: '20261027_121121_analytics_settings',
+  },
+  {
+    up: migration_20261028_073322_media_settings.up,
+    down: migration_20261028_073322_media_settings.down,
+    name: '20261028_073322_media_settings'
   },
 ];

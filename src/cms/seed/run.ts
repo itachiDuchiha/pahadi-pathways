@@ -16,7 +16,7 @@ import { packageOptionOverrides, packageVehicleRates, pricingSettings } from "./
 import { legalFill, legalSettings } from "./legal";
 import { analyticsFill, analyticsSettings } from "./analytics";
 import { notificationFill } from "./notifications";
-import { siteSettings } from "./site";
+import { siteMediaFill, siteSettings } from "./site";
 import { testimonials } from "./testimonials";
 import { DESTINATION_CATEGORIES } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
@@ -367,10 +367,13 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
   }
 
   const siteDoc = await payload.findGlobal({ slug: "site-settings", depth: 0, overrideAccess: true });
-  if (overwrite || !siteDoc.phoneE164) {
+  // The media settings are only ever filled in, never reset (see siteMediaFill).
+  const mediaFill = siteMediaFill(siteDoc.media);
+  const siteData = overwrite || !siteDoc.phoneE164 ? { ...siteSettings, ...mediaFill } : mediaFill;
+  if (siteData) {
     await payload.updateGlobal({
       slug: "site-settings",
-      data: siteSettings,
+      data: siteData,
       overrideAccess: true,
       context,
     });
