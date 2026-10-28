@@ -108,7 +108,3 @@ Open items only; each line notes why it is still open.
     Remove when `drizzle-kit` drops `@esbuild-kit/esm-loader`.
   After removing one, run `npm install`, `npm audit --omit=dev` and the
   full build; keep the override if the audit is no longer clean.
-
-- **Set up Dependabot for `@types/*` and other dependency updates.** There
-  is no automated dependency-update process yet; version bumps are
-  currently manual.

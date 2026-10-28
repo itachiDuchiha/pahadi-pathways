@@ -485,3 +485,6 @@ each adapter: run `npm run payload migrate:create <name>` once with each
 - A few images are still 300–432 KB.
 - There are no browser/E2E tests yet, only Vitest unit and integration
   tests.
+- Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm
+  minor and patch updates (grouped) and GitHub Actions; major versions of
+  Next.js, React and Payload are ignored and need a planned manual upgrade.
