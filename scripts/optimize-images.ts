@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Converts public/images/**/*.{png,jpg,jpeg} to WebP, resizing non-logo assets
 // to a capped width, and deletes the original only after the WebP write
 // succeeds. Idempotent: re-running skips any source whose .webp sibling
@@ -17,7 +16,7 @@ import { readdir, stat, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
-import { nextQuality } from "../src/lib/image-budget";
+import { nextQuality, parseBudgetFlags } from "../src/lib/image-budget";
 
 const IMAGES_ROOT = path.join(process.cwd(), "public", "images");
 
@@ -29,6 +28,7 @@ const HERO_FILES = [path.join(IMAGES_ROOT, "himachal-home.png")];
 const LOGO_DIR = path.join(IMAGES_ROOT, "logo");
 
 const SOURCE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg"]);
+const WEBP_EXTENSIONS = new Set([".webp"]);
 
 function isUnderDir(filePath: string, dir: string) {
   const rel = path.relative(dir, filePath);
@@ -42,14 +42,14 @@ function classify(filePath: string) {
   return "default";
 }
 
-async function walk(dir: string): Promise<string[]> {
+async function walk(dir: string, extensions: Set<string>): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
   const files: string[] = [];
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      files.push(...(await walk(fullPath)));
-    } else if (SOURCE_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
+      files.push(...(await walk(fullPath, extensions)));
+    } else if (extensions.has(path.extname(entry.name).toLowerCase())) {
       files.push(fullPath);
     }
   }
@@ -139,17 +139,6 @@ function isHeroBudgetTarget(filePath: string) {
   );
 }
 
-async function walkWebp(dir: string): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files: string[] = [];
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...(await walkWebp(fullPath)));
-    else if (path.extname(entry.name).toLowerCase() === ".webp") files.push(fullPath);
-  }
-  return files;
-}
-
 // Re-encode one WebP in place until it fits `maxBytes`. Keeps the smallest
 // result; never writes a file larger than the original.
 async function budgetFile(filePath: string, maxBytes: number, floor: number) {
@@ -180,15 +169,12 @@ async function budgetFile(filePath: string, maxBytes: number, floor: number) {
   console.log(`${rel} ${before}→${best.length} bytes (q${bestQuality})${over}`);
 }
 
-function flagValue(name: string): string | undefined {
-  const i = process.argv.indexOf(name);
-  return i === -1 ? undefined : process.argv[i + 1];
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
-async function runBudget(maxKb: number) {
-  const floor = Number(flagValue("--quality-floor") ?? 60);
-  const heroesOnly = process.argv.includes("--heroes-only");
-  const files = (await walkWebp(IMAGES_ROOT)).filter(
+async function runBudget(maxKb: number, floor: number, heroesOnly: boolean) {
+  const files = (await walk(IMAGES_ROOT, WEBP_EXTENSIONS)).filter(
     (f) =>
       classify(f) !== "logo" &&
       (heroesOnly ? isHeroBudgetTarget(f) : !isHeroBudgetTarget(f)),
@@ -198,26 +184,31 @@ async function runBudget(maxKb: number) {
       await budgetFile(filePath, maxKb * 1024, floor);
     } catch (err) {
       process.exitCode = 1;
-      console.error(`failed: ${path.relative(process.cwd(), filePath)}: ${(err as Error).message}`);
+      console.error(`failed: ${path.relative(process.cwd(), filePath)}: ${errorMessage(err)}`);
     }
   }
 }
 
 async function main() {
-  const maxKb = flagValue("--max-kb");
-  if (maxKb !== undefined) {
-    await runBudget(Number(maxKb));
+  const flags = parseBudgetFlags(process.argv.slice(2));
+  if (flags !== null) {
+    if ("error" in flags) {
+      console.error(flags.error);
+      process.exitCode = 1;
+      return;
+    }
+    await runBudget(flags.maxKb, flags.qualityFloor, flags.heroesOnly);
     return;
   }
-  const files = await walk(IMAGES_ROOT);
+  const files = await walk(IMAGES_ROOT, SOURCE_EXTENSIONS);
   const webpPaths = buildWebpPathMap(files);
   let failed = false;
-  for (const filePath of files) {
+  for (const [filePath, webpPath] of webpPaths) {
     try {
-      await processFile(filePath, webpPaths.get(filePath) ?? filePath.replace(/\.[^.]+$/, ".webp"));
+      await processFile(filePath, webpPath);
     } catch (err) {
       failed = true;
-      console.error(`failed: ${path.relative(process.cwd(), filePath)}: ${(err as Error).message}`);
+      console.error(`failed: ${path.relative(process.cwd(), filePath)}: ${errorMessage(err)}`);
     }
   }
   if (failed) {
@@ -226,6 +217,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
+  console.error(errorMessage(err));
   process.exitCode = 1;
 });

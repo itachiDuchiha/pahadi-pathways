@@ -390,8 +390,9 @@ at or under 260 KB and every other image at or under 200 KB. Enforce it with
 `npm run images:optimize -- --max-kb 260 --heroes-only` and
 `npm run images:optimize -- --max-kb 200`, which re-encode existing WebP files
 in place (quality 80, 72, 65, then the `--quality-floor`, default 60) and never
-enlarge a file or change its dimensions. A few wide hero images stay above
-budget at the quality floor.
+enlarge a file or change its dimensions. At the default floor of 60 a few
+wide hero images stay above 260 KB, and a handful of larger non-hero
+destination and package photos stay slightly above 200 KB.
 
 ## Deployment
 
@@ -512,7 +513,7 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   rather than blocking them.
 - `/packages` renders on demand (it reads search params), unlike the
   statically generated destination and package detail pages.
-- A few hero images are still 280–330 KB at the quality floor.
+- A few wide hero images are still above 260 KB, and some non-hero photos slightly above 200 KB, at the quality floor of 60.
 - There are no browser/E2E tests yet, only Vitest unit and integration
   tests.
 - Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm
