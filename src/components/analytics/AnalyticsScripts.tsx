@@ -1,10 +1,11 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect } from "react";
 
 import { shouldLoadAnalytics } from "@/lib/consent";
 
-import { useConsent } from "./ConsentProvider";
+import { markVendorScriptsLoaded, useConsent } from "./ConsentProvider";
 
 type Props = { gaMeasurementId: string | null; clarityProjectId: string | null };
 
@@ -26,6 +27,11 @@ function literal(id: string): string {
 export default function AnalyticsScripts({ gaMeasurementId, clarityProjectId }: Props) {
   const { consent } = useConsent();
   const load = shouldLoadAnalytics(consent, { ga: gaMeasurementId, clarity: clarityProjectId });
+  const loadsAny = load.ga || load.clarity;
+
+  useEffect(() => {
+    if (loadsAny) markVendorScriptsLoaded();
+  }, [loadsAny]);
 
   return (
     <>

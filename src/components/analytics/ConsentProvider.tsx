@@ -62,6 +62,14 @@ function clearVendorCookies(): void {
 /** The choice as this tab last saw it, so a change from accepted can be spotted. */
 let lastSeen: Consent | null | undefined;
 
+/** Whether this tab has rendered a vendor script, which only a reload can stop. */
+let vendorScriptsLoaded = false;
+
+/** Called by `AnalyticsScripts` once it renders a vendor script tag. */
+export function markVendorScriptsLoaded(): void {
+  vendorScriptsLoaded = true;
+}
+
 function store(value: Consent): void {
   const secure = window.location.protocol === "https:";
 
@@ -91,8 +99,10 @@ function subscribe(listener: () => void): () => void {
     // cookies they set. `lastSeen` has moved on, so this happens once.
     if (previous === "accepted" && next !== "accepted") {
       clearVendorCookies();
-      window.location.reload();
-      return;
+      if (vendorScriptsLoaded) {
+        window.location.reload();
+        return;
+      }
     }
     listener();
   };
@@ -111,11 +121,10 @@ export default function ConsentProvider({ children }: { children: ReactNode }) {
 
   const accept = useCallback(() => store("accepted"), []);
   const decline = useCallback(() => {
-    const wasAccepted = readStored() === "accepted";
     store("declined");
     clearVendorCookies();
     // Vendor scripts cannot be unloaded, so a reload drops any that ran.
-    if (wasAccepted) window.location.reload();
+    if (vendorScriptsLoaded) window.location.reload();
   }, []);
 
   const value = useMemo(() => ({ consent, accept, decline }), [consent, accept, decline]);
