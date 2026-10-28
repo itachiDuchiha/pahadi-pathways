@@ -18,6 +18,7 @@
 ### Fixed
 - Showed a placeholder image when a media file is missing from disk, keeping the placeholder out of the seeded media library (b67af35, fd5a955).
 - Cleared the Google Analytics and Clarity cookies the site can see and stopped vendor scripts on every open tab that ran them when a visitor declines, reloading only tabs where scripts ran (47c5af4, 4f7a42d).
+- Limited the upload temp sweep to Payload's temp file names and refused to sweep a temp directory that overlaps the media directory or `public`; showed the Turnstile widget only when both keys are set, matching the server check and the privacy policy; printed the deploy restore hint only when a previous build exists (24f04cf).
 
 ### Security
 - Added Dependabot for npm and GitHub Actions (e64a65e).
