@@ -284,6 +284,9 @@ describe("seed", () => {
       }
       expect(spiti?.pricing.stayOptions?.[1]?.deltaPerNight).toBeCloseTo(2500 / 9, 9);
 
+      const gallery = await payload.find({ collection: "gallery-items", limit: 0, depth: 0 });
+      expect(new Set(gallery.docs.map((doc) => doc.kind))).toEqual(new Set(["image"]));
+
       const publicDestinations = await payload.find({
         collection: "destinations",
         overrideAccess: false,

@@ -375,7 +375,19 @@ export interface GalleryItem {
   category: string;
   location: string;
   size: 'normal' | 'large';
-  image: number | Media;
+  /**
+   * A video appears in the video section, with its poster as the thumbnail.
+   */
+  kind: 'image' | 'video';
+  image?: (number | null) | Media;
+  /**
+   * MP4 or WebM, up to 100 MB.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Shown before the video plays.
+   */
+  poster?: (number | null) | Media;
   caption?: string | null;
   /**
    * Lower numbers appear first.
@@ -737,7 +749,10 @@ export interface GalleryItemsSelect<T extends boolean = true> {
   category?: T;
   location?: T;
   size?: T;
+  kind?: T;
   image?: T;
+  video?: T;
+  poster?: T;
   caption?: T;
   order?: T;
   updatedAt?: T;

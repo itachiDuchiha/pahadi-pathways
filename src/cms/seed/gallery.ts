@@ -1,5 +1,7 @@
 /** Gallery images seeded into the `gallery-items` collection. */
 export type GallerySeedItem = {
+  /** Seeded items are images; videos are added in the admin. */
+  kind: "image";
   title: string;
   category: string;
   image: string;
@@ -19,6 +21,7 @@ export type GallerySeedItem = {
 
 export const galleryItems: GallerySeedItem[] = [
   {
+    kind: "image",
     title: "Spiti Valley",
     category: "Landscapes",
     image: "/images/hero/hero-jpg.webp",
@@ -26,6 +29,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "large",
   },
   {
+    kind: "image",
     title: "The Himalayan Roads",
     category: "Road Journeys",
     image: "/images/hero/hero-jpg.webp",
@@ -33,6 +37,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "normal",
   },
   {
+    kind: "image",
     title: "Shimla",
     category: "Mountain Towns",
     image: "/images/hero/hero-jpg.webp",
@@ -40,6 +45,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "normal",
   },
   {
+    kind: "image",
     title: "Manali",
     category: "Valleys",
     image: "/images/hero/hero-jpg.webp",
@@ -47,6 +53,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "large",
   },
   {
+    kind: "image",
     title: "Life in the Mountains",
     category: "Local Life",
     image: "/images/hero/hero-jpg.webp",
@@ -54,6 +61,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "normal",
   },
   {
+    kind: "image",
     title: "Beyond the Ordinary",
     category: "Landscapes",
     image: "/images/hero/hero-jpg.webp",
@@ -61,6 +69,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "normal",
   },
   {
+    kind: "image",
     title: "Quiet Mountain Towns",
     category: "Mountain Towns",
     image: "/images/hero/hero-jpg.webp",
@@ -68,6 +77,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "normal",
   },
   {
+    kind: "image",
     title: "The Journey Itself",
     category: "Road Journeys",
     image: "/images/hero/hero-jpg.webp",
@@ -75,6 +85,7 @@ export const galleryItems: GallerySeedItem[] = [
     size: "large",
   },
   {
+    kind: "image",
     title: "Valleys of Himachal",
     category: "Valleys",
     image: "/images/hero/hero-jpg.webp",

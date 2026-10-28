@@ -311,7 +311,8 @@ async function runSeed(payload: Payload, options: SeedOptions): Promise<SeedResu
     "gallery-items",
     galleryItems.length,
     () =>
-      galleryItems.map(({ title, category, location, size, image }, order) => ({
+      galleryItems.map(({ kind, title, category, location, size, image }, order) => ({
+        kind,
         title,
         category,
         location,

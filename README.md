@@ -60,7 +60,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `PAYLOAD_SECRET` | Required. Signing secret for CMS sessions, at least 32 random characters (`openssl rand -hex 32`). The server refuses to start without it. |
 | `DATABASE_ADAPTER` | `sqlite` (default) or `postgres`. |
 | `DATABASE_URL` | Required. `file:./data/cms.db` for SQLite, `postgres://user:password@host:5432/db` for Postgres. |
-| `MEDIA_DIR` | Directory where uploaded images are stored (default `media`, relative to the repository root). Use an absolute path outside the checkout in production. |
+| `MEDIA_DIR` | Directory where uploaded images and videos are stored (default `media`, relative to the repository root). Use an absolute path outside the checkout in production. |
 | `PAYLOAD_ADMIN_EMAIL` | Email of the first admin account, created only while there are no users. |
 | `PAYLOAD_ADMIN_PASSWORD` | Password of the first admin account, at least 12 characters. Remove it from the environment once the account exists. |
 
@@ -156,8 +156,8 @@ clear the shell history afterwards so the password is not kept there.
 - Editable in the CMS: package content, itineraries, prices (base price per
   adult, per-vehicle rates and optional per-package stay and meal
   options), destinations (including whether a destination uses its
-  dedicated layout or the shared one), testimonials, gallery images,
-  experiences (text and icon name), the default stay, meal and vehicle
+  dedicated layout or the shared one), testimonials, gallery images and
+  videos, experiences (text and icon name), the default stay, meal and vehicle
   pricing tables, site contact details, and all images.
 - Stay and meal options are priced in rupees per booking per night (added
   once, regardless of the number of adults): a quote adds the option's
@@ -169,14 +169,22 @@ clear the shell history afterwards so the password is not kept there.
   the defaults. Vehicle upgrades, GST and the child rule always come from
   the pricing settings.
 - Code: page layouts, the dedicated Manali, Shimla and Spiti destination
-  pages, gallery videos, the experience icon set, the price calculation
+  pages, the experience icon set, the price calculation
   rules and the enquiry forms.
 - Packages and destinations have drafts; only published versions appear on
   the site. Publishing revalidates the affected pages, so changes show up
   without a rebuild. Enquiries submitted on the site are stored under
   Leads as well as emailed.
+- A gallery item is an image or a video (set by its **Kind**). A video
+  item needs an MP4 or WebM video (up to 100 MB) and a poster image, shown
+  as the thumbnail and before the video plays; it appears in the video
+  section of the gallery page, which is shown only when at least one video
+  item exists. Videos are stored as uploaded: they are not compressed or
+  resized, so export them at web size (for example 1080p H.264 MP4) before
+  uploading. Image fields elsewhere offer only images.
 - An image that a package, destination (cover or gallery), gallery item or
-  experience still uses cannot be deleted; the admin names up to five of
+  experience still uses (or a video or poster that a gallery item uses)
+  cannot be deleted; the admin names up to five of
   the documents that use it. Replace the image there first. Drafts count
   too.
 - Replacing or editing an image revalidates every page, since an image can
@@ -390,7 +398,9 @@ does not slow the site down:
 - The card (800 px), hero (1920 px) and social-sharing (1200 × 630 px)
   sizes are then made from that file, also as WebP.
 - A file that cannot be read as an image is refused with a message asking
-  for a JPEG, PNG or WebP; other file types are not accepted at all.
+  for a JPEG, PNG or WebP. Images over 10 MB are refused. MP4 and WebM
+  videos (up to 100 MB) are accepted and stored unchanged; other file types
+  are not accepted at all.
 - If an image file is removed from `MEDIA_DIR` outside the admin, pages show
   a placeholder image instead of failing, and the build or server log names
   the missing file once.
@@ -500,8 +510,10 @@ enough: a client-forged `X-Forwarded-For` would pass through and defeat the
 limiter. Without the header the client address is unknown and the rate limiter is
 skipped entirely, so enquiries are unlimited; the proxy must set the
 header for the limiter to work. For nginx:
-`proxy_set_header X-Forwarded-For $remote_addr;`. Serve the site over
-HTTPS: in production the admin session cookie is `secure`.
+`proxy_set_header X-Forwarded-For $remote_addr;`. The proxy must also
+accept request bodies of a little over 100 MB, the largest upload (a
+video), for example `client_max_body_size 101m;` in nginx (its default
+is 1 MB). Serve the site over HTTPS: in production the admin session cookie is `secure`.
 
 CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`) before merging to the default branch.
@@ -548,7 +560,10 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   undo them, restore the newest `<database>.bak-<timestamp>` copy over the
   database file, `git checkout` the previous commit and run
   `scripts/deploy.sh` again.
-- Gallery videos and experience icons are managed in code, not the CMS.
+- Experience icons are managed in code, not the CMS.
+- Uploaded videos are stored and served as uploaded (no transcoding or
+  compression), and an upload is held in server memory while it is
+  processed.
 - There is no live preview of drafts in the admin.
 - Media is stored on the server's disk, which suits a single server only.
 - Moving from SQLite to Postgres does not copy existing content.

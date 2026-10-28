@@ -12,8 +12,6 @@ Open items only; each line notes why it is still open.
 - **Add live preview of drafts.** Editors currently publish to see a
   change on the site; Payload's live preview needs a preview route and
   draft-aware reads.
-- **Manage gallery videos in the CMS.** Videos are still code-managed; the
-  Media collection accepts images only.
 - **Move media to S3-compatible storage if the site ever runs on more than
   one server.** Media is on the server's disk (`MEDIA_DIR`), which only
   works for a single instance.

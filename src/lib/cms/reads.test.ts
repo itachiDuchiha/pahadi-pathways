@@ -163,7 +163,7 @@ describe("ordered collections", () => {
       });
       await temp.payload.create({
         collection: "gallery-items",
-        data: { title: name, category: "Landscapes", location: "Spiti", size: "normal", image: imageId, order },
+        data: { kind: "image", title: name, category: "Landscapes", location: "Spiti", size: "normal", image: imageId, order },
         overrideAccess: true,
         context,
       });

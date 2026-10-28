@@ -209,6 +209,7 @@ describe("content access (Local API, overrideAccess: false)", () => {
     const item = await temp.payload.create({
       collection: "gallery-items",
       data: {
+        kind: "image",
         title: "Spiti Valley",
         category: "Landscapes",
         location: "Spiti",

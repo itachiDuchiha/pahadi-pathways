@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { APIError, type CollectionBeforeOperationHook } from "payload";
 
 import { compressImage, isCompressibleImage } from "@/lib/media/compress";
+import { IMAGE_TOO_LARGE, MAX_IMAGE_BYTES, uploadSize } from "@/lib/media/limits";
 import { QUALITY_BY_LEVEL, resolveMediaSettings, type MediaSettings } from "@/lib/media/settings";
 
 type HookArgs = Parameters<CollectionBeforeOperationHook>[0];
@@ -30,6 +31,8 @@ export const compressUpload: CollectionBeforeOperationHook = async ({ args, oper
   // This hook runs before access control: do no work for a request that
   // will be refused (no signed-in user and no server-side override).
   if (!overrideAccess && !req.user) return args;
+  // The HTTP limit is sized for videos; images keep their smaller one.
+  if (uploadSize(file) > MAX_IMAGE_BYTES) throw new APIError(IMAGE_TOO_LARGE, 413);
 
   const { imageQuality, maxImageWidth } = await readSettings(req);
 

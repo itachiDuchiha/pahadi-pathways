@@ -24,7 +24,9 @@ describe("securityConfig", () => {
     expect(config.cors).toEqual([site.url]);
     expect(config.csrf).toEqual([site.url]);
     expect(config.serverURL).toBe(site.url);
-    expect(config.upload.limits.fileSize).toBe(10 * 1024 * 1024);
+    expect(config.upload.limits.fileSize).toBe(100 * 1024 * 1024);
+    expect(config.upload.requestSizeLimit).toBeGreaterThan(config.upload.limits.fileSize);
+    expect(config.upload.responseOnLimit).toBe("Files must be 100 MB or smaller");
     expect(config.cookiePrefix).toBe("thc");
   });
 });

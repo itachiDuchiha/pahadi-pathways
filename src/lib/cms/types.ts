@@ -36,12 +36,16 @@ export type Destination = {
 };
 
 export type GalleryItem = {
+  /** Videos appear in the video section; images in the photo grid. */
+  kind: "image" | "video";
   title: string;
   category: string;
   image: string;
   location: string;
   size: "normal" | "large";
   caption: string;
+  /** Present only on video items; `image` is then the poster. */
+  video?: { src: string; poster: string };
 };
 
 /**

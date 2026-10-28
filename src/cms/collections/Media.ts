@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { isEditorOrAdmin } from "../access";
 import { compressUpload } from "../hooks/compressUpload";
+import { limitVideoSize } from "../hooks/limitVideoSize";
 import { protectInUseMedia } from "../hooks/protectInUseMedia";
 import { revalidateHooks } from "../hooks/revalidate";
 
@@ -18,13 +19,15 @@ export const Media: CollectionConfig = {
   hooks: {
     // Compresses an uploaded image before Payload stores it and makes the sizes.
     beforeOperation: [compressUpload],
+    // Videos are stored as uploaded (no compression, no sizes), up to 100 MB.
+    beforeValidate: [limitVideoSize],
     beforeDelete: [protectInUseMedia],
     afterChange: [revalidate.afterChange],
     afterDelete: [revalidate.afterDelete],
   },
   upload: {
     staticDir: process.env.MEDIA_DIR ?? "media",
-    mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/avif"],
+    mimeTypes: ["image/jpeg", "image/png", "image/webp", "image/avif", "video/mp4", "video/webm"],
     imageSizes: [
       { name: "card", width: 800, formatOptions: { format: "webp", options: { quality: 80 } } },
       { name: "hero", width: 1920, formatOptions: { format: "webp", options: { quality: 80 } } },

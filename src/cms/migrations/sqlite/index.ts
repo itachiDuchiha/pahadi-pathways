@@ -10,6 +10,7 @@ import * as migration_20261027_115006_legal_effective_date_required from './2026
 import * as migration_20261027_115708_notification_settings from './20261027_115708_notification_settings';
 import * as migration_20261027_121121_analytics_settings from './20261027_121121_analytics_settings';
 import * as migration_20261028_073322_media_settings from './20261028_073322_media_settings';
+import * as migration_20261028_083933_gallery_videos from './20261028_083933_gallery_videos';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20261028_073322_media_settings.up,
     down: migration_20261028_073322_media_settings.down,
-    name: '20261028_073322_media_settings'
+    name: '20261028_073322_media_settings',
+  },
+  {
+    up: migration_20261028_083933_gallery_videos.up,
+    down: migration_20261028_083933_gallery_videos.down,
+    name: '20261028_083933_gallery_videos'
   },
 ];

@@ -115,6 +115,40 @@ function destinationDoc(slug: string, overrides: Partial<DestinationDoc> = {}): 
   };
 }
 
+function videoMedia(filename: string): Media {
+  return {
+    id: nextId++,
+    alt: filename,
+    createdAt: STAMP,
+    updatedAt: STAMP,
+    filename,
+    mimeType: "video/mp4",
+    url: `${ORIGIN}/api/media/file/${filename}`,
+    sizes: { card: { url: null }, hero: { url: null }, og: { url: null } },
+  };
+}
+
+function videoItemDoc(overrides: Partial<GalleryItemDoc> = {}): GalleryItemDoc {
+  const poster = media("poster.webp");
+  poster.sizes!.card!.filename = "poster-800x533.webp";
+  return {
+    id: 3,
+    kind: "video",
+    title: "Road to Kaza",
+    category: "Road Journeys",
+    location: "Spiti",
+    size: "normal",
+    image: null,
+    video: videoMedia("road.mp4"),
+    poster,
+    caption: null,
+    order: 0,
+    createdAt: STAMP,
+    updatedAt: STAMP,
+    ...overrides,
+  };
+}
+
 describe("mediaPath", () => {
   it("drops the server origin so next/image treats the file as local", () => {
     expect(mediaPath(`${ORIGIN}/api/media/file/a.webp`)).toBe("/api/media/file/a.webp");
@@ -229,6 +263,7 @@ describe("mapTestimonial, mapGalleryItem, mapExperience", () => {
   it("falls back to the title when a gallery item has no caption", () => {
     const doc: GalleryItemDoc = {
       id: 1,
+      kind: "image",
       title: "Spiti Valley",
       category: "Landscapes",
       location: "Spiti",
@@ -240,6 +275,7 @@ describe("mapTestimonial, mapGalleryItem, mapExperience", () => {
       updatedAt: STAMP,
     };
     expect(mapGalleryItem(doc)).toEqual({
+      kind: "image",
       title: "Spiti Valley",
       category: "Landscapes",
       location: "Spiti",
@@ -247,8 +283,33 @@ describe("mapTestimonial, mapGalleryItem, mapExperience", () => {
       image: "/api/media/file/hero-hero-jpg.webp",
       caption: "Spiti Valley",
     });
-    expect(mapGalleryItem({ ...doc, caption: "Dawn" }).caption).toBe("Dawn");
+    expect(mapGalleryItem({ ...doc, caption: "Dawn" })?.caption).toBe("Dawn");
     expect(() => mapGalleryItem({ ...doc, image: 1 })).toThrow(/Spiti Valley/);
+  });
+
+  it("maps a video item to the video file and the poster's card size", () => {
+    const doc = videoItemDoc();
+    expect(mapGalleryItem(doc)).toEqual({
+      kind: "video",
+      title: "Road to Kaza",
+      category: "Road Journeys",
+      location: "Spiti",
+      size: "normal",
+      image: "/api/media/file/poster-800x533.webp",
+      caption: "Road to Kaza",
+      video: { src: "/api/media/file/road.mp4", poster: "/api/media/file/poster-800x533.webp" },
+    });
+  });
+
+  it("uses the poster original when it has no card size", () => {
+    const poster = media("small-poster.webp");
+    poster.sizes = { card: { url: null } };
+    expect(mapGalleryItem(videoItemDoc({ poster }))?.video?.poster).toBe("/api/media/file/small-poster.webp");
+  });
+
+  it("throws for a video item whose video or poster is not populated", () => {
+    expect(() => mapGalleryItem(videoItemDoc({ video: 4 }))).toThrow(/Road to Kaza/);
+    expect(() => mapGalleryItem(videoItemDoc({ poster: 5 }))).toThrow(/Road to Kaza/);
   });
 
   it("maps an experience with its icon name", () => {
@@ -310,5 +371,31 @@ describe("missing media files", () => {
 
   it("uses the original when there is no hero rendition", () => {
     expect(heroUrl(media("a.webp"), "owner", "heroImage", () => true)).toBe("/api/media/file/a.webp");
+  });
+
+  it("shows the placeholder poster when the poster's file is missing", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const item = mapGalleryItem(videoItemDoc(), (name) => name !== "poster-800x533.webp");
+    expect(item?.video).toEqual({ src: "/api/media/file/road.mp4", poster: PLACEHOLDER_IMAGE });
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it("falls back to the item's image when the video file is missing", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const doc = videoItemDoc({ image: media("still.webp") });
+    const item = mapGalleryItem(doc, (name) => name !== "road.mp4");
+    expect(item).toMatchObject({ kind: "image", image: "/api/media/file/still.webp" });
+    expect(item).not.toHaveProperty("video");
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("road.mp4");
+  });
+
+  it("skips a video item with a missing video file and no image, warning once", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const missingVideo = (name: string) => name !== "road.mp4";
+    expect(mapGalleryItem(videoItemDoc(), missingVideo)).toBeNull();
+    expect(mapGalleryItem(videoItemDoc(), missingVideo)).toBeNull();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("road.mp4");
   });
 });

@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { DESTINATION_CATEGORIES } from "@/lib/cms/types";
 
 import { isEditorOrAdmin, publishedOnly } from "../access";
-import { imageField } from "../fields/image";
+import { imageField, mimeTypeFilter } from "../fields/image";
 import { slugField } from "../fields/slug";
 import { revalidateHooks } from "../hooks/revalidate";
 
@@ -39,6 +39,7 @@ export const Destinations: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       hasMany: true,
+      filterOptions: mimeTypeFilter("image/"),
     },
     {
       name: "category",

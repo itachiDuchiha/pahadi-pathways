@@ -1,10 +1,10 @@
 import { APIError, type CollectionBeforeDeleteHook, type CollectionSlug, type Payload, type PayloadRequest, type Where } from "payload";
 
-/** Every place an image can be used, with the field that names the document. */
+/** Every place an image or video can be used, with the field that names the document. */
 const USAGES = [
   { collection: "packages", title: "title", fields: ["image", "heroImage"], drafts: true },
   { collection: "destinations", title: "name", fields: ["image", "gallery"], drafts: true },
-  { collection: "gallery-items", title: "title", fields: ["image"], drafts: false },
+  { collection: "gallery-items", title: "title", fields: ["image", "video", "poster"], drafts: false },
   { collection: "experiences", title: "title", fields: ["image"], drafts: false },
 ] as const satisfies readonly {
   collection: CollectionSlug;

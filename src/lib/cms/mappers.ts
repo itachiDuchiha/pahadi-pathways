@@ -49,15 +49,23 @@ export function resetMissingMediaWarnings(): void {
 
 type FileExists = (filename: string) => boolean;
 
+function storedName(url: string, filename: string | null | undefined): string {
+  return filename ?? mediaPath(url).split("/").pop() ?? "";
+}
+
+/** Reports a missing file once per process; `outcome` says what is shown instead. */
+function warnMissing(name: string, outcome: string): void {
+  if (warnedMissing.has(name)) return;
+  warnedMissing.add(name);
+  console.warn(`Media file "${name}" is missing from the media directory; ${outcome}.`);
+}
+
 /** The site path for a stored file, or the placeholder (with one warning per file) when it is missing. */
 function servedPath(url: string, filename: string | null | undefined, exists: FileExists): string {
-  const name = filename ?? mediaPath(url).split("/").pop() ?? "";
+  const name = storedName(url, filename);
   if (exists(name)) return mediaPath(url);
 
-  if (!warnedMissing.has(name)) {
-    warnedMissing.add(name);
-    console.warn(`Media file "${name}" is missing from the media directory; showing a placeholder image.`);
-  }
+  warnMissing(name, "showing a placeholder image");
   return PLACEHOLDER_IMAGE;
 }
 
@@ -197,15 +205,42 @@ export function mapTestimonial(doc: TestimonialDoc): Testimonial {
   return { name: doc.name, city: doc.city, tour: doc.tour, review: doc.review, rating: doc.rating };
 }
 
-export function mapGalleryItem(doc: GalleryItemDoc): GalleryItem {
-  return {
+/** A video poster at the card size when one was generated (small posters have none), else the original. */
+function posterUrl(media: number | Media | null | undefined, owner: string, exists: FileExists): string {
+  const doc = populated(media, owner, "poster");
+  const card = doc.sizes?.card;
+  return card?.url ? servedPath(card.url, card.filename, exists) : mediaUrl(doc, owner, "poster", exists);
+}
+
+/**
+ * A gallery item. A video item whose video file is missing falls back to
+ * the item's image when it has one; without one the item is left out
+ * (`null`), so no card shows a video that cannot play.
+ */
+export function mapGalleryItem(doc: GalleryItemDoc, exists: FileExists = mediaFileExists): GalleryItem | null {
+  const owner = `gallery item "${doc.title}"`;
+  const common = {
     title: doc.title,
     category: doc.category,
-    image: mediaUrl(doc.image, `gallery item "${doc.title}"`, "image"),
     location: doc.location,
     size: doc.size,
     caption: doc.caption?.trim() || doc.title,
   };
+
+  if (doc.kind === "video") {
+    const video = populated(doc.video, owner, "video");
+    if (!video.url) throw new Error(`Media for "video" on ${owner} has no URL.`);
+    const poster = posterUrl(doc.poster, owner, exists);
+    const name = storedName(video.url, video.filename);
+
+    if (exists(name)) {
+      return { kind: "video", ...common, image: poster, video: { src: mediaPath(video.url), poster } };
+    }
+    warnMissing(name, doc.image ? `showing ${owner} as an image` : `leaving ${owner} out`);
+    if (!doc.image) return null;
+  }
+
+  return { kind: "image", ...common, image: mediaUrl(doc.image, owner, "image", exists) };
 }
 
 export function mapExperience(doc: ExperienceDoc): Experience {

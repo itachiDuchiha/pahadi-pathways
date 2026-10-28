@@ -25,42 +25,6 @@ const categories = [
   "Local Life",
 ];
 
-/*
-  VIDEO GALLERY
-
-  Add your videos to:
-  public/videos/
-
-  Then replace an empty src with a filename, for example:
-  src: "/videos/spiti-journey.mp4"
-
-  Keep the poster image as the video thumbnail.
-*/
-
-const videoItems = [
-  {
-    title: "A Journey Through Spiti",
-    category: "Road Stories",
-    src: "",
-    poster: "/images/hero/hero-jpg.webp",
-    duration: "Travel film",
-  },
-  {
-    title: "The Quiet Side of Himachal",
-    category: "Local Life",
-    src: "",
-    poster: "/images/hero/hero-jpg.webp",
-    duration: "Mountain moments",
-  },
-  {
-    title: "Roads Into the Himalayas",
-    category: "Scenic Journeys",
-    src: "",
-    poster: "/images/hero/hero-jpg.webp",
-    duration: "On the road",
-  },
-];
-
 type GalleryExplorerProps = {
   items: GalleryItem[];
 };
@@ -70,10 +34,15 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
 
+  const photoItems = galleryItems.filter((item) => item.kind === "image");
+  const videoItems = galleryItems.flatMap((item) =>
+    item.kind === "video" && item.video ? [{ ...item, video: item.video }] : []
+  );
+
   const filteredItems =
     activeCategory === "All Moments"
-      ? galleryItems
-      : galleryItems.filter(
+      ? photoItems
+      : photoItems.filter(
           (item) => item.category === activeCategory
         );
 
@@ -257,70 +226,70 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
       {/* VIDEO COLLECTION */}
       {/* ================================================== */}
 
-      <section className="bg-[#10264A] px-5 py-16 sm:px-8 md:py-20 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
-            {/* Video introduction */}
-            <div className="text-white">
-              <div className="flex items-center gap-3">
-                <Film size={19} className="text-[#D4AF37]" />
-                <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
-                  Beyond photographs
+      {videoItems.length > 0 && (
+        <section className="bg-[#10264A] px-5 py-16 sm:px-8 md:py-20 lg:px-10">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
+              {/* Video introduction */}
+              <div className="text-white">
+                <div className="flex items-center gap-3">
+                  <Film size={19} className="text-[#D4AF37]" />
+                  <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#D4AF37]">
+                    Beyond photographs
+                  </p>
+                </div>
+
+                <h2 className="mt-5 font-serif text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
+                  See the mountains
+                  <span className="block italic text-[#D4AF37]">
+                    in motion.
+                  </span>
+                </h2>
+
+                <p className="mt-5 max-w-lg text-sm leading-7 text-gray-300 sm:text-base sm:leading-8">
+                  Some journeys deserve more than a photograph. Explore
+                  cinematic travel films, scenic drives and the atmosphere
+                  of life in the Himalayas.
                 </p>
+
+                <div className="mt-7 flex items-center gap-3 text-sm text-white/75">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#C89A3D]/50 text-[#D4AF37]">
+                    <Play size={15} fill="currentColor" />
+                  </span>
+                  <span>Travel stories, one moment at a time.</span>
+                </div>
               </div>
 
-              <h2 className="mt-5 font-serif text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
-                See the mountains
-                <span className="block italic text-[#D4AF37]">
-                  in motion.
-                </span>
-              </h2>
-
-              <p className="mt-5 max-w-lg text-sm leading-7 text-gray-300 sm:text-base sm:leading-8">
-                Some journeys deserve more than a photograph. Explore
-                cinematic travel films, scenic drives and the atmosphere
-                of life in the Himalayas.
-              </p>
-
-              <div className="mt-7 flex items-center gap-3 text-sm text-white/75">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#C89A3D]/50 text-[#D4AF37]">
-                  <Play size={15} fill="currentColor" />
-                </span>
-                <span>Travel stories, one moment at a time.</span>
-              </div>
-            </div>
-
-            {/* Video cards */}
-            <div className="grid gap-5 sm:grid-cols-2">
-              {videoItems.map((video, index) => (
-                <div
-                  key={video.title}
-                  className={`group relative overflow-hidden bg-[#081526] ${
-                    index === 0 ? "sm:col-span-2" : ""
-                  }`}
-                >
+              {/* Video cards */}
+              <div className="grid gap-5 sm:grid-cols-2">
+                {videoItems.map((video, index) => (
                   <div
-                    className={`relative ${
-                      index === 0
-                        ? "aspect-[16/8] sm:aspect-[16/7]"
-                        : "aspect-[16/10]"
+                    key={`${video.title}-${video.video.src}`}
+                    className={`group relative overflow-hidden bg-[#081526] ${
+                      index === 0 ? "sm:col-span-2" : ""
                     }`}
                   >
-                    <Image
-                      src={video.poster}
-                      alt={video.title}
-                      fill
-                      sizes={
+                    <div
+                      className={`relative ${
                         index === 0
-                          ? "(max-width: 640px) 100vw, 70vw"
-                          : "(max-width: 640px) 100vw, 35vw"
-                      }
-                      className="object-cover opacity-75 transition-transform duration-700 group-hover:scale-105"
-                    />
+                          ? "aspect-[16/8] sm:aspect-[16/7]"
+                          : "aspect-[16/10]"
+                      }`}
+                    >
+                      <Image
+                        src={video.video.poster}
+                        alt={video.title}
+                        fill
+                        sizes={
+                          index === 0
+                            ? "(max-width: 640px) 100vw, 70vw"
+                            : "(max-width: 640px) 100vw, 35vw"
+                        }
+                        className="object-cover opacity-75 transition-transform duration-700 group-hover:scale-105"
+                      />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/95 via-[#081526]/15 to-[#081526]/10" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#081526]/95 via-[#081526]/15 to-[#081526]/10" />
 
-                    {video.src ? (
                       <button
                         type="button"
                         onClick={() => setSelectedVideo(index)}
@@ -331,40 +300,28 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
                           <Play size={21} fill="currentColor" />
                         </span>
                       </button>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/50 bg-white/10 text-white backdrop-blur-sm transition-all duration-300 group-hover:border-[#C89A3D] group-hover:bg-[#C89A3D] group-hover:text-[#10264A]">
-                          <Play size={20} />
-                        </span>
+
+                      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
+                          {video.category}
+                        </p>
+
+                        <h3 className="mt-2 font-serif text-xl font-medium text-white sm:text-2xl">
+                          {video.title}
+                        </h3>
+
+                        <p className="mt-2 text-xs text-white/65">
+                          {video.location}
+                        </p>
                       </div>
-                    )}
-
-                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#D4AF37]">
-                        {video.category}
-                      </p>
-
-                      <h3 className="mt-2 font-serif text-xl font-medium text-white sm:text-2xl">
-                        {video.title}
-                      </h3>
-
-                      <p className="mt-2 text-xs text-white/65">
-                        {video.src ? video.duration : "Video coming soon"}
-                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-
-          <p className="mt-8 border-t border-white/10 pt-5 text-xs leading-6 text-white/45">
-            Video placeholders are ready for your own travel footage.
-            Add your video files and update their paths in the gallery
-            configuration when they are available.
-          </p>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ================================================== */}
       {/* PHOTO LIGHTBOX */}
@@ -455,7 +412,7 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
       {/* VIDEO PLAYER */}
       {/* ================================================== */}
 
-      {selectedVideo !== null && videoItems[selectedVideo]?.src && (
+      {selectedVideo !== null && videoItems[selectedVideo] && (
         <div
           className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#050B14]/95 p-4 backdrop-blur-md sm:p-8"
           onClick={closeOverlays}
@@ -477,10 +434,11 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
             onClick={(event) => event.stopPropagation()}
           >
             <video
-              key={videoItems[selectedVideo].src}
-              src={videoItems[selectedVideo].src}
-              poster={videoItems[selectedVideo].poster}
+              key={videoItems[selectedVideo].video.src}
+              src={videoItems[selectedVideo].video.src}
+              poster={videoItems[selectedVideo].video.poster}
               controls
+              preload="none"
               autoPlay
               playsInline
               className="max-h-[75vh] w-full bg-black"

@@ -186,6 +186,23 @@ describe("compressUpload (hook)", () => {
     expect(JSON.stringify(logger.error.mock.calls[0])).toContain("ENOENT");
   });
 
+  it("refuses an image over 10 MB before reading the settings or compressing", async () => {
+    const data = await png(100, 100);
+    const { args, findGlobal } = hookArgs("create", {
+      data,
+      mimetype: "image/png",
+      name: "huge.png",
+      size: 10 * 1024 * 1024 + 1,
+    });
+
+    await expect(compressUpload(args)).rejects.toMatchObject({
+      message: "Images must be 10 MB or smaller",
+      status: 413,
+    });
+    expect(findGlobal).not.toHaveBeenCalled();
+    expect(compressImage).not.toHaveBeenCalled();
+  });
+
   it("refuses a file that claims to be an image but is not", async () => {
     const { args } = hookArgs("create", {
       data: Buffer.from("not really a png"),
