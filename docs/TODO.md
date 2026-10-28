@@ -17,9 +17,6 @@ Open items only; each line notes why it is still open.
 - **Move media to S3-compatible storage if the site ever runs on more than
   one server.** Media is on the server's disk (`MEDIA_DIR`), which only
   works for a single instance.
-- **Ask before `cms:seed -- --overwrite`.** It reverts editor changes
-  without a confirmation step; a prompt or a `--yes` flag would prevent
-  accidents.
 - **Render without a missing image.** Deleting an image that content
   still uses is now refused, but a media file removed from disk outside
   the admin still makes that page and the build fail; a fallback image

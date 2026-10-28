@@ -78,7 +78,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `npm run generate:types` | Regenerate `src/cms/payload-types.ts` from the CMS config. |
 | `npm run generate:importmap` | Regenerate the admin import map after adding admin components. |
 | `npm run cms:seed` | Fill empty collections with the bundled content and create the first admin (see Content management). |
-| `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes. |
+| `npm run cms:seed -- --overwrite` | Reset every seeded item to the bundled content, reverting editor changes; asks for confirmation (`--yes` skips it). |
 | `npm run cms:prune-enquiries` | Optional, not part of the retention policy: delete stored enquiries older than a number of months (24 if none is passed). Enquiries are otherwise kept and deleted on request (see Backups). |
 | `npm run cms:set-password -- --email <addr>` | Set a user's password from `NEW_PASSWORD` (see "Recovering the admin account"). |
 | `scripts/deploy.sh` | Install, migrate, seed, build and restart on the server (see Deployment). |
@@ -284,10 +284,13 @@ are empty the site loads no analytics and shows no banner.
   images in `public/images`, and skips anything already populated. It is
   safe to re-run and is part of every deploy.
 - `npm run cms:seed -- --overwrite` resets every seeded item to the bundled
-  content. **It reverts editor changes** to those items and asks for no
-  confirmation; use it only on a fresh or throwaway database, or to
-  complete a seed that was interrupted. It keeps the owner's analytics IDs,
-  notification choices and data contact email.
+  content. **It reverts editor changes** to those items, so it prints a
+  warning and asks you to type `overwrite` before it runs; use it only on a
+  fresh or throwaway database, or to complete a seed that was interrupted.
+  Without a terminal (CI, scripts) it refuses unless `--yes` is added:
+  `npm run cms:seed -- --overwrite --yes`. It keeps the owner's analytics
+  IDs, notification choices and data contact email. `scripts/deploy.sh`
+  never passes `--overwrite`.
 
 ### Backups
 
@@ -465,8 +468,6 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   client-sent value (setting only `X-Real-IP` is not enough; see
   Deployment). On a bare `next start` without a proxy the header can be
   forged.
-- `npm run cms:seed -- --overwrite` reverts editor changes without a
-  confirmation step.
 - Media files are publicly readable by URL, including images attached only
   to drafts that are not published yet (accepted by the owner).
 - The deploy builds in place: a failed `npm run build` leaves the site
