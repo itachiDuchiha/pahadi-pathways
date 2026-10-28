@@ -2,12 +2,20 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { ValidationError } from "payload";
+import { Forbidden, ValidationError } from "payload";
 import sharp from "sharp";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { compressImage } from "@/lib/media/compress";
 
 import { withTempPayload } from "../test/withTempPayload";
 import { compressUpload } from "./compressUpload";
+
+// A pass-through spy, so tests can see whether the compressor ran.
+vi.mock("@/lib/media/compress", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/media/compress")>();
+  return { ...actual, compressImage: vi.fn(actual.compressImage) };
+});
 
 type HookArgs = Parameters<typeof compressUpload>[0];
 type UploadFile = { data: Buffer; mimetype: string; name: string; size: number; tempFilePath?: string };
@@ -20,12 +28,28 @@ function png(width: number, height: number): Promise<Buffer> {
     .toBuffer();
 }
 
-function hookArgs(operation: string, file: UploadFile | undefined, media: Record<string, unknown> = {}) {
-  const findGlobal = vi.fn().mockResolvedValue({ media });
-  const req = { file, payload: { findGlobal } };
-  const args = { operation, req, args: { req } } as unknown as HookArgs;
-  return { args, req, findGlobal };
+type HookOptions = {
+  user?: { role: string } | null;
+  overrideAccess?: boolean;
+  findGlobal?: ReturnType<typeof vi.fn>;
+};
+
+function hookArgs(
+  operation: string,
+  file: UploadFile | undefined,
+  media: Record<string, unknown> = {},
+  { user = { role: "editor" }, overrideAccess = false, findGlobal }: HookOptions = {}
+) {
+  const read = findGlobal ?? vi.fn().mockResolvedValue({ media });
+  const logger = { warn: vi.fn(), error: vi.fn() };
+  const req = { file, user, payload: { findGlobal: read, logger } };
+  const args = { operation, overrideAccess, req, args: { req } } as unknown as HookArgs;
+  return { args, req, findGlobal: read, logger };
 }
+
+beforeEach(() => {
+  vi.mocked(compressImage).mockClear();
+});
 
 describe("compressUpload (hook)", () => {
   it("replaces an uploaded image with a resized WebP using the site settings", async () => {
@@ -96,6 +120,72 @@ describe("compressUpload (hook)", () => {
     await expect(compressUpload(none.args)).resolves.toBe(none.args.args);
   });
 
+  it("does no work for an untrusted request, which access control refuses next", async () => {
+    const data = await png(3000, 2000);
+    const image = { data, mimetype: "image/png", name: "big.png", size: data.length };
+    const { args, req, findGlobal } = hookArgs("create", image, {}, { user: null });
+
+    await expect(compressUpload(args)).resolves.toBe(args.args);
+
+    expect(findGlobal).not.toHaveBeenCalled();
+    expect(compressImage).not.toHaveBeenCalled();
+    expect(req.file).toBe(image);
+  });
+
+  it("compresses a server-side upload that overrides access without a user", async () => {
+    const data = await png(3000, 2000);
+    const { args, req } = hookArgs(
+      "create",
+      { data, mimetype: "image/png", name: "seed.png", size: data.length },
+      {},
+      { user: null, overrideAccess: true }
+    );
+
+    await compressUpload(args);
+
+    expect(req.file?.mimetype).toBe("image/webp");
+  });
+
+  it("falls back to the defaults and warns when the settings cannot be read", async () => {
+    const data = await png(3000, 1500);
+    const findGlobal = vi.fn().mockRejectedValue(new Error("database is locked"));
+    const { args, req, logger } = hookArgs(
+      "create",
+      { data, mimetype: "image/png", name: "a.png", size: data.length },
+      {},
+      { findGlobal }
+    );
+
+    await compressUpload(args);
+
+    expect(logger.warn).toHaveBeenCalledTimes(1);
+    expect(String(logger.warn.mock.calls[0]?.[0])).toContain("database is locked");
+    expect((await sharp(req.file?.data).metadata()).width).toBe(2400);
+  });
+
+  it("adds .webp to a file name without an extension", async () => {
+    const data = await png(100, 100);
+    const { args, req } = hookArgs("create", { data, mimetype: "image/png", name: "photo", size: data.length });
+
+    await compressUpload(args);
+
+    expect(req.file?.name).toBe("photo.webp");
+  });
+
+  it("logs a temp-file read failure before refusing the upload", async () => {
+    const { args, logger } = hookArgs("create", {
+      data: Buffer.alloc(0),
+      mimetype: "image/png",
+      name: "gone.png",
+      size: 0,
+      tempFilePath: path.join(tmpdir(), "thc-upload-missing", "upload"),
+    });
+
+    await expect(compressUpload(args)).rejects.toMatchObject({ status: 400 });
+    expect(logger.error).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(logger.error.mock.calls[0])).toContain("ENOENT");
+  });
+
   it("refuses a file that claims to be an image but is not", async () => {
     const { args } = hookArgs("create", {
       data: Buffer.from("not really a png"),
@@ -137,6 +227,47 @@ describe("media uploads (Payload)", () => {
     expect(doc.filesize).toBeLessThan(data.length);
     expect(doc.sizes?.card?.width).toBe(800);
     expect(doc.sizes?.card?.mimeType).toBe("image/webp");
+  });
+
+  it("refuses an anonymous upload without compressing it, and compresses an editor's", async () => {
+    const { payload } = temp;
+    const findGlobal = vi.spyOn(payload, "findGlobal");
+    const data = await png(3000, 2000);
+    const file = { data, mimetype: "image/png", name: "anon.png", size: data.length };
+
+    try {
+      await expect(
+        payload.create({
+          collection: "media",
+          data: { alt: "Anonymous" },
+          file,
+          overrideAccess: false,
+          context: { skipRevalidate: true },
+        })
+      ).rejects.toThrow(Forbidden);
+      expect(findGlobal).not.toHaveBeenCalled();
+      expect(compressImage).not.toHaveBeenCalled();
+
+      const editor = await payload.create({
+        collection: "users",
+        data: { email: "editor-upload@example.test", password: "a-long-test-password", role: "editor" },
+        overrideAccess: true,
+        context: { skipRevalidate: true, internal: true },
+      });
+      const doc = await payload.create({
+        collection: "media",
+        data: { alt: "Editor upload" },
+        file: { ...file, name: "editor.png" },
+        user: editor,
+        overrideAccess: false,
+        context: { skipRevalidate: true },
+      });
+
+      expect(compressImage).toHaveBeenCalledTimes(1);
+      expect(doc).toMatchObject({ mimeType: "image/webp", width: 2400 });
+    } finally {
+      findGlobal.mockRestore();
+    }
   });
 
   it("still rejects a file type the media library does not allow", async () => {

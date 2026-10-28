@@ -1,6 +1,6 @@
 import type { SiteSetting } from "@/cms/payload-types";
 import { site } from "@/config/site";
-import { DEFAULT_IMAGE_QUALITY, DEFAULT_MAX_IMAGE_WIDTH } from "@/lib/media/compress";
+import { DEFAULT_IMAGE_QUALITY, DEFAULT_MAX_IMAGE_WIDTH } from "@/lib/media/settings";
 
 /** The `site-settings` global as seeded from `src/config/site.ts`. */
 export type SiteSeed = Omit<SiteSetting, "id" | "updatedAt" | "createdAt" | "media">;

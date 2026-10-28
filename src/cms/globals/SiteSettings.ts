@@ -7,7 +7,7 @@ import {
   DEFAULT_MAX_IMAGE_WIDTH,
   MAX_IMAGE_WIDTH,
   MIN_IMAGE_WIDTH,
-} from "@/lib/media/compress";
+} from "@/lib/media/settings";
 
 const revalidate = revalidateHooks("site");
 

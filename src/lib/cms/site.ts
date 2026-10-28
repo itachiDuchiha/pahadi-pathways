@@ -2,7 +2,7 @@ import { cache } from "react";
 
 import type { SiteSetting } from "@/cms/payload-types";
 import { site } from "@/config/site";
-import { resolveMediaSettings } from "@/lib/media/compress";
+import { resolveMediaSettings } from "@/lib/media/settings";
 
 import { getPayloadClient } from "./client";
 import type { Site } from "./types";

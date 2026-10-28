@@ -1,10 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { SiteSetting } from "@/cms/payload-types";
 import { siteSettings } from "@/cms/seed/site";
 import { site } from "@/config/site";
 
 import { mergeSiteSettings } from "./site";
+
+// The site read layer must not load sharp; importing it here would throw.
+vi.mock("sharp", () => {
+  throw new Error("sharp must not load in the site read layer");
+});
 
 const STAMP = "2026-10-27T00:00:00.000Z";
 
