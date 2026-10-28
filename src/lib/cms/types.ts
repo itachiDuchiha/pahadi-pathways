@@ -2,24 +2,20 @@
  * Domain types the frontend renders. Payload documents are mapped into
  * these shapes in `mappers.ts`, so components never see CMS documents.
  */
-import type { PackageContent } from "@/cms/seed/packages";
-
-export type { PackageContent };
 export type { Testimonial } from "@/types/testimonial";
 
-export type DestinationCategory =
-  | "Featured Journeys"
-  | "Along the Way"
-  | "Hidden Himachal"
-  | "Culture & Soul";
-
-/** Display order of the destination categories. */
-export const DESTINATION_CATEGORIES: readonly DestinationCategory[] = [
+/**
+ * Display order of the destination categories; the frontend sorts groups by
+ * this order and the CMS offers them as the `category` select options.
+ */
+export const DESTINATION_CATEGORIES = [
   "Featured Journeys",
   "Along the Way",
   "Hidden Himachal",
   "Culture & Soul",
-];
+] as const;
+
+export type DestinationCategory = (typeof DESTINATION_CATEGORIES)[number];
 
 export type DestinationLayout = "dedicated" | "shared";
 
@@ -46,15 +42,22 @@ export type GalleryItem = {
   caption: string;
 };
 
-export type ExperienceIcon =
-  | "Camera"
-  | "Compass"
-  | "Footprints"
-  | "Home"
-  | "Landmark"
-  | "Mountain"
-  | "Star"
-  | "Utensils";
+/**
+ * lucide-react icon names the experiences page maps to components; the CMS
+ * offers them as the `icon` select options.
+ */
+export const EXPERIENCE_ICONS = [
+  "Camera",
+  "Compass",
+  "Footprints",
+  "Home",
+  "Landmark",
+  "Mountain",
+  "Star",
+  "Utensils",
+] as const;
+
+export type ExperienceIcon = (typeof EXPERIENCE_ICONS)[number];
 
 export type Experience = {
   title: string;
@@ -81,7 +84,58 @@ export type PackagePricing = {
  * A published package. `price` is the display string derived from
  * `pricing.basePricePerAdult`; it is never stored.
  */
-export type Package = PackageContent & { pricing: PackagePricing };
+export type Package = {
+  slug: string;
+  title: string;
+  image: string;
+  heroImage?: string;
+  duration: string;
+  rating: number;
+  pickup: string;
+  price: string;
+  popular?: boolean;
+
+  itinerary: string[];
+  hiddenItinerary?: string[];
+  includes: string[];
+
+  summary?: string;
+  faqs?: {
+    question: string;
+    answer: string;
+  }[];
+
+  // Package Details
+  overview?: string;
+  stayPlan?: string[];
+  highlights?: string[];
+  exclusions?: string[];
+  travelNote?: string;
+  bestTime?: string;
+  vehicle?: string;
+  tourType?: string;
+  maxAltitude?: string;
+  idealFor?: string[];
+
+  itineraryDays?: {
+    day: number;
+    title: string;
+    start?: string;
+    end?: string;
+    stay: string;
+    description: string;
+    places?: string[];
+    details?: {
+      title: string;
+      description: string;
+    }[];
+  }[];
+
+  pricing: PackagePricing;
+};
+
+/** A package without its pricing group: the seed's authored content, and all that llms.txt and JSON-LD read. */
+export type PackageContent = Omit<Package, "pricing">;
 
 /** A stay or meal option: rupees per booking per night (once, regardless of adults), times the package's nights. */
 export type PricingOption = { label: string; deltaPerNight: number };

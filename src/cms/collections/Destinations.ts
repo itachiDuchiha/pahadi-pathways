@@ -1,19 +1,13 @@
 import type { CollectionConfig } from "payload";
 
+import { DESTINATION_CATEGORIES } from "@/lib/cms/types";
+
 import { isEditorOrAdmin, publishedOnly } from "../access";
 import { imageField } from "../fields/image";
 import { slugField } from "../fields/slug";
 import { revalidateHooks } from "../hooks/revalidate";
 
 const revalidate = revalidateHooks("destination");
-
-/** Listed in display order; the frontend sorts groups by this order. */
-export const DESTINATION_CATEGORIES = [
-  "Featured Journeys",
-  "Along the Way",
-  "Hidden Himachal",
-  "Culture & Soul",
-] as const;
 
 export const Destinations: CollectionConfig = {
   slug: "destinations",

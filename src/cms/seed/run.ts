@@ -5,7 +5,6 @@ import type { Payload, RequiredDataFromCollectionSlug } from "payload";
 
 import { ensureAdmin, type EnsureAdminResult } from "../bootstrap/ensureAdmin";
 import { isMissingSchemaError } from "../bootstrap/schema";
-import { DESTINATION_CATEGORIES } from "../collections/Destinations";
 import { MIN_SECRET_LENGTH } from "../config/security";
 import type { Destination as DestinationDoc } from "../payload-types";
 import { allDestinations, type Destination } from "./destinations";
@@ -19,6 +18,7 @@ import { analyticsFill, analyticsSettings } from "./analytics";
 import { notificationFill } from "./notifications";
 import { siteSettings } from "./site";
 import { testimonials } from "./testimonials";
+import { DESTINATION_CATEGORIES } from "@/lib/cms/types";
 import { parsePackagePrice } from "@/lib/pricing";
 
 export { isMissingSchemaError };

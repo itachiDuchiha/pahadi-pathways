@@ -25,11 +25,6 @@ Open items only; each line notes why it is still open.
   builds in place, so a failed build leaves no working build until the
   documented rollback is run; building into a fresh directory and
   switching over only on success would keep the old build serving.
-- **De-duplicate the shared content types.** `DESTINATION_CATEGORIES`
-  (CMS config and site types), `EXPERIENCE_ICONS` (CMS config and the
-  site's `ExperienceIcon` type) and the `Package` type (built on the
-  seed's `PackageContent`) each have more than one source; a single one
-  would stop them drifting apart.
 
 ## Security
 

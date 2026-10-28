@@ -1,51 +1,7 @@
-/** Package content as authored; the domain `Package` in `src/lib/cms/types.ts` adds its pricing. */
-export type PackageContent = {
-  slug: string;
-  title: string;
-  image: string;
-  heroImage?: string;
-  duration: string;
-  rating: number;
-  pickup: string;
-  price: string;
-  popular?: boolean;
+import type { PackageContent } from "@/lib/cms/types";
 
-  itinerary: string[];
-  hiddenItinerary?: string[];
-  includes: string[];
-
-  summary?: string;
-  faqs?: {
-    question: string;
-    answer: string;
-  }[];
-
-  // Package Details
-  overview?: string;
-  stayPlan?: string[];
-  highlights?: string[];
-  exclusions?: string[];
-  travelNote?: string;
-  bestTime?: string;
-  vehicle?: string;
-  tourType?: string;
-  maxAltitude?: string;
-  idealFor?: string[];
-
-  itineraryDays?: {
-    day: number;
-    title: string;
-    start?: string;
-    end?: string;
-    stay: string;
-    description: string;
-    places?: string[];
-    details?: {
-      title: string;
-      description: string;
-    }[];
-  }[];
-};
+/** Package content as authored; the domain `Package` in `src/lib/cms/types.ts` is the source of its shape. */
+export type { PackageContent };
 
 export const packages: PackageContent[] = [
   // ============================================================

@@ -1,22 +1,12 @@
 import type { CollectionConfig } from "payload";
 
+import { EXPERIENCE_ICONS } from "@/lib/cms/types";
+
 import { isEditorOrAdmin } from "../access";
 import { imageField } from "../fields/image";
 import { revalidateHooks } from "../hooks/revalidate";
 
 const revalidate = revalidateHooks("experience");
-
-/** lucide-react icon names the experiences page maps to components. */
-export const EXPERIENCE_ICONS = [
-  "Camera",
-  "Compass",
-  "Footprints",
-  "Home",
-  "Landmark",
-  "Mountain",
-  "Star",
-  "Utensils",
-] as const;
 
 export const Experiences: CollectionConfig = {
   slug: "experiences",
