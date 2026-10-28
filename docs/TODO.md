@@ -27,7 +27,7 @@ Open items only; each line notes why it is still open.
 ## Testing
 
 - **Add browser/E2E tests.** Only Vitest unit and integration tests exist
-  today (456 tests across `src/**/*.test.ts`); there is no coverage that
+  today (Vitest tests across `src/**/*.test.ts`); there is no coverage that
   exercises the app or the admin in a real browser (forms, modal focus
   trapping, navigation, editing and publishing, the consent banner and
   the analytics scripts it gates).
@@ -44,6 +44,10 @@ Open items only; each line notes why it is still open.
 
 ## Dependencies
 
+- **Upstream advisory GHSA-gcqx-w48m-w2h4 (prototype poisoning in
+  `deepmerge`).** Pulled in by `payload`; no fixed release exists yet, so
+  `npm audit --omit=dev` shows only this one (low severity) and an override
+  cannot clear it. Remove this note when `payload` updates.
 - **Remove the `npm audit` overrides in `package.json` when upstream
   catches up.** They keep `npm audit --omit=dev` clean:
   - `dompurify` 3.4.17 — `monaco-editor` (the admin's code editor, via
@@ -60,3 +64,31 @@ Open items only; each line notes why it is still open.
     Remove when `drizzle-kit` drops `@esbuild-kit/esm-loader`.
   After removing one, run `npm install`, `npm audit --omit=dev` and the
   full build; keep the override if the audit is no longer clean.
+
+## Owner to decide
+
+- **Gallery videos: uploads only, or pasted YouTube links too?** Only
+  uploaded MP4/WebM files (up to 100 MB) are supported today.
+
+## Known limits
+
+Each is accepted for now; the line says why it is still open.
+
+- **Clarity's own-domain cookies (`CLID`, `ANONCHK`, `MUID`, `SM`) survive a
+  decline.** They belong to Clarity's domain, which the site cannot clear.
+- **Visitors with Cloudflare blocked cannot pass the CAPTCHA.** They see a
+  message pointing to WhatsApp; there is no second challenge provider.
+- **Stray multipart temp files can sit in `UPLOAD_TEMP_DIR` for up to 6
+  hours** after an interrupted upload; the periodic sweep is the only cleanup.
+- **A 100 MB video needs the proxy body limit raised on the media route**
+  (README, Deployment); the app cannot raise a limit set in front of it.
+- **Videos are stored as uploaded**, with no transcoding or codec check.
+- **Live preview needs the admin on the same origin as
+  `NEXT_PUBLIC_SITE_URL`.** Otherwise the frame loads but does not refresh
+  after a save.
+- **Four hero images stay above the 260 KB budget at the quality floor of
+  60** (`destination-shimla`, and the Dharamshala, Kalpa and Manali package
+  heroes); meeting it would mean smaller dimensions.
+- **A failed deploy build leaves migrations and seed applied.** Only the
+  running build is protected; restoring the database backup undoes them.
+- **Changing the image quality or width affects new uploads only.**

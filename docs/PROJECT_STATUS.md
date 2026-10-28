@@ -22,7 +22,7 @@ A modern travel website focused on handcrafted Himalayan journeys. The company l
 
 ---
 
-## Status as of 2026-10-27
+## Status as of 2026-10-28
 
 The site's content, images and prices are now managed in Payload CMS,
 which runs inside the Next.js app. The rebrand to The Himalayan Compass is
@@ -57,6 +57,14 @@ complete.
   a Microsoft Clarity project ID. Vendor scripts load only after a visitor
   accepts the consent banner; with no ID set there is no banner and no
   script.
+- Live preview (done): packages and destinations can be previewed as
+  drafts beside the admin form, at Mobile, Tablet and Desktop sizes, on a
+  signed-in-only route that is never indexed.
+- Gallery videos (done): a gallery item is an image or an MP4/WebM video
+  (up to 100 MB) with a poster image; the gallery page shows a video
+  section when any exist.
+- The overwrite seed (done) asks for confirmation before reverting editor
+  changes (`--yes` for scripts).
 - SQLite is the default database; a Postgres `init` migration is committed
   and was rehearsed end to end (migrate, seed, build) against Postgres 16.
 
@@ -86,9 +94,9 @@ complete.
 - The rate limiter is per server process; when no client IP header is
   present it is skipped (and logged) rather than shared. The reverse proxy
   must forward the real client IP.
-- The enquiry forms are protected by Cloudflare Turnstile once its two
-  keys are set; the server check fails open when Cloudflare is
-  unreachable.
+- The enquiry forms are protected by Cloudflare Turnstile (done) once its
+  two keys are set; the server check fails open when Cloudflare is
+  unreachable, and the forms point to WhatsApp if the widget cannot load.
 
 ### SEO, AEO and GEO
 
@@ -112,10 +120,13 @@ complete.
   The admin routes get their own policy and a `noindex` header.
 - The CMS requires `PAYLOAD_SECRET`, restricts CORS/CSRF to the site URL,
   disables GraphQL, uses `httpOnly` session cookies (`secure` in
-  production), locks logins after 5 failures and accepts only image
-  uploads.
-- `npm audit --omit=dev` is clean, with three dependency overrides
+  production), locks logins after 5 failures and accepts only image and
+  (up to 100 MB) MP4/WebM video uploads.
+- `npm audit --omit=dev` shows only the upstream `deepmerge` advisory
+  GHSA-gcqx-w48m-w2h4, with three dependency overrides; both are
   documented in `docs/TODO.md`.
+- Dependabot (done, `.github/dependabot.yml`) opens weekly update pull
+  requests for npm and GitHub Actions.
 - Privacy policy (`/privacy`) and terms (`/terms`) pages are in place
   (done); their variable facts (grievance officer, data contact, effective
   date, deletion window, retention statement) come from the legal
@@ -123,16 +134,22 @@ complete.
   grievance officer shows a placeholder until the owner fills it in.
 - The report-only Content-Security-Policy lists the Google Analytics and
   Clarity hosts.
+- Declining analytics consent (done) stops vendor scripts on every open tab
+  that ran them and removes the vendor cookies the site can see.
 
 ### Images
 
-- Uploaded images are stored in `MEDIA_DIR` and served by the CMS in
-  several sizes. The bundled images in `public/images` (about 13 MB, WebP)
-  are the seed source; `npm run images:optimize` re-optimizes them.
+- Uploaded images are compressed and resized on upload (admin quality and
+  width settings), stored in `MEDIA_DIR` and served by the CMS in several
+  sizes. A missing media file shows a placeholder image instead of
+  failing (done).
+- The bundled images in `public/images` (about 13 MB, WebP) are the seed
+  source; `npm run images:optimize` re-optimizes them. Most now meet the
+  size budget; four hero images stay above 260 KB at the quality floor.
 
 ### Tests, CI and deployment
 
-- 456 Vitest tests across 39 files cover site configuration, SEO helpers,
+- 612 Vitest tests across 54 files cover site configuration, SEO helpers,
   pricing, the enquiry pipeline, structured data, CMS access control,
   fields, hooks, mappers, the data layer and the seed (integration tests
   run against a temporary SQLite database).
@@ -140,20 +157,25 @@ complete.
   migrates and seeds a throwaway SQLite database and builds against it.
 - `scripts/deploy.sh` is the supported deployment: it refuses to run
   without the required environment, then installs, migrates, seeds,
-  builds and restarts the server (default `systemctl --user restart thc`,
-  overridable with `APP_RESTART_CMD`). It was rehearsed on a fresh clone.
+  builds into a fresh directory and, only when the build succeeds, swaps it
+  in and restarts the server (default `systemctl --user restart thc`,
+  overridable with `APP_RESTART_CMD`); a failed build leaves the running
+  site untouched, and `scripts/deploy.test.sh` checks the swap. It was rehearsed on a fresh clone.
 - There are no browser or end-to-end tests yet.
+- Code structure (done): shared content types now have one source
+  (`src/lib/cms/types.ts`), the package and destination page bodies are
+  shared components used by both the public routes and the preview, and
+  the hero planner's popup positioning is split into `popupPosition.ts`
+  and `usePopupPosition.ts`.
 
 ### Intentionally deferred
 
 - Moving production to Postgres (the path is ready; existing SQLite
   content would have to be re-entered).
-- Live preview of drafts, gallery videos in the CMS, and S3-style media
-  storage for a multi-server setup.
+- S3-style media storage for a multi-server setup.
 - Enforcing the Content-Security-Policy (moving off report-only) after a
   monitoring period.
 - An external, shared rate limiter for the enquiry APIs.
 - Browser/end-to-end tests and error reporting.
-- Further trimming of the largest remaining images.
 
 See `docs/TODO.md` for the full list of open items.

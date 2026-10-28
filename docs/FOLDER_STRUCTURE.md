@@ -27,6 +27,8 @@ of the documentation.
   uploaded media (`media/`).
 - `.env.example` — template for the environment variables.
 - `AGENTS.md` / `CLAUDE.md` — notes for coding assistants.
+- `.github/dependabot.yml` — weekly Dependabot updates for npm and GitHub
+  Actions (major Next.js, React and Payload versions ignored).
 - `.github/workflows/ci.yml` — CI pipeline (lint, typecheck, test, migrate
   and seed a throwaway database, build).
 - `docs/` — project documentation (this file and its siblings).
@@ -35,13 +37,16 @@ of the documentation.
 
 - `scripts/` — operational scripts: `deploy.sh` (install, migrate, seed,
   build, restart on the server), `cms-seed.ts` (content seed),
-  `cms-prune-enquiries.ts` (optional enquiry pruning) and
-  `optimize-images.ts` (re-encodes `public/images` to WebP).
+  `cms-prune-enquiries.ts` (optional enquiry pruning), `cms-set-password.ts`
+  (account recovery), `optimize-images.ts` (re-encodes `public/images` to
+  WebP and enforces the size budget) and `deploy.test.sh` (checks the
+  build-and-swap step of `deploy.sh`).
 
 ## `public/images/`
 
 - `public/images/` — bundled site images; also the source the seed uploads
-  into the CMS media library.
+  into the CMS media library. `placeholder.webp` is a site asset shown when
+  a media file is missing; it is not seeded.
 - `public/images/destinations/` — destination photography.
 - `public/images/hero/` — hero banner images for the home page and section pages.
 - `public/images/logo/` — logo assets.
@@ -68,6 +73,9 @@ of the documentation.
 - `src/app/(frontend)/llms.txt/` — `/llms.txt` route for AI crawlers.
 - `src/app/(frontend)/packages/` — packages listing page; rendered on demand because it reads search params.
 - `src/app/(frontend)/packages/[slug]/` — package detail page, statically generated.
+- `src/app/(frontend)/preview/[collection]/[slug]/` — draft preview of a
+  package or destination for the admin's live preview (signed-in only,
+  never cached or indexed).
 - `src/app/(frontend)/privacy/`, `terms/` — privacy policy and terms pages
   (prose in `src/lib/legal-copy.ts`).
 - `src/app/(frontend)/reviews/` — reviews page.
@@ -89,16 +97,20 @@ of the documentation.
 - `src/cms/collections/` — collection configs (packages, destinations,
   testimonials, gallery items, experiences, enquiries, media, users), with
   access tests.
-- `src/cms/config/` — database adapter selection, security settings and
-  admin metadata (title suffix, favicon, Open Graph, graphics), with tests.
+- `src/cms/config/` — database adapter selection, security settings,
+  admin metadata (title suffix, favicon, Open Graph, graphics) and the
+  live preview configuration (`livePreview.ts`), with tests.
 - `src/cms/fields/` — reusable fields (slug, image, string list).
 - `src/cms/globals/` — pricing, site, legal, notification and analytics settings.
-- `src/cms/hooks/` — revalidation of public pages on publish and the
-  anonymous-create guard, with tests.
+- `src/cms/hooks/` — revalidation of public pages on publish, the
+  anonymous-create guard, upload compression (`compressUpload.ts`), the
+  video size limit (`limitVideoSize.ts`) and the in-use media delete
+  protection (`protectInUseMedia.ts`), with tests.
 - `src/cms/migrations/postgres/` — committed Postgres migrations.
 - `src/cms/migrations/sqlite/` — committed SQLite migrations.
 - `src/cms/seed/` — bundled seed content, the media manifest, the seed and
-  prune runner and the CLI wrapper, with integration tests.
+  prune runner, the CLI wrapper and the `--overwrite` confirmation rules
+  (`overwrite-guard.ts`), with integration tests.
 - `src/cms/test/` — helper that boots Payload against a temporary SQLite
   database for integration tests.
 
@@ -108,23 +120,31 @@ of the documentation.
   consent-gated analytics scripts.
 - `src/components/destination-page/` — destination page templates
   (dedicated pages for Manali, Shimla and Spiti, the shared template, and
-  the `registry.ts` that picks a page from the destination's layout field).
+  the `registry.ts` that picks a page from the destination's layout field)
+  and `DestinationPage.tsx`, the page body shared by the public route and
+  the preview.
 - `src/components/destinations/` — destination listing UI (card, hero, section).
-- `src/components/forms/` — contact form and trip planner form.
+- `src/components/forms/` — contact form, trip planner form and the
+  Cloudflare Turnstile widget (`Turnstile.tsx`).
 - `src/components/gallery/` — gallery explorer UI.
 - `src/components/home/` — homepage sections (hero, featured destinations,
   popular packages, testimonials, why-choose-us, call to action).
 - `src/components/home/planner/` — hero planner popups (date, destination,
-  traveller pickers) and the `useHeroPlanner` state hook.
+  traveller pickers), the `useHeroPlanner` state hook and popup
+  positioning (`popupPosition.ts`, `usePopupPosition.ts`).
 - `src/components/legal/` — shared layout of the privacy and terms pages.
 - `src/components/layout/` — navbar, footer, floating action buttons and
   the shared `PlannerProvider`.
 - `src/components/package-details/` — package detail page sections
-  (overview, day timeline, stay plan, FAQ, terms, etc.).
+  (overview, day timeline, stay plan, FAQ, terms, etc.) and
+  `PackagePage.tsx`, the page body shared by the public route and the
+  preview.
 - `src/components/package-details/booking/` — the booking panel (stay,
   meal, vehicle and traveller selectors, price summary, enquiry modal,
   `useBookingState`).
 - `src/components/packages/` — package card and custom-journey CTA.
+- `src/components/preview/` — `RefreshRouteOnSave.tsx`, which reloads the
+  preview when the editor saves a draft.
 - `src/components/seo/` — `JsonLd` structured-data renderer.
 - `src/components/ui/` — shared UI primitives (modal, dialog hook, review
   card, scrolling testimonials).
@@ -135,15 +155,24 @@ of the documentation.
   and security headers, with tests.
 - `src/lib/` — SEO helpers, server-side pricing, structured data and
   `llms.txt` builders, the privacy and terms prose (`legal-copy.ts`) and
-  the analytics consent rules (`consent.ts`), each with a colocated test.
+  the analytics consent rules (`consent.ts`), the image size budget rules
+  used by `scripts/optimize-images.ts` (`image-budget.ts`) and the
+  Turnstile key check (`captcha-config.ts`), each with a colocated test.
 - `src/lib/cms/` — the typed data layer the site reads content through:
   Payload client, queries, mappers from CMS documents to domain types,
   pricing tables, enquiry storage, the legal, notification and analytics
-  settings readers (`legal.ts`, `notifications.ts`, `analytics.ts`) and
-  the empty-database build guard, with tests.
+  settings readers (`legal.ts`, `notifications.ts`, `analytics.ts`), the
+  missing-media-file check (`media-files.ts`), the draft preview read
+  (`preview.ts`, `preview-collections.ts`) and the empty-database build
+  guard, with tests.
 - `src/lib/enquiry/` — the shared enquiry pipeline: Zod schema, origin/body
-  guards and client-IP lookup, in-memory rate limiter, HTML email
-  templates, Resend mail sender and the route handler factory, each with a
-  colocated test.
+  guards and client-IP lookup, Turnstile verification (`captcha.ts`),
+  in-memory rate limiter, HTML email templates, Resend mail sender and the
+  route handler factory, each with a colocated test.
+- `src/lib/media/` — upload handling shared by the CMS and the site:
+  image compression (`compress.ts`), quality and width settings
+  (`settings.ts`), size limits (`limits.ts`) and the upload temp directory
+  with its sweep (`upload-temp.ts`); the settings and limits do not import
+  sharp, so client code can use them.
 - `src/lib/hooks/` — shared hooks, currently `useTodayIso` and its test.
 - `src/types/` — shared TypeScript types (testimonials).

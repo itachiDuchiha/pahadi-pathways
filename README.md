@@ -62,6 +62,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `DATABASE_URL` | Required. `file:./data/cms.db` for SQLite, `postgres://user:password@host:5432/db` for Postgres. |
 | `MEDIA_DIR` | Directory where uploaded images and videos are stored (default `media`, relative to the repository root). Use an absolute path outside the checkout in production. |
 | `UPLOAD_TEMP_DIR` | Optional. Directory where request bodies with files are streamed while they are processed (default `thc-uploads` in the OS temp directory; created when missing). It needs room for a few 100 MB uploads. |
+| `NEXT_DIST_DIR` | Set by `scripts/deploy.sh` to build into `.next-build` (default `.next`). Do not set it yourself (see Deployment). |
 | `PAYLOAD_ADMIN_EMAIL` | Email of the first admin account, created only while there are no users. |
 | `PAYLOAD_ADMIN_PASSWORD` | Password of the first admin account, at least 12 characters. Remove it from the environment once the account exists. |
 
@@ -91,7 +92,9 @@ CI (`.github/workflows/ci.yml`) runs `npm ci`, `npm run lint`,
 database, fails if the CMS config needs a migration that is not committed
 (`migrate:create --skip-empty` must create nothing), and runs
 `npm run build` against it, on every push and pull request. The CI build only proves the code builds; it is not what gets
-deployed.
+deployed. Dependabot (`.github/dependabot.yml`) opens weekly pull requests for
+npm minor and patch updates (grouped) and GitHub Actions; major versions of
+Next.js, React and Payload are ignored and need a planned manual upgrade.
 
 ## Project structure
 
@@ -207,7 +210,9 @@ the admin in the same browser; everyone else gets a 404. Preview pages
 are never cached, never listed in the sitemap or `llms.txt`, are
 disallowed in `robots.txt` and are sent with
 `X-Robots-Tag: noindex, nofollow`. A new document shows a preview once it
-has a slug and has been saved.
+has a slug and has been saved. Open the admin on the same origin as
+`NEXT_PUBLIC_SITE_URL` (same host, scheme and port, no `www.` variant),
+or the preview frame loads but does not refresh after a save.
 
 ### Branding
 
@@ -381,10 +386,6 @@ accepted and `captcha unavailable; accepting enquiry` is logged, so an
 outage never loses a real lead; only a token Cloudflare rejects, or a
 missing one, is refused. The token is never stored or emailed.
 
-**Known limitation:** the rate limiter keeps its counters in process
-memory. On a serverless or multi-instance host, each instance has its own
-counter, so the effective limit is per instance rather than global.
-
 ## SEO, AEO and GEO
 
 - `src/app/(frontend)/sitemap.ts` and `src/app/robots.ts` generate
@@ -434,8 +435,7 @@ keep the size and quality they were uploaded with.
 - **Maximum image width:** 2400 pixels by default, enough for full-screen
   photos; it can be set between 1200 and 4000.
 
-The seed fills in these defaults only when they are empty and never
-changes them, even with `--overwrite`.
+The seed never changes these settings (see Seeding).
 
 The bundled images under `public/images` (about 13 MB total, WebP with capped
 dimensions) are the seed source and the site's fixed artwork. Run
@@ -553,7 +553,10 @@ Uploads are streamed to `UPLOAD_TEMP_DIR` (default `thc-uploads` in the
 OS temp directory) rather than held in memory. Payload deletes a media
 upload's temp file when the request finishes; the server also removes
 any temp file older than six hours every half hour, which covers bodies
-sent to other endpoints. Serve the site over HTTPS: in production the admin session cookie is `secure`.
+sent to other endpoints. A temp file left behind by an interrupted upload can
+stay for up to six hours.
+
+Serve the site over HTTPS: in production the admin session cookie is `secure`.
 
 CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`) before merging to the default branch.
@@ -602,7 +605,12 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   `scripts/deploy.sh` again.
 - Experience icons are managed in code, not the CMS.
 - Uploaded videos are stored and served as uploaded (no transcoding or
-  compression).
+  compression), and the media upload route needs the larger proxy body
+  limit described in Deployment.
+- Visitors whose browser blocks Cloudflare cannot pass the CAPTCHA when it
+  is enabled and are pointed to WhatsApp.
+- Clarity's own-domain cookies cannot be cleared from the site on decline
+  (see Analytics and consent).
 - Media is stored on the server's disk, which suits a single server only.
 - Moving from SQLite to Postgres does not copy existing content.
 - The Content-Security-Policy header is sent as
@@ -610,9 +618,6 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   rather than blocking them.
 - `/packages` renders on demand (it reads search params), unlike the
   statically generated destination and package detail pages.
-- A few wide hero images are still above 260 KB, and some non-hero photos slightly above 200 KB, at the quality floor of 60.
+- Four hero images (`destinations/destination-shimla.webp` and `packages/heroes/{dharamshala,kalpa,manali}.webp`) are still above 260 KB, and some non-hero photos slightly above 200 KB, at the quality floor of 60.
 - There are no browser/E2E tests yet, only Vitest unit and integration
   tests.
-- Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm
-  minor and patch updates (grouped) and GitHub Actions; major versions of
-  Next.js, React and Payload are ignored and need a planned manual upgrade.

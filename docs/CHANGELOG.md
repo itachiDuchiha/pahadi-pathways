@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-10-28
+
+### Added
+- Asked for confirmation before `cms:seed -- --overwrite` reverts editor changes: it prints a warning and wants `overwrite` typed, or `--yes` when there is no terminal (55b229a).
+- Compressed and resized uploaded images (upright, WebP, maximum width) with an admin quality and width setting, refused unreadable files and images over 10 MB, skipped compression for untrusted uploads and kept sharp out of reads (9807d9a, 09a6b9f).
+- Protected the enquiry forms with Cloudflare Turnstile when both keys are set, with a fallback message pointing to WhatsApp and a logged warning for a misconfigured key; the check fails open if Cloudflare is unreachable (286eea9, 266d59e).
+- Built deploys into a fresh `.next-build` directory and swapped it in only on success, so a failed build leaves the running site untouched, with a `scripts/deploy.test.sh` check and a rollback recipe in the README (be0df92, b74fac9).
+- Managed gallery videos in the CMS: a gallery item is an image or an MP4/WebM video (up to 100 MB) with a poster, shown in the gallery's video section; uploads are streamed to temp files and the video checks tightened (203789d, 6466f79).
+- Previewed draft packages and destinations from the admin with Live Preview at Mobile, Tablet and Desktop sizes, on a signed-in-only route that is never cached or indexed (50cd3d7).
+
+### Changed
+- Kept one source for the shared content types (0bc5d52).
+- Brought the remaining images under the size budget where the quality floor allows, and validated the `images:optimize` budget flags, which now also state what stays over budget (f357843, 1ee8568).
+- Split popup positioning out of the hero planner hook (599318d).
+
+### Fixed
+- Showed a placeholder image when a media file is missing from disk, keeping the placeholder out of the seeded media library (b67af35, fd5a955).
+- Cleared the Google Analytics and Clarity cookies the site can see and stopped vendor scripts on every open tab that ran them when a visitor declines, reloading only tabs where scripts ran (47c5af4, 4f7a42d).
+
+### Security
+- Added Dependabot for npm and GitHub Actions (e64a65e).
+
 ## 2026-10-27
 
 ### Added
