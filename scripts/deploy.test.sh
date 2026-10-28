@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Tests build_and_swap from scripts/deploy.sh without running a deploy.
+# Run by hand or in CI: bash scripts/deploy.test.sh
+set -euo pipefail
+
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+DEPLOY_SOURCE_ONLY=1 source "$repo/scripts/deploy.sh"
+
+fail() { echo "FAIL: $*" >&2; exit 1; }
+
+fresh() {
+  rm -rf "$tmp/work"
+  mkdir -p "$tmp/work/.next"
+  touch "$tmp/work/.next/marker"
+  cd "$tmp/work"
+}
+
+# A failing build leaves the running build untouched.
+fresh
+if (NEXT_BUILD_CMD=false build_and_swap) 2>/dev/null; then
+  fail "build_and_swap succeeded although the build failed"
+fi
+[[ -f .next/marker ]] || fail "failed build removed the running .next"
+[[ ! -e .next-previous ]] || fail "failed build created .next-previous"
+
+# A failing build after partial output still leaves .next untouched.
+fresh
+if (NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/partial && false" build_and_swap) 2>/dev/null; then
+  fail "build_and_swap succeeded although the build failed midway"
+fi
+[[ -f .next/marker ]] || fail "partial failed build replaced .next"
+[[ ! -e .next-previous ]] || fail "partial failed build created .next-previous"
+
+# A successful build is swapped in and the old one is kept.
+fresh
+NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/new" build_and_swap >/dev/null
+[[ -f .next/new ]] || fail "new build is not in .next"
+[[ -f .next-previous/marker ]] || fail "old build was not kept in .next-previous"
+[[ ! -e .next-build ]] || fail ".next-build was left behind"
+
+# The first deploy has no existing .next.
+rm -rf "$tmp/work"; mkdir -p "$tmp/work"; cd "$tmp/work"
+NEXT_BUILD_CMD="mkdir -p .next-build && touch .next-build/new" build_and_swap >/dev/null
+[[ -f .next/new ]] || fail "first build is not in .next"
+[[ ! -e .next-previous ]] || fail ".next-previous appeared on a first deploy"
+
+# The build command sees NEXT_DIST_DIR.
+fresh
+NEXT_BUILD_CMD='mkdir -p "$NEXT_DIST_DIR" && echo "$NEXT_DIST_DIR" > "$NEXT_DIST_DIR/dir"' build_and_swap >/dev/null
+[[ "$(cat .next/dir)" == ".next-build" ]] || fail "NEXT_DIST_DIR was not .next-build"
+
+echo "deploy.test.sh: all passed"

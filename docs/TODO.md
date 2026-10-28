@@ -17,10 +17,6 @@ Open items only; each line notes why it is still open.
 - **Move media to S3-compatible storage if the site ever runs on more than
   one server.** Media is on the server's disk (`MEDIA_DIR`), which only
   works for a single instance.
-- **Build into a separate directory when deploying.** `scripts/deploy.sh`
-  builds in place, so a failed build leaves no working build until the
-  documented rollback is run; building into a fresh directory and
-  switching over only on success would keep the old build serving.
 
 ## Security
 

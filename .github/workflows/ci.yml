@@ -17,6 +17,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - run: bash scripts/deploy.test.sh
       - name: Seed a throwaway CMS database
         run: |
           secret="$(openssl rand -hex 32)"

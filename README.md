@@ -445,9 +445,20 @@ it runs on the server itself.
    (keeping the newest three); it creates `MEDIA_DIR` if it is missing;
    then it runs `npm ci`, `npm run payload migrate`, `npm run cms:seed`
    (fills only empty collections, creates the first admin only when there
-   are no users), `npm run build`, and restarts the server. Expect a brief
-   disruption while the build replaces the running build output and the
-   server restarts.
+   are no users), then builds into a fresh `.next-build` directory while
+   the running site keeps serving from `.next`. Only when the build
+   succeeds does it move `.next` to `.next-previous`, move `.next-build`
+   to `.next`, and restart the server. If the build fails, the script
+   exits with "build failed; the running site is untouched", `.next` is
+   not changed and the server is not restarted. Expect a brief disruption
+   only while the server restarts.
+
+   To roll back to the previous build (kept in `.next-previous` until the
+   next deploy), run `mv .next .next-failed && mv .next-previous .next`
+   and restart the server with the same command the script uses
+   (`systemctl --user restart thc` by default). This does not undo
+   database migrations; restore the newest `<database>.bak-<timestamp>`
+   copy as well if a migration must be reverted.
 3. The restart command defaults to `systemctl --user restart thc`, i.e. a
    systemd user unit named `thc` that runs `npm start` in the checkout.
    For another process manager set `APP_RESTART_CMD`, for example
@@ -527,10 +538,11 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   forged.
 - Media files are publicly readable by URL, including images attached only
   to drafts that are not published yet (accepted by the owner).
-- The deploy builds in place: a failed `npm run build` leaves the site
-  without a working build until it is fixed. To roll back, restore the
-  newest `<database>.bak-<timestamp>` copy over the database file,
-  `git checkout` the previous commit and run `scripts/deploy.sh` again.
+- A failed build leaves the running site untouched (see Deployment), but
+  the migrations and seed that run before the build are not reverted. To
+  undo them, restore the newest `<database>.bak-<timestamp>` copy over the
+  database file, `git checkout` the previous commit and run
+  `scripts/deploy.sh` again.
 - Gallery videos and experience icons are managed in code, not the CMS.
 - There is no live preview of drafts in the admin.
 - Media is stored on the server's disk, which suits a single server only.
