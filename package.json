@@ -15,7 +15,7 @@
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "images:optimize": "node scripts/optimize-images.mjs",
+    "images:optimize": "tsx scripts/optimize-images.ts",
     "payload": "payload",
     "generate:types": "payload generate:types",
     "generate:importmap": "payload generate:importmap",

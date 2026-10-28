@@ -36,7 +36,7 @@ of the documentation.
 - `scripts/` — operational scripts: `deploy.sh` (install, migrate, seed,
   build, restart on the server), `cms-seed.ts` (content seed),
   `cms-prune-enquiries.ts` (optional enquiry pruning) and
-  `optimize-images.mjs` (re-encodes `public/images` to WebP).
+  `optimize-images.ts` (re-encodes `public/images` to WebP).
 
 ## `public/images/`
 

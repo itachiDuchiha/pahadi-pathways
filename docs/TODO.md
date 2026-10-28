@@ -64,13 +64,6 @@ Open items only; each line notes why it is still open.
   require `https://*.clarity.ms` and `https://c.bing.com` in `img-src` of
   the Content-Security-Policy; check before enforcing it.
 
-## Performance
-
-- **Trim the remaining large images.** A handful of package/destination
-  hero images are still in the 300–432 KB range after the WebP conversion;
-  `scripts/optimize-images.mjs` can be rerun with tighter settings once a
-  size budget is agreed.
-
 ## Code structure
 
 - **Extract the popup-positioning logic from `useHeroPlanner`.**

@@ -360,9 +360,14 @@ several sizes, and served by the CMS; they are not part of the build. The
 bundled images under `public/images` (about 13 MB total, WebP with capped
 dimensions) are the seed source and the site's fixed artwork. Run
 `npm run images:optimize` after adding or replacing images to re-encode
-and resize them with `scripts/optimize-images.mjs`. A few
-package/destination hero images are still in the 300–432 KB range and are
-candidates for further trimming (see `docs/TODO.md`).
+and resize them with `scripts/optimize-images.ts`. Size budget: hero
+images (`packages/heroes/*` and `destinations/*-featured.webp`) should stay
+at or under 260 KB and every other image at or under 200 KB. Enforce it with
+`npm run images:optimize -- --max-kb 260 --heroes-only` and
+`npm run images:optimize -- --max-kb 200`, which re-encode existing WebP files
+in place (quality 80, 72, 65, then the `--quality-floor`, default 60) and never
+enlarge a file or change its dimensions. A few wide hero images stay above
+budget at the quality floor.
 
 ## Deployment
 
@@ -483,7 +488,7 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   rather than blocking them.
 - `/packages` renders on demand (it reads search params), unlike the
   statically generated destination and package detail pages.
-- A few images are still 300–432 KB.
+- A few hero images are still 280–330 KB at the quality floor.
 - There are no browser/E2E tests yet, only Vitest unit and integration
   tests.
 - Dependabot (`.github/dependabot.yml`) opens weekly pull requests for npm
