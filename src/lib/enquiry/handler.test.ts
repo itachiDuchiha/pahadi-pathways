@@ -24,6 +24,10 @@ vi.mock("./mail", async (importOriginal) => {
   };
 });
 
+vi.mock("./captcha", () => ({
+  verifyTurnstile: vi.fn(async () => "disabled" as const),
+}));
+
 // The package route reads packages and pricing through the CMS read layer;
 // point it at a throwaway Payload instance.
 const temp = withTempPayload();
@@ -33,9 +37,11 @@ const { POST: packagePOST } = await import("@/app/(frontend)/api/package-enquiry
 const { POST: tripPOST } = await import("@/app/(frontend)/api/trip-enquiry/route");
 const { MAX_BODY_BYTES } = await import("./guards");
 const { getMailConfig, sendEnquiryEmail } = await import("./mail");
+const { verifyTurnstile } = await import("./captcha");
 
 const sendMock = vi.mocked(sendEnquiryEmail);
 const mailConfigMock = vi.mocked(getMailConfig);
+const captchaMock = vi.mocked(verifyTurnstile);
 
 let ipCounter = 0;
 function freshIp(): string {
@@ -124,6 +130,8 @@ async function seedPackage(
 
 beforeEach(async () => {
   sendMock.mockClear();
+  captchaMock.mockReset();
+  captchaMock.mockResolvedValue("disabled");
   mailConfigMock.mockReturnValue(MAIL_CONFIG);
   vi.stubEnv("TRIP_ENQUIRY_EMAIL", ENV_RECIPIENT);
   await temp.payload.updateGlobal({
@@ -711,5 +719,92 @@ describe("notification settings", () => {
     expect(response.status).toBe(502);
     expect((await response.json()).ok).toBe(false);
     expect(sendMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("captcha", () => {
+  const TOKEN = "turnstile-token-0123456789";
+
+  async function enquiries() {
+    return (await temp.payload.find({ collection: "enquiries", depth: 0, overrideAccess: true })).docs;
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("checks the token from the body with the client IP", async () => {
+    await tripPOST(post(TRIP_URL, { ...contact, turnstileToken: TOKEN }, { "x-forwarded-for": "203.0.113.200" }));
+
+    expect(captchaMock).toHaveBeenCalledWith(TOKEN, "203.0.113.200");
+  });
+
+  it("passes no token and a null IP when neither is present", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    await tripPOST(post(TRIP_URL, { ...contact, turnstileToken: 42 }));
+
+    expect(captchaMock).toHaveBeenCalledWith(undefined, null);
+  });
+
+  it("answers 400 to a failed check without storing or sending", async () => {
+    captchaMock.mockResolvedValue("invalid");
+
+    const response = await tripPOST(
+      post(TRIP_URL, { ...contact, turnstileToken: TOKEN }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      ok: false,
+      message: "Please complete the verification and try again.",
+    });
+    expect(sendMock).not.toHaveBeenCalled();
+    expect(await enquiries()).toHaveLength(0);
+  });
+
+  it("accepts the enquiry with one warning when Cloudflare is unavailable", async () => {
+    captchaMock.mockResolvedValue("unavailable");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const response = await tripPOST(
+      post(TRIP_URL, { ...contact, turnstileToken: TOKEN }, { "x-forwarded-for": freshIp() })
+    );
+
+    expect(response.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(await enquiries()).toHaveLength(1);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalledWith("captcha unavailable; accepting enquiry");
+  });
+
+  it("leaves the flow unchanged when the captcha is disabled", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const response = await tripPOST(post(TRIP_URL, contact, { "x-forwarded-for": freshIp() }));
+
+    expect(response.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(await enquiries()).toHaveLength(1);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("never stores or emails the token", async () => {
+    captchaMock.mockResolvedValue("success");
+    const store = vi.spyOn(temp.payload, "create");
+
+    const responses = await Promise.all([
+      tripPOST(post(TRIP_URL, { ...contact, turnstileToken: TOKEN }, { "x-forwarded-for": freshIp() })),
+      packagePOST(post(PACKAGE_URL, { ...pkg, turnstileToken: TOKEN }, { "x-forwarded-for": freshIp() })),
+    ]);
+
+    expect(responses.map((response) => response.status)).toEqual([200, 200]);
+    expect(sendMock).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(sendMock.mock.calls)).not.toContain(TOKEN);
+    expect(store).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(store.mock.calls)).not.toContain(TOKEN);
+    const docs = await enquiries();
+    expect(docs).toHaveLength(2);
+    expect(JSON.stringify(docs)).not.toContain(TOKEN);
   });
 });

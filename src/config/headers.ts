@@ -15,6 +15,10 @@ const ANALYTICS_CONNECT = [
 ];
 const ANALYTICS_IMG = ["https://*.google-analytics.com", "https://*.googletagmanager.com"];
 
+// Cloudflare Turnstile on the enquiry forms (only when its keys are set):
+// the script, the iframe the widget renders in, and its own requests.
+const TURNSTILE = "https://challenges.cloudflare.com";
+
 const siteHeaders = [
   {
     key: "X-Frame-Options",
@@ -43,8 +47,9 @@ const siteHeaders = [
       `img-src 'self' data: blob: ${ANALYTICS_IMG.join(" ")}`,
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      `script-src 'self' 'unsafe-inline' ${ANALYTICS_SCRIPTS.join(" ")}`,
-      `connect-src 'self' ${ANALYTICS_CONNECT.join(" ")}`,
+      `script-src 'self' 'unsafe-inline' ${ANALYTICS_SCRIPTS.join(" ")} ${TURNSTILE}`,
+      `connect-src 'self' ${ANALYTICS_CONNECT.join(" ")} ${TURNSTILE}`,
+      `frame-src 'self' ${TURNSTILE}`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

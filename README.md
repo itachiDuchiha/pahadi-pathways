@@ -53,6 +53,8 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | --- | --- |
 | `RESEND_API_KEY` | API key used to send enquiry emails through Resend. Without it (or the sender) no email is sent; enquiries are still stored. |
 | `RESEND_FROM_EMAIL` | Verified sender address the enquiry emails are sent from. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile site key for the enquiry forms (see Enquiry pipeline). Inlined at build time, so rebuild after changing it. |
+| `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile secret key; the CAPTCHA is on only when both Turnstile keys are set. |
 | `TRIP_ENQUIRY_EMAIL` | Fallback recipient when the admin's notification settings have no addresses for a source (see Notifications). |
 | `NEXT_PUBLIC_SITE_URL` | Public base URL used for metadata, sitemap, canonical links and the CMS origin checks (defaults to `https://thehimalayancompass.in`). Set it to the dev origin, e.g. `http://localhost:3000`, for local development. |
 | `PAYLOAD_SECRET` | Required. Signing secret for CMS sessions, at least 32 random characters (`openssl rand -hex 32`). The server refuses to start without it. |
@@ -319,23 +321,38 @@ and `contact`) and `POST /api/package-enquiry`. Both share the pipeline in
    actually received.
 4. Answer honeypot submissions (a hidden `website` field) immediately,
    before they consume a rate-limit slot.
-5. Apply an in-memory rate limit of 5 requests per 10 minutes per IP
+5. Check the Cloudflare Turnstile token (`src/lib/enquiry/captcha.ts`),
+   when the CAPTCHA is enabled (see below). A failed check is answered 400.
+6. Apply an in-memory rate limit of 5 requests per 10 minutes per IP
    (`src/lib/enquiry/rate-limit.ts`). The client IP is read from
    `x-forwarded-for`, then `x-real-ip`, then `cf-connecting-ip`; when none
    is present the limiter is skipped and a warning is logged.
-6. Validate the payload with a Zod schema (`src/lib/enquiry/schema.ts`).
-7. Recompute package pricing on the server (`src/lib/pricing.ts`), using
+7. Validate the payload with a Zod schema (`src/lib/enquiry/schema.ts`).
+8. Recompute package pricing on the server (`src/lib/pricing.ts`), using
    the prices stored in the CMS and the package's own stay and meal
    options where it has them, rather than trusting a client-submitted
    total. A stay or meal label must be one the package offers.
-8. Store the enquiry in the CMS (Leads) and send the notification email via
+9. Store the enquiry in the CMS (Leads) and send the notification email via
    Resend (`src/lib/enquiry/mail.ts`). A stored enquiry counts as success
    for the visitor even if the email fails; the failure is logged.
 
+**CAPTCHA (Cloudflare Turnstile).** Off until both keys are set. To
+enable it, add a widget in the Turnstile dashboard
+(https://dash.cloudflare.com/?to=/:account/turnstile) for the site's
+hostname, set `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
+in the server environment, and rebuild (the site key is inlined into the
+browser bundle). The three forms then show the widget and keep the submit
+button disabled until it yields a token; the privacy policy names
+Cloudflare. With either key missing there is no widget, no script and no
+server check. The check fails open: when Cloudflare cannot be reached
+(timeout after 5 seconds, error status or unreadable reply) the enquiry is
+accepted and `captcha unavailable; accepting enquiry` is logged, so an
+outage never loses a real lead; only a token Cloudflare rejects, or a
+missing one, is refused. The token is never stored or emailed.
+
 **Known limitation:** the rate limiter keeps its counters in process
 memory. On a serverless or multi-instance host, each instance has its own
-counter, so the effective limit is per instance rather than global. There
-is no CAPTCHA.
+counter, so the effective limit is per instance rather than global.
 
 ## SEO, AEO and GEO
 
@@ -498,7 +515,7 @@ each adapter: run `npm run payload migrate:create <name>` once with each
 ## Known limitations
 
 - The enquiry rate limiter is per server process and keeps its counters in
-  memory (they reset on restart); there is no CAPTCHA.
+  memory (they reset on restart).
 - The rate limiter trusts `x-forwarded-for`; the reverse proxy must set
   `X-Forwarded-For` to the real client address, overwriting any
   client-sent value (setting only `X-Real-IP` is not enough; see

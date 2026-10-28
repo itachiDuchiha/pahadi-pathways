@@ -5,6 +5,7 @@ import LegalDocument from "@/components/legal/LegalDocument";
 import { getAnalyticsSettings } from "@/lib/cms/analytics";
 import { getLegalSettings } from "@/lib/cms/legal";
 import { getSiteSettings } from "@/lib/cms/site";
+import { captchaEnabled } from "@/lib/captcha-config";
 import { formatEffectiveDate, PROCESSORS_HEADING, privacySections } from "@/lib/legal-copy";
 import { pageMetadata } from "@/lib/seo";
 
@@ -34,7 +35,11 @@ export default async function PrivacyPage() {
       title="Privacy Policy"
       description={`How ${settings.name} collects, uses and protects the information you share when you plan a trip with us.`}
       effectiveDate={formatEffectiveDate(legal.effectiveDate)}
-      sections={privacySections(legal, { analyticsEnabled: analytics.enabled, vendors: analytics.vendors })}
+      sections={privacySections(legal, {
+        analyticsEnabled: analytics.enabled,
+        vendors: analytics.vendors,
+        captchaEnabled: captchaEnabled(),
+      })}
       extras={analytics.enabled ? { [PROCESSORS_HEADING]: <ConsentControls /> } : undefined}
     />
   );

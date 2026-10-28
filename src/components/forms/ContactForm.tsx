@@ -4,15 +4,18 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
+import Turnstile, { useCaptchaToken } from "./Turnstile";
+
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const captcha = useCaptchaToken();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isSubmitting) return;
+    if (isSubmitting || !captcha.ready) return;
 
     setIsSubmitting(true);
     setErrorMessage("");
@@ -39,6 +42,7 @@ export default function ContactForm() {
           email,
           message,
           website,
+          turnstileToken: captcha.token ?? undefined,
         }),
       });
 
@@ -60,6 +64,7 @@ export default function ContactForm() {
       );
     } finally {
       setIsSubmitting(false);
+      if (captcha.required) captcha.renew();
     }
   };
 
@@ -317,9 +322,13 @@ export default function ContactForm() {
 
       {/* Submit */}
 
+      {captcha.required && (
+        <Turnstile key={captcha.round} onToken={captcha.setToken} />
+      )}
+
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !captcha.ready}
         className="
           group
           inline-flex

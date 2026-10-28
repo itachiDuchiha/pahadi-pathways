@@ -12,6 +12,7 @@ import { useTodayIso } from "@/lib/hooks/useTodayIso";
 import { formatCurrency } from "@/lib/pricing";
 import { useDialog } from "@/components/ui/useDialog";
 import type { BookingPrice } from "@/components/package-details/booking/useBookingState";
+import Turnstile, { useCaptchaToken } from "@/components/forms/Turnstile";
 
 type Props = {
   pkg: Package;
@@ -45,6 +46,7 @@ export default function EnquiryModal({
   const [travelDate, setTravelDate] = useState("");
   const [enquiryError, setEnquiryError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const captcha = useCaptchaToken();
 
   // `undefined` on the server and on the initial client render, then
   // today's date once the client's external clock is read, so server and
@@ -60,7 +62,8 @@ export default function EnquiryModal({
     closeOnEscape: !isSubmitting,
   });
 
-  // Clear any previous error each time the modal is opened.
+  // Clear any previous error (and any token from an earlier opening) each
+  // time the modal is opened.
   const [wasEnquiryOpen, setWasEnquiryOpen] = useState(isEnquiryOpen);
 
   if (isEnquiryOpen !== wasEnquiryOpen) {
@@ -68,6 +71,7 @@ export default function EnquiryModal({
 
     if (isEnquiryOpen) {
       setEnquiryError("");
+      if (captcha.required) captcha.renew();
     }
   }
 
@@ -98,6 +102,7 @@ export default function EnquiryModal({
 
   const handleEnquirySubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting || !captcha.ready) return;
     setEnquiryError("");
     setIsSubmitting(true);
 
@@ -128,6 +133,7 @@ export default function EnquiryModal({
           meals,
           vehicle,
           website,
+          turnstileToken: captcha.token ?? undefined,
         }),
       });
 
@@ -155,6 +161,7 @@ export default function EnquiryModal({
       );
     } finally {
       setIsSubmitting(false);
+      if (captcha.required) captcha.renew();
     }
   };
 
@@ -218,7 +225,11 @@ export default function EnquiryModal({
 
               {enquiryError && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs leading-5 text-red-700">{enquiryError}</p>}
 
-              <button type="submit" disabled={isSubmitting} className="flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-[#C89A3D] px-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#10264A] shadow-[0_6px_15px_rgba(200,154,61,0.25)] transition hover:bg-[#D5AA4F] disabled:cursor-not-allowed disabled:opacity-60">
+              {captcha.required && (
+                <Turnstile key={captcha.round} onToken={captcha.setToken} />
+              )}
+
+              <button type="submit" disabled={isSubmitting || !captcha.ready} className="flex h-11 w-full items-center justify-center gap-2 rounded-[10px] bg-[#C89A3D] px-4 text-[10px] font-bold uppercase tracking-[0.12em] text-[#10264A] shadow-[0_6px_15px_rgba(200,154,61,0.25)] transition hover:bg-[#D5AA4F] disabled:cursor-not-allowed disabled:opacity-60">
                 <MessageCircle size={14} />
                 {isSubmitting ? "Sending Enquiry..." : "Send Enquiry & Continue to WhatsApp"}
               </button>

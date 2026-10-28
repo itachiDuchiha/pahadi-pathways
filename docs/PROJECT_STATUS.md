@@ -85,7 +85,10 @@ complete.
   the CMS instead of trusting client-submitted totals.
 - The rate limiter is per server process; when no client IP header is
   present it is skipped (and logged) rather than shared. The reverse proxy
-  must forward the real client IP. There is no CAPTCHA.
+  must forward the real client IP.
+- The enquiry forms are protected by Cloudflare Turnstile once its two
+  keys are set; the server check fails open when Cloudflare is
+  unreachable.
 
 ### SEO, AEO and GEO
 
@@ -149,7 +152,7 @@ complete.
   storage for a multi-server setup.
 - Enforcing the Content-Security-Policy (moving off report-only) after a
   monitoring period.
-- An external, shared rate limiter and a CAPTCHA for the enquiry APIs.
+- An external, shared rate limiter for the enquiry APIs.
 - Browser/end-to-end tests and error reporting.
 - Further trimming of the largest remaining images.
 

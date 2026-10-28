@@ -5,6 +5,7 @@ import type { Legal } from "@/lib/cms/types";
 import {
   DEFAULT_RETENTION_STATEMENT,
   formatEffectiveDate,
+  PROCESSORS_HEADING,
   privacySections,
   termsSections,
   type Section,
@@ -92,6 +93,19 @@ describe("privacySections", () => {
 
     expect(withAnalytics).toContain("Google Analytics and Microsoft Clarity");
     expect(withAnalytics).toMatch(/only after you accept/);
+  });
+
+  it("names Cloudflare only when the CAPTCHA is enabled", () => {
+    expect(privacy).not.toMatch(/Cloudflare/);
+    expect(text(privacySections(legal, { ...noAnalytics, captchaEnabled: false }))).toBe(privacy);
+
+    const sections = privacySections(legal, { ...noAnalytics, captchaEnabled: true });
+    const processors = sections.find((s) => s.heading === PROCESSORS_HEADING);
+
+    expect(processors?.paragraphs.join("\n")).toContain(
+      "Cloudflare, to protect the forms from automated abuse"
+    );
+    expect(processors?.paragraphs[0]).toMatch(/protect the forms/);
   });
 });
 

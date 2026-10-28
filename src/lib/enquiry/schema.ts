@@ -73,7 +73,10 @@ const message = z
   .max(2000, { error: "Please shorten your message." })
   .optional();
 
-const shared = { name, phone, email, website };
+/** Turnstile response token; checked by the handler, then dropped before storage and mail. */
+const turnstileToken = z.string().max(2048).optional();
+
+const shared = { name, phone, email, website, turnstileToken };
 
 /* Per-source schemas -------------------------------------------------- */
 

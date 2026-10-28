@@ -14,6 +14,8 @@ export type PrivacyOptions = {
   analyticsEnabled: boolean;
   /** Vendor names shown when analytics is enabled, e.g. "Google Analytics". */
   vendors: string[];
+  /** True when both Cloudflare Turnstile keys are configured. */
+  captchaEnabled?: boolean;
 };
 
 export const DEFAULT_RETENTION_STATEMENT = "We keep enquiry records to maintain a history of your requests.";
@@ -25,6 +27,18 @@ export const GRIEVANCE_PLACEHOLDER = "Grievance officer details will be publishe
 
 const NO_SALE =
   "We do not sell or share your data with third parties, except the service providers we use to deliver email and, when enabled, measure site usage.";
+
+const NO_SALE_WITH_CAPTCHA =
+  "We do not sell or share your data with third parties, except the service providers we use to deliver email, protect the forms and, when enabled, measure site usage.";
+
+const DELIVERY =
+  "Enquiry details are delivered to us by email using Resend, a transactional email provider, and land in our Google Workspace / Gmail inbox.";
+
+const CAPTCHA =
+  "When you submit a form, your browser is checked by Cloudflare, to protect the forms from automated abuse.";
+
+const ON_OUR_BEHALF =
+  "These providers process your information only to deliver and store your enquiry on our behalf.";
 
 /** The privacy section that names the processors, analytics vendors included. */
 export const PROCESSORS_HEADING = "Who Processes It";
@@ -57,10 +71,9 @@ export function formatEffectiveDate(value: string): string {
 }
 
 export function privacySections(legal: Legal, options: PrivacyOptions): Section[] {
-  const processors = [
-    NO_SALE,
-    "Enquiry details are delivered to us by email using Resend, a transactional email provider, and land in our Google Workspace / Gmail inbox. These providers process your information only to deliver and store your enquiry on our behalf.",
-  ];
+  const processors = options.captchaEnabled
+    ? [NO_SALE_WITH_CAPTCHA, `${DELIVERY} ${CAPTCHA} ${ON_OUR_BEHALF}`]
+    : [NO_SALE, `${DELIVERY} ${ON_OUR_BEHALF}`];
 
   if (options.analyticsEnabled && options.vendors.length > 0) {
     processors.push(

@@ -19,11 +19,14 @@ import { whatsappUrl } from "@/config/site";
 import { useSiteSettings } from "@/components/layout/SiteSettingsProvider";
 import { useTodayIso } from "@/lib/hooks/useTodayIso";
 
+import Turnstile, { useCaptchaToken } from "./Turnstile";
+
 export default function TripPlannerForm() {
   const settings = useSiteSettings();
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const captcha = useCaptchaToken();
   const [whatsappMessage, setWhatsappMessage] = useState("");
   const [budget, setBudget] = useState(40000);
   const [adults, setAdults] = useState(2);
@@ -36,7 +39,7 @@ export default function TripPlannerForm() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isSubmitting) return;
+    if (isSubmitting || !captcha.ready) return;
 
     setIsSubmitting(true);
     setErrorMessage("");
@@ -77,6 +80,7 @@ export default function TripPlannerForm() {
       budgetPerPerson: budget,
       message,
       website,
+      turnstileToken: captcha.token ?? undefined,
     };
 
     const formattedMessage = [
@@ -125,6 +129,7 @@ export default function TripPlannerForm() {
       );
     } finally {
       setIsSubmitting(false);
+      if (captcha.required) captcha.renew();
     }
   };
 
@@ -569,9 +574,13 @@ export default function TripPlannerForm() {
 
           {/* SUBMIT */}
 
+          {captcha.required && (
+            <Turnstile key={captcha.round} onToken={captcha.setToken} />
+          )}
+
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !captcha.ready}
             className="group flex h-10.5 w-full items-center justify-center gap-2 rounded-lg bg-[#C89A3D] px-6 text-[10px] font-bold uppercase tracking-[0.12em] text-[#10264A] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#D7AE57] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
           >
             {isSubmitting ? "SENDING YOUR REQUEST..." : "SEND MY TRIP REQUEST"}

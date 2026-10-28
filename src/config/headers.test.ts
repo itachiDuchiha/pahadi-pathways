@@ -81,4 +81,17 @@ describe("site CSP (report-only)", () => {
   it("keeps the analytics hosts out of the CMS policy", () => {
     expect(headersFor("/ramram")["Content-Security-Policy-Report-Only"]).not.toMatch(/googletagmanager|clarity/);
   });
+
+  it("allows Cloudflare Turnstile to load, frame its widget and verify", () => {
+    for (const name of ["script-src", "frame-src", "connect-src"]) {
+      expect(directive(csp, name)).toContain("https://challenges.cloudflare.com");
+    }
+    expect(directive(csp, "frame-src")).toEqual(["'self'", "https://challenges.cloudflare.com"]);
+  });
+
+  it("keeps the Turnstile host out of the CMS policy", () => {
+    const cms = headersFor("/ramram")["Content-Security-Policy-Report-Only"] ?? "";
+    expect(cms).not.toContain("challenges.cloudflare.com");
+    expect(directive(cms, "frame-src")).toEqual([]);
+  });
 });

@@ -2,7 +2,8 @@ import { site } from "@/config/site";
 import type { StoredEnquiryInput, StoreEnquiryResult } from "@/lib/cms/enquiries";
 import { getNotificationPolicy } from "@/lib/cms/notifications";
 
-import { checkOrigin, rateLimitKey, readJson } from "./guards";
+import { verifyTurnstile } from "./captcha";
+import { checkOrigin, clientIp, rateLimitKey, readJson } from "./guards";
 import type { EnquiryContent } from "./html";
 import { getMailConfig, sendEnquiryEmail } from "./mail";
 import { rateLimit } from "./rate-limit";
@@ -66,11 +67,26 @@ function honeypotFilled(body: unknown): boolean {
   return website !== undefined && website !== "";
 }
 
+function tokenOf(body: unknown): string | undefined {
+  if (!body || typeof body !== "object") return undefined;
+  const token = (body as Record<string, unknown>).turnstileToken;
+  return typeof token === "string" ? token : undefined;
+}
+
+/** The client IP for the CAPTCHA check, or `null` when no usable header is present. */
+function captchaIp(request: Request): string | null {
+  const ip = clientIp(request);
+  return ip === "unknown" || ip === "invalid" ? null : ip;
+}
+
 /**
  * Builds a POST handler that runs every enquiry through the same pipeline:
- * origin check, size-capped JSON read, honeypot, rate limit, schema, then
- * storage and mail. Honeypot hits are answered before the limiter so
- * they never consume a real visitor's allowance.
+ * origin check, size-capped JSON read, honeypot, CAPTCHA, rate limit,
+ * schema, then storage and mail. Honeypot hits are answered before the
+ * limiter so they never consume a real visitor's allowance. A failed
+ * CAPTCHA is answered 400; when Cloudflare cannot be reached the enquiry
+ * is accepted (fail open) with a warning, and with no keys configured the
+ * check is skipped. The token is never stored or emailed.
  *
  * A stored lead counts as success: when the email cannot be sent the
  * visitor still gets 200, because the lead is in the admin and a retry
@@ -108,6 +124,16 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(200, true, text);
       }
 
+      const captcha = await verifyTurnstile(tokenOf(read.body), captchaIp(request));
+
+      if (captcha === "invalid") {
+        return respond(400, false, "Please complete the verification and try again.");
+      }
+
+      if (captcha === "unavailable") {
+        console.warn("captcha unavailable; accepting enquiry");
+      }
+
       const key = rateLimitKey(config.routeKey, request);
       const limit = key === null ? null : rateLimit(key);
 
@@ -126,7 +152,9 @@ export function createEnquiryHandler<S extends EnquirySource>(
         return respond(400, false, firstIssueMessage(parsed.error));
       }
 
-      const enquiry = parsed.data;
+      // The token has done its job; nothing downstream may store or email it.
+      const enquiry = { ...parsed.data };
+      delete enquiry.turnstileToken;
 
       if (!isSource(enquiry.source)) {
         return respond(400, false, "Invalid enquiry details.");

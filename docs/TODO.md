@@ -32,9 +32,6 @@ Open items only; each line notes why it is still open.
   `src/lib/enquiry/rate-limit.ts` keeps counters in process memory, so on a
   multi-instance or serverless host each instance has its own counter
   rather than a global limit, and counters reset on restart.
-- **Add a CAPTCHA to the enquiry forms.** The honeypot field in
-  `src/lib/enquiry/handler.ts` only deters simple bots; there is no
-  challenge against more persistent automated submissions.
 
 ## Testing
 
