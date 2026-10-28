@@ -3,6 +3,12 @@
  * text the seed gives its Media document. Alt text comes from the package
  * or destination that uses the image, or from the page that shows it.
  */
+/**
+ * Files under `public/images` that are site assets, not content: they are
+ * never seeded into the media library, so an editor cannot pick them.
+ */
+export const SEED_EXCLUDED_IMAGES: readonly string[] = ["/images/placeholder.webp"];
+
 export const mediaManifest: Readonly<Record<string, string>> = {
   "/images/destinations/chitkul.webp": "Chitkul",
   "/images/destinations/destination-manali.webp": "Manali",
@@ -44,7 +50,6 @@ export const mediaManifest: Readonly<Record<string, string>> = {
   "/images/logo/full-logo.webp": "The Himalayan Compass",
   "/images/logo/icon-logo.webp": "The Himalayan Compass",
   "/images/logo/navbar-logo5.webp": "The Himalayan Compass",
-  "/images/placeholder.webp": "Image unavailable",
   "/images/packages/dharamshala.webp": "Himachal Grand Circuit",
   "/images/packages/heroes/dharamshala.webp": "Himachal Grand Circuit",
   "/images/packages/heroes/kalpa.webp": "Shimla, Kinnaur & Spiti Explorer",

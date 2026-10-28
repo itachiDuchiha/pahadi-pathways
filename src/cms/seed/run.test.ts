@@ -9,7 +9,7 @@ import { withTempPayload } from "../test/withTempPayload";
 import { allDestinations } from "./destinations";
 import { experiences } from "./experiences";
 import { galleryItems } from "./gallery";
-import { mediaManifest } from "./media-manifest";
+import { mediaManifest, SEED_EXCLUDED_IMAGES } from "./media-manifest";
 import { packages } from "./packages";
 import { legalFill, legalSettings } from "./legal";
 import { analyticsFill, analyticsSettings } from "./analytics";
@@ -30,9 +30,17 @@ async function listImages(dir: string): Promise<string[]> {
 
 describe("media manifest", () => {
   it("lists every file under public/images with alt text", async () => {
-    const files = await listImages(path.join("public", "images"));
+    const files = (await listImages(path.join("public", "images"))).filter(
+      (file) => !SEED_EXCLUDED_IMAGES.includes(file)
+    );
     expect(Object.keys(mediaManifest).sort()).toEqual(files);
     for (const alt of Object.values(mediaManifest)) expect(alt.trim()).not.toBe("");
+  });
+
+  it("keeps the placeholder image out of the manifest", async () => {
+    expect(SEED_EXCLUDED_IMAGES).toEqual(["/images/placeholder.webp"]);
+    for (const image of SEED_EXCLUDED_IMAGES) expect(mediaManifest).not.toHaveProperty([image]);
+    expect(await listImages(path.join("public", "images"))).toContain("/images/placeholder.webp");
   });
 
   it("maps every public path to a distinct upload filename", () => {
@@ -221,6 +229,11 @@ describe("seed", () => {
         ["analytics-settings", 1],
       ]);
       expect(first.media).toBe(FIXTURE_COUNTS.media);
+      const placeholder = await payload.find({
+        collection: "media",
+        where: { filename: { equals: mediaFilename("/images/placeholder.webp") } },
+      });
+      expect(placeholder.totalDocs).toBe(0);
       expect(first.admin).toBe("skipped");
 
       expect(packages.length).toBe(5);
