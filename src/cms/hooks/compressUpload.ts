@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, rm } from "node:fs/promises";
 
 import { APIError, type CollectionBeforeOperationHook } from "payload";
 
@@ -45,6 +45,10 @@ export const compressUpload: CollectionBeforeOperationHook = async ({ args, oper
     // 400 makes the message public, so the editor sees it in the admin.
     throw new APIError("Could not process the image; upload a JPEG, PNG or WebP", 400);
   }
+
+  // Payload deletes only the temp file still named on req.file, so remove
+  // the original here once it has been replaced.
+  if (file.tempFilePath) await rm(file.tempFilePath, { force: true });
 
   req.file = {
     ...file,

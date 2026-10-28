@@ -439,7 +439,6 @@ export default function GalleryExplorer({ items: galleryItems }: GalleryExplorer
               poster={videoItems[selectedVideo].video.poster}
               controls
               preload="none"
-              autoPlay
               playsInline
               className="max-h-[75vh] w-full bg-black"
             />

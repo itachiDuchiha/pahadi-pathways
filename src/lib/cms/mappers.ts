@@ -213,9 +213,8 @@ function posterUrl(media: number | Media | null | undefined, owner: string, exis
 }
 
 /**
- * A gallery item. A video item whose video file is missing falls back to
- * the item's image when it has one; without one the item is left out
- * (`null`), so no card shows a video that cannot play.
+ * A gallery item. A video item whose video file is missing is left out
+ * (`null`, with one warning), so no card shows a video that cannot play.
  */
 export function mapGalleryItem(doc: GalleryItemDoc, exists: FileExists = mediaFileExists): GalleryItem | null {
   const owner = `gallery item "${doc.title}"`;
@@ -236,8 +235,8 @@ export function mapGalleryItem(doc: GalleryItemDoc, exists: FileExists = mediaFi
     if (exists(name)) {
       return { kind: "video", ...common, image: poster, video: { src: mediaPath(video.url), poster } };
     }
-    warnMissing(name, doc.image ? `showing ${owner} as an image` : `leaving ${owner} out`);
-    if (!doc.image) return null;
+    warnMissing(name, `leaving ${owner} out`);
+    return null;
   }
 
   return { kind: "image", ...common, image: mediaUrl(doc.image, owner, "image", exists) };

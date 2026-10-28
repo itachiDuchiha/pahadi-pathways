@@ -1,5 +1,6 @@
 import { site } from "@/config/site";
 import { MAX_VIDEO_BYTES } from "@/lib/media/limits";
+import { uploadTempDir } from "@/lib/media/upload-temp";
 
 export const MIN_SECRET_LENGTH = 32;
 
@@ -20,8 +21,11 @@ export function securityConfig(env: Readonly<Record<string, string | undefined>>
     graphQL: { disable: true },
     // Sized for the largest upload (a video); the Media hooks hold images
     // to their own, smaller limit. The request limit leaves room for the
-    // form fields around the file.
+    // form fields around the file. Bodies are parsed before access control
+    // runs, so they stream to temp files instead of being held in memory.
     upload: {
+      useTempFiles: true,
+      tempFileDir: uploadTempDir(env),
       limits: { fileSize: MAX_VIDEO_BYTES },
       requestSizeLimit: MAX_VIDEO_BYTES + 1024 * 1024,
       responseOnLimit: "Files must be 100 MB or smaller",

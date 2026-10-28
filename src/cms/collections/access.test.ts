@@ -735,7 +735,7 @@ describe("in-use media protection", () => {
 
     await expect(
       temp.payload.delete({ collection: "media", id: imageId, overrideAccess: false, user: editor, context })
-    ).rejects.toThrow('This image is still used by: packages "Package in-use-image"');
+    ).rejects.toThrow('This file is still used by: packages "Package in-use-image"');
     await expect(
       temp.payload.findByID({ collection: "media", id: imageId, overrideAccess: true })
     ).resolves.toMatchObject({ id: imageId });
@@ -756,7 +756,7 @@ describe("in-use media protection", () => {
 
     await expect(
       temp.payload.delete({ collection: "media", id: image.id, overrideAccess: true, context })
-    ).rejects.toThrow('This image is still used by: packages "Package draft-image"');
+    ).rejects.toThrow('This file is still used by: packages "Package draft-image"');
   });
 
   it("counts a destination gallery image", async () => {
@@ -782,7 +782,7 @@ describe("in-use media protection", () => {
 
     await expect(
       temp.payload.delete({ collection: "media", id: image.id, overrideAccess: true, context })
-    ).rejects.toThrow('This image is still used by: destinations "Gallery Dest"');
+    ).rejects.toThrow('This file is still used by: destinations "Gallery Dest"');
   });
 
   it("deletes an image nothing uses", async () => {

@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -80,7 +81,7 @@ describe("compressUpload (hook)", () => {
     expect((await sharp(req.file?.data).metadata()).width).toBe(2400);
   });
 
-  it("reads an upload that was buffered to a temp file and clears the path", async () => {
+  it("reads an upload that was buffered to a temp file, removes that file and clears the path", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "thc-upload-"));
     try {
       const tempFilePath = path.join(dir, "upload");
@@ -96,6 +97,8 @@ describe("compressUpload (hook)", () => {
       await compressUpload(args);
 
       expect(req.file?.tempFilePath).toBeUndefined();
+      // Payload removes only the temp file still named on req.file.
+      expect(existsSync(tempFilePath)).toBe(false);
       expect(req.file?.data.length).toBeGreaterThan(0);
       expect((await sharp(req.file?.data).metadata()).format).toBe("webp");
     } finally {

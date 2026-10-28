@@ -61,6 +61,7 @@ fill in real values (`.env.local` is ignored by git via `.gitignore`).
 | `DATABASE_ADAPTER` | `sqlite` (default) or `postgres`. |
 | `DATABASE_URL` | Required. `file:./data/cms.db` for SQLite, `postgres://user:password@host:5432/db` for Postgres. |
 | `MEDIA_DIR` | Directory where uploaded images and videos are stored (default `media`, relative to the repository root). Use an absolute path outside the checkout in production. |
+| `UPLOAD_TEMP_DIR` | Optional. Directory where request bodies with files are streamed while they are processed (default `thc-uploads` in the OS temp directory; created when missing). It needs room for a few 100 MB uploads. |
 | `PAYLOAD_ADMIN_EMAIL` | Email of the first admin account, created only while there are no users. |
 | `PAYLOAD_ADMIN_PASSWORD` | Password of the first admin account, at least 12 characters. Remove it from the environment once the account exists. |
 
@@ -528,10 +529,31 @@ enough: a client-forged `X-Forwarded-For` would pass through and defeat the
 limiter. Without the header the client address is unknown and the rate limiter is
 skipped entirely, so enquiries are unlimited; the proxy must set the
 header for the limiter to work. For nginx:
-`proxy_set_header X-Forwarded-For $remote_addr;`. The proxy must also
-accept request bodies of a little over 100 MB, the largest upload (a
-video), for example `client_max_body_size 101m;` in nginx (its default
-is 1 MB). Serve the site over HTTPS: in production the admin session cookie is `secure`.
+`proxy_set_header X-Forwarded-For $remote_addr;`.
+
+Allow large request bodies only on the media upload route. The admin
+uploads images and videos (up to 100 MB) to `/api/media`, so that route
+needs a body limit of a little over 100 MB; every other request is small,
+so keep a low limit everywhere else. Payload reads a request body (to a
+temp file) before it checks who is asking, so a high limit on every route
+would let anyone make the server write up to 100 MB per request. For
+nginx:
+
+```nginx
+client_max_body_size 2m;
+
+location /api/media {
+    client_max_body_size 101m;
+    proxy_pass http://127.0.0.1:3000;
+    # plus the same proxy_set_header lines as the main location
+}
+```
+
+Uploads are streamed to `UPLOAD_TEMP_DIR` (default `thc-uploads` in the
+OS temp directory) rather than held in memory. Payload deletes a media
+upload's temp file when the request finishes; the server also removes
+any temp file older than six hours every half hour, which covers bodies
+sent to other endpoints. Serve the site over HTTPS: in production the admin session cookie is `secure`.
 
 CI must pass (`npm run lint`, `npm run typecheck`, `npm test`,
 `npm run build`) before merging to the default branch.
@@ -580,8 +602,7 @@ each adapter: run `npm run payload migrate:create <name>` once with each
   `scripts/deploy.sh` again.
 - Experience icons are managed in code, not the CMS.
 - Uploaded videos are stored and served as uploaded (no transcoding or
-  compression), and an upload is held in server memory while it is
-  processed.
+  compression).
 - Media is stored on the server's disk, which suits a single server only.
 - Moving from SQLite to Postgres does not copy existing content.
 - The Content-Security-Policy header is sent as

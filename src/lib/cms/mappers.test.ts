@@ -380,21 +380,11 @@ describe("missing media files", () => {
     expect(warn).toHaveBeenCalledTimes(1);
   });
 
-  it("falls back to the item's image when the video file is missing", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const doc = videoItemDoc({ image: media("still.webp") });
-    const item = mapGalleryItem(doc, (name) => name !== "road.mp4");
-    expect(item).toMatchObject({ kind: "image", image: "/api/media/file/still.webp" });
-    expect(item).not.toHaveProperty("video");
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain("road.mp4");
-  });
-
-  it("skips a video item with a missing video file and no image, warning once", () => {
+  it("skips a video item whose video file is missing, warning once", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const missingVideo = (name: string) => name !== "road.mp4";
     expect(mapGalleryItem(videoItemDoc(), missingVideo)).toBeNull();
-    expect(mapGalleryItem(videoItemDoc(), missingVideo)).toBeNull();
+    expect(mapGalleryItem(videoItemDoc({ image: media("still.webp") }), missingVideo)).toBeNull();
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("road.mp4");
   });

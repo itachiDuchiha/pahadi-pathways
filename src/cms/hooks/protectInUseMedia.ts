@@ -69,10 +69,10 @@ export function inUseMessage(usages: readonly MediaUsage[]): string {
     .join(", ");
   const more = usages.length > MAX_LISTED ? ` and ${usages.length - MAX_LISTED} more` : "";
 
-  return `This image is still used by: ${listed}${more}`;
+  return `This file is still used by: ${listed}${more}`;
 }
 
-/** Refuses to delete an image that content still uses, so no page loses it. */
+/** Refuses to delete an image or video that content still uses, so no page loses it. */
 export const protectInUseMedia: CollectionBeforeDeleteHook = async ({ id, req }) => {
   const usages = await findMediaUsages(req.payload, id, req);
 

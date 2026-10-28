@@ -21,6 +21,7 @@ const ENV_KEYS = [
   "PAYLOAD_ADMIN_EMAIL",
   "PAYLOAD_ADMIN_PASSWORD",
   "MEDIA_DIR",
+  "UPLOAD_TEMP_DIR",
 ] as const;
 
 export type TempPayload = {
@@ -68,6 +69,7 @@ export function withTempPayload(): TempPayload {
     process.env.DATABASE_URL = `file:${path.join(dir, "test.db")}`;
     process.env.PAYLOAD_SECRET = randomBytes(32).toString("hex");
     process.env.MEDIA_DIR = path.join(dir, "media");
+    process.env.UPLOAD_TEMP_DIR = path.join(dir, "upload-tmp");
     delete process.env.PAYLOAD_ADMIN_EMAIL;
     delete process.env.PAYLOAD_ADMIN_PASSWORD;
 

@@ -1,4 +1,4 @@
-import type { CollectionConfig, PayloadRequest, UploadField } from "payload";
+import type { CollectionBeforeValidateHook, CollectionConfig, PayloadRequest, UploadField } from "payload";
 import { upload } from "payload/shared";
 
 import { isEditorOrAdmin } from "../access";
@@ -66,6 +66,17 @@ const imageOnly: UploadField = {
   },
 };
 
+/**
+ * Clears the media the item's kind does not use. Payload skips validating
+ * a field whose admin condition hides it, so without this an API write
+ * could store, say, a video in `image` on a video item.
+ */
+export const clearUnusedMedia: CollectionBeforeValidateHook = async ({ data, originalDoc }) => {
+  if (!data) return data;
+  const kind = kindOf("kind" in data ? data : originalDoc);
+  return kind === "video" ? { ...data, image: null } : { ...data, video: null, poster: null };
+};
+
 export const GalleryItems: CollectionConfig = {
   slug: "gallery-items",
   labels: { singular: "Gallery item", plural: "Gallery items" },
@@ -81,6 +92,7 @@ export const GalleryItems: CollectionConfig = {
     delete: isEditorOrAdmin,
   },
   hooks: {
+    beforeValidate: [clearUnusedMedia],
     afterChange: [revalidate.afterChange],
     afterDelete: [revalidate.afterDelete],
   },

@@ -22,6 +22,7 @@ import { LegalSettings } from "./cms/globals/LegalSettings";
 import { NotificationSettings } from "./cms/globals/NotificationSettings";
 import { PricingSettings } from "./cms/globals/PricingSettings";
 import { SiteSettings } from "./cms/globals/SiteSettings";
+import { scheduleUploadTempSweep, uploadTempDir } from "./lib/media/upload-temp";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -57,5 +58,6 @@ export default buildConfig({
   },
   onInit: async (payload) => {
     await bootstrapAdmin(payload, process.env);
+    scheduleUploadTempSweep(uploadTempDir(process.env), payload.logger);
   },
 });

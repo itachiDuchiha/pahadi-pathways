@@ -82,8 +82,9 @@ describe("video uploads", () => {
   });
 
   it("rejects a video over 100 MB with the size message and stores nothing", async () => {
-    await expect(uploadVideo(MAX_VIDEO_BYTES + MB, "big.mp4")).rejects.toThrow("Videos must be 100 MB or smaller");
-    await expect(uploadVideo(MAX_VIDEO_BYTES + MB, "big.mp4")).rejects.toBeInstanceOf(APIError);
+    const error: unknown = await uploadVideo(MAX_VIDEO_BYTES + MB, "big.mp4").catch((caught: unknown) => caught);
+    expect(error).toBeInstanceOf(APIError);
+    expect(error).toMatchObject({ message: "Videos must be 100 MB or smaller", status: 413 });
     expect((await temp.payload.count({ collection: "media", overrideAccess: true })).totalDocs).toBe(0);
   });
 
@@ -95,7 +96,7 @@ describe("video uploads", () => {
     for (const id of [video.id, poster.id]) {
       await expect(
         temp.payload.delete({ collection: "media", id, overrideAccess: true, context })
-      ).rejects.toThrow('is still used by: gallery-items "Road to Kaza"');
+      ).rejects.toThrow('This file is still used by: gallery-items "Road to Kaza"');
     }
   });
 });
@@ -151,5 +152,27 @@ describe("gallery items", () => {
         context,
       })
     ).rejects.toThrow(ValidationError);
+  });
+
+  it("keeps only the media an item's kind uses, so an API write cannot hide a video in `image`", async () => {
+    const image = await uploadImage();
+    const video = await uploadVideo(MB);
+
+    const videoItem = await createItem({ kind: "video", video: video.id, poster: image.id, image: video.id });
+    expect(videoItem.image ?? null).toBeNull();
+
+    const imageItem = await createItem({ kind: "image", image: image.id, video: video.id, poster: image.id });
+    expect(imageItem.video ?? null).toBeNull();
+    expect(imageItem.poster ?? null).toBeNull();
+
+    // A partial update without `kind` uses the stored kind.
+    const updated = await temp.payload.update({
+      collection: "gallery-items",
+      id: videoItem.id,
+      data: { image: image.id },
+      overrideAccess: true,
+      context,
+    });
+    expect(updated).toMatchObject({ kind: "video", image: null });
   });
 });
